@@ -1,0 +1,14 @@
+stages:
+    - tests-grammaire
+#    - tests-semantiques
+#    - compilation
+#    - tests-unitaires
+
+antlr4:
+    image: "any0ne22/antlr4"
+    stage: tests-grammaire
+    script:
+        - antlr4 -o build/grammaire -Dlanguage=Java grammaire*.g4
+    artifacts:
+        paths:
+            - build
