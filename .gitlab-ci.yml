@@ -8,7 +8,7 @@ antlr4:
     image: "any0ne22/antlr4"
     stage: tests-grammaire
     script:
-        - antlr4 -o build/grammaire -Dlanguage=Java grammaire*.g4
+        - java -Xmx500M -cp /usr/local/lib/antlr4-tool.jar org.antlr.v4.Tool -o build/grammaire -Dlanguage=Java grammaire/*.g4
     artifacts:
         paths:
             - build
