@@ -1,0 +1,24 @@
+stages:
+    - tests-grammaire
+    - compilation
+#    - tests-unitaires
+
+antlr4:
+    image: "any0ne22/antlr4"
+    stage: tests-grammaire
+    script:
+        - java -Xmx500M -cp /usr/local/lib/antlr4-tool.jar org.antlr.v4.Tool -o src/ -Dlanguage=Java grammar/*.g4
+    artifacts:
+        paths:
+            - build
+            - src
+
+compil-java:
+    image: "gradle:jdk17"
+    stage: compilation
+    script:
+        - ./gradlew build
+    artifacts:
+        paths:
+            - build
+            - src
