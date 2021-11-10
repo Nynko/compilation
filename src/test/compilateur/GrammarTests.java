@@ -25,22 +25,22 @@ import compilateur.grammar.*;
 public class GrammarTests {
     @Test
     public void goodTest() throws IOException {
-        assertEquals(testFile("./examples/good.exp"), true);
+        assertEquals(true, testFile("./examples/good.exp"));
     }
 
     @Test
     public void badTest() throws IOException {
-        assertEquals(testFile("./examples/bad.exp"), false);
+        assertEquals(false, testFile("./examples/bad.exp"));
     }
 
     @Test
     public void emptyTest() throws IOException {
-        assertEquals(testFile("./examples/empty.exp"), true);
+        assertEquals(true, testFile("./examples/empty.exp"));
     }
 
     @TestFactory
     Stream<DynamicTest> dynamicTestsFromStreamInJava8() {
-                        
+        
         List<String> testFiles = Arrays.asList(
             "Caractere.Good.exp",
             "DeclType.Bad.exp",
@@ -57,7 +57,7 @@ public class GrammarTests {
             System.out.println(parts.length);
             return DynamicTest.dynamicTest(parts[0].toString() + parts[1].toString() + "Test()", 
                 () -> {
-                    assertEquals(testFile("./examples/" + file), parts[1].equals("Good") ? true : false);
+                    assertEquals(parts[1].equals("Good") ? true : false, testFile("./examples/" + file));
                 });
         });
     }
