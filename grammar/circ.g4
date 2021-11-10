@@ -5,20 +5,20 @@ grammar circ;
 
 fichier : decl* EOF;
 decl : decl_typ | decl_fct;
-decl_vars : 'int' idf (','idf)* ';'
-		| 'struct' idf (',''*' idf)*';';
-decl_typ : 'struct' idf '{' decl_vars* '}' ';';
-decl_fct : 'int' idf '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
-		| 'struct' idf '*' idf '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
+decl_vars : 'int' IDF (','IDF)* ';'
+		| 'struct' IDF (',''*' IDF)*';';
+decl_typ : 'struct' IDF '{' decl_vars* '}' ';';
+decl_fct : 'int' IDF '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
+		| 'struct' IDF '*' IDF '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
 param_liste :  param (',' param)*
 			|;
-param : 'int' idf
-	| 'struct' idf '*' idf;
+param : 'int' IDF
+	| 'struct' IDF '*' IDF;
 expr_primaire : valeur
-	| idf
-	| idf '(' ')'
-	| idf '(' expr ( ',' expr)* ')'
-	| 'sizeof' '(' 'struct' idf ')'
+	| IDF
+	| IDF '(' ')'
+	| IDF '(' expr ( ',' expr)* ')'
+	| 'sizeof' '(' 'struct' IDF ')'
 	| '(' expr ')';
 
 instruction : ';'
@@ -40,11 +40,11 @@ ordre : addition (('<'|'<='|'>'|'>=') addition)*;
 addition : multiplication (('+' | '-') multiplication )*;
 multiplication : unaire (('*'|'/') unaire)*;
 unaire : ('!'|'-')* fleche;
-fleche : expr_primaire ('->' idf)*;
+fleche : expr_primaire ('->' IDF)*;
 
-valeur : ENTIER | CHIFFRE | '\''carac'\''; 
-CHIFFRE: '0'..'9';
-ENTIER: '0'|('1'..'9')('0'..'9')*;
+valeur : ENTIER | CARACTERE; 
+
+
 // ENTIER: '0'
 // 		| ('1'..'9') CHIFFRE*
 // 		| '\''CARACTERE'\''; 
@@ -56,13 +56,13 @@ ENTIER: '0'|('1'..'9')('0'..'9')*;
 // 		| '\\\''
 // 		| '\\"';
 
-carac : '!' | '#' | '$' |'(' |')' |'*' |'+'|','|'.'| ':' |';'
+CARACTERE : '\''('!' | '#' | '$' |'(' |')' |'*' |'+'|','|'.'| ':' |';'
 | '<' | '=' |'>' |'?'|'@' | '[' | ']' | '|' | '~' |'{' |'}'
-|'\\\\' | '\\\'' | '\\"' | ALPHABET | CHIFFRE ;
+|'\\\\' | '\\\'' | '\\"' | 'a'..'z' |'A'..'Z' | '0'..'9')'\'' ;
 
-ALPHABET: ('a'..'z' |'A'..'Z');
 
-idf: ALPHABET ( ALPHABET|'_' )*;
+ENTIER: '0'|('1'..'9')('0'..'9')*;
+IDF: ('a'..'z' |'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
 WS: ('\n' | '\t' | ' ')+ -> skip;
 COM: '//'(.)*?'\n' -> skip;
 COMBIS : '/*'(.|'\n')?'*/' -> skip;
