@@ -1,3 +1,4 @@
+package main;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -11,8 +12,9 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
-import grammar.*;
-import grammar.circParser.FichierContext;
+import main.grammar.*;
+import main.grammar.circParser.FichierContext;
+
 public class Main {
 
     public static void main(String[] args){
@@ -22,15 +24,22 @@ public class Main {
             return;
         }*/
 
-        String testFile = "./examples/good.exp";
+        String testFile = "./examples/empty.exp";
 
         try {
 
             //chargement du fichier et construction du parser
             CharStream input = CharStreams.fromFileName(testFile);
             circLexer lexer = new circLexer(input); 
+
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+
             CommonTokenStream stream = new CommonTokenStream(lexer);
             circParser parser = new circParser(stream);
+
+            parser.removeErrorListeners();
+            parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
             FichierContext program = parser.fichier();
 

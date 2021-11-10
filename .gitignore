@@ -1,13 +1,26 @@
 # Ignore Gradle project-specific cache directory
 .gradle
 
+#Gradle folders
+.project
+.settings
+
 # Ignore Gradle build output directory
 build
 bin
 .vscode
 
 # Ignore build of grammar
-src/grammar
+src/main/grammar
 
-# Ignore .antlr
+
+#Ignore macOs folders
+.DS_Store
+
+#Java
+.classpath
+
+#ANTLR
 .antlr
+grammar/.antlr
+

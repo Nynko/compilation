@@ -1,10 +1,13 @@
 all: grammar java
 
 # targets
-grammar: grammar/*
-	antlr4 -o src/ -Dlanguage=Java grammar/*.g4
+grammar: FORCE
+	antlr4 -o src/main -Dlanguage=Java grammar/*.g4
 
 java:
 	./gradlew run
 
+test: grammar
+	./gradlew test
 
+FORCE:

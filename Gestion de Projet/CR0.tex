@@ -1,0 +1,120 @@
+\documentclass[french]{article}
+\usepackage[utf8]{inputenc}
+
+
+\title{Compte Rendu 0}
+\author{Nicolas Beaudouin}
+\date{Réunion du Mercredi 20 Octobre}
+
+
+\usepackage{natbib}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{multirow}
+
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots. http://texdoc.net/texmf-dist/doc/latex/geometry/geometry.pdf
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+
+%Amélioration tableaux : https://fr.overleaf.com/learn/latex/Tables
+\renewcommand{\arraystretch}{1.5} %The height of each row is set to 1.5 relative to its default height.
+\setlength{\tabcolsep}{18pt}%The space between the text and the left/right border of its containing cell is set to 18pt with this command. Again, you may use other units if needed.
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+\begin{flushleft}
+ \begin{tabular}{|m{4cm}|m{8cm}|}
+    \hline
+    Motif/Type de Réunion :  & Première réunion, discussions autour du projet \\
+    \hline
+    Lieu:  & TELECOM Nancy (Salle S.13) \\
+    \hline
+    Présents:  & Tout le groupe \\
+    \hline \hline
+    Date/heure début:  & 14h \\
+    \hline
+    Durée: & 45min \\
+    \hline
+ \end{tabular}
+\end{flushleft}
+
+\section*{Ordre du jour}
+
+\begin{enumerate}
+    \item Gestion de Projet \\
+    \item Sujet du projet \\
+    \item Outils \\
+\end{enumerate}
+
+
+\subsection*{Gestion de Projet}
+
+Le poste de secrétaire sera alterné par tous les membres. Il est préférable d'utiliser une gestion de projet avec des méthodes agiles. Cependant, il serait utile de réaliser un GANTT prévisionnel afin d'avoir une vision d'ensemble sur le projet.
+On rappelle que l'on doit fournir des rapports réguliers pour ce projet.
+
+
+\subsection*{Sujet du projet}
+
+Nous avons discuté rapidement de la grammaire. Notamment de l'intérêt ou non de la rendre LL1. Il semble préférable de ne pas forcément tenter de faire une grammaire trop complexe pour la rendre LL1 alors que cela n'est pas explicitement demandé.
+
+Nous avons discuté des tests que l'on devait réaliser, nous en sommes venus sur le fait de devoir faire: 
+\begin{itemize}
+    \item Des tests sur l'arbre syntaxique (afin que vérifier que notre grammaire soit correcte)
+    \item Des tests sémantique ( par exemple des tests syntaxiquement vrais, mais sémantiquement faux)
+    \item Des tests sur le compilateur de manière plus générale (avec une possibilité de comparer ce qui compile bien avec clang ou gcc et avec notre projet).
+\end{itemize}
+
+
+\subsection*{Outils}
+
+Nous avons discuté des outils à notre disposition et que nous allions utiliser durant ce projet. 
+
+En dehors d'ANTLR4 qui faudra bien utiliser, nous avons le repository sur gitlab et un overleaf pour la rédaction des comptes rendus et des rapports.
+Tom a noté qu'il serait préférable de mettre les fichiers tex sur le gitlab afin notamment qu'ils soient automatiquement compilés par une pipeline.
+
+Nous avons mis en place un certain nombre de règles pour l'utilisation du Gitlab:
+\begin{itemize}
+    \item On ne commit pas sur master 
+    \item On utiliser les merge request de gitlab (dès qu'on a un truc fonctionnel), notamment les commentaires dans les merge request.
+    \item Règle de relecture: quand quelqu'un n'a pas validé 
+\end{itemize}
+
+Tom nous a aussi précisé plus exactement le fonctionnement des pipelines.
+
+\section*{TO-DO List}
+
+\begin{itemize}
+    \item mettre les issues (Et issues dans plus longtemps si besoin)
+    \item Mettre un gitignore
+    \item Faire la pipeline
+    \item On réfléchi à la grammaire chacun de notre côté
+\end{itemize}
+
+\begin{itemize}
+    \item Nicolas : Écrire le CR et commencer à réfléchir à la grammaire.
+    \item Tout le monde : Réfléchir et écrire une grammaire.
+\end{itemize}
+
+
+\section*{Prochaine Réunion}
+
+Date et Heure : Mercredi 3 novembre à 14h
+
+\section*{Annexes}
+RAS
+
+\end{document}
