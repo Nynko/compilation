@@ -7,5 +7,7 @@ grammar: FORCE
 java:
 	./gradlew run
 
+test: grammar
+	./gradlew test
 
 FORCE:
