@@ -7,7 +7,7 @@ bin
 .vscode
 
 # Ignore build of grammar
-src/grammar
+src/main/grammar
 
 # Ignore .antlr
 .antlr
