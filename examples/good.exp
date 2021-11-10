@@ -1,0 +1,5 @@
+int main (){
+    int azert, b;
+    azert = 30 + 10 + 20 * 5;
+    return azert;
+}

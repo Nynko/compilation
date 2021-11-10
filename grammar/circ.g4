@@ -1,6 +1,6 @@
-grammar cir_c;
+grammar circ;
 @header {
-    package parser;
+    package grammar;
  }
 
 fichier : decl* EOF;
@@ -10,8 +10,8 @@ decl_vars : 'int' IDF (','IDF)+ ';'
 decl_typ : 'struct' IDF '{' decl_vars* '}' ';';
 decl_fct : 'int' IDF '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
 		| 'struct' IDF '*' IDF '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
-param_liste :  param (',' param)*
-			| ;
+param_liste :  param (',' param)* 
+			|;
 param : 'int' IDF
 	| 'struct' IDF '*' IDF;
 expr_primaire : ENTIER
@@ -44,7 +44,7 @@ fleche : expr_primaire ('->' IDF)*;
 
 CHIFFRE: '0'..'9';
 ENTIER: '0' 
-		| ('1'..'9') CHIFFRE*
+		| ('1'..'9') (CHIFFRE)*
 		| '\''CARACTERE'\''; 
 CARACTERE:'\u0021' 
 		| '\u0023'..'\u0026'
@@ -58,8 +58,8 @@ CARACTERE:'\u0021'
 // | '<' | '=' |'>' |'?'|'@' | '[' | ']' | 'a'..'z' |'A'..'Z'  | '|' | '~' |'{' |'}'
 // |'\\\\' | '\\\'' | '\\"';
 
-IDF: ('A' ..'Z' | 'a' ..'z') (
-		| CHIFFRE
+IDF: ('A'..'Z'|'a'..'z') (
+		CHIFFRE
 		| 'A'..'Z'
 		| 'a'..'z'
 		| '_'

@@ -8,3 +8,6 @@ bin
 
 # Ignore build of grammar
 src/grammar
+
+# Ignore .antlr
+.antlr
