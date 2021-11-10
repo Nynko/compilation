@@ -5,20 +5,20 @@ grammar circ;
 
 fichier : decl* EOF;
 decl : decl_typ | decl_fct;
-decl_vars : 'int' IDF (','IDF)* ';'
-		| 'struct' IDF (',''*' IDF)*';';
-decl_typ : 'struct' IDF '{' decl_vars* '}' ';';
-decl_fct : 'int' IDF '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
-		| 'struct' IDF '*' IDF '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
+decl_vars : 'int' idf (','idf)* ';'
+		| 'struct' idf (',''*' idf)*';';
+decl_typ : 'struct' idf '{' decl_vars* '}' ';';
+decl_fct : 'int' idf '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
+		| 'struct' idf '*' idf '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
 param_liste :  param (',' param)*
 			|;
-param : 'int' IDF
-	| 'struct' IDF '*' IDF;
+param : 'int' idf
+	| 'struct' idf '*' idf;
 expr_primaire : valeur
-	| IDF
-	| IDF '(' ')'
-	| IDF '(' expr ( ',' expr)* ')'
-	| 'sizeof' '(' 'struct' IDF ')'
+	| idf
+	| idf '(' ')'
+	| idf '(' expr ( ',' expr)* ')'
+	| 'sizeof' '(' 'struct' idf ')'
 	| '(' expr ')';
 
 instruction : ';'
@@ -40,7 +40,7 @@ ordre : addition (('<'|'<='|'>'|'>=') addition)*;
 addition : multiplication (('+' | '-') multiplication )*;
 multiplication : unaire (('*'|'/') unaire)*;
 unaire : ('!'|'-')* fleche;
-fleche : expr_primaire ('->' IDF)*;
+fleche : expr_primaire ('->' idf)*;
 
 valeur : ENTIER | CHIFFRE | '\''carac'\''; 
 CHIFFRE: '0'..'9';
@@ -58,12 +58,11 @@ ENTIER: '0'|('1'..'9')('0'..'9')*;
 
 carac : '!' | '#' | '$' |'(' |')' |'*' |'+'|','|'.'| ':' |';'
 | '<' | '=' |'>' |'?'|'@' | '[' | ']' | '|' | '~' |'{' |'}'
-|'\\\\' | '\\\'' | '\\"' | IDF | CHIFFRE ;
+|'\\\\' | '\\\'' | '\\"' | ALPHABET | CHIFFRE ;
 
-IDF: ('a'..'z' |'A'..'Z')(
-	'a'..'z' |'A'..'Z'
-	|'_'
-	)*;
+ALPHABET: ('a'..'z' |'A'..'Z');
+
+idf: ALPHABET ( ALPHABET|'_' )*;
 WS: ('\n' | '\t' | ' ')+ -> skip;
 COM: '//'(.)*?'\n' -> skip;
 COMBIS : '/*'(.|'\n')?'*/' -> skip;

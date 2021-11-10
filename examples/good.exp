@@ -3,5 +3,7 @@ int main (){
     int ab, c;
     a = 20;
     ab = 2;
-    c = 0;
+    c = 'a';
+    c = '!';
+    //com
 }
