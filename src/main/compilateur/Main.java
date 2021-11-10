@@ -1,4 +1,4 @@
-package main;
+package compilateur;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,8 +12,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
-import main.grammar.*;
-import main.grammar.circParser.FichierContext;
+import compilateur.grammar.*;
+import compilateur.grammar.circParser.FichierContext;
 
 public class Main {
 

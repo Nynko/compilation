@@ -1,24 +1,18 @@
-package test;
+package compilateur;
 
-import java.io.Console;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 
-import main.grammar.*;
-import main.grammar.circParser.FichierContext;
-
-import main.ThrowingErrorListener;
+import compilateur.grammar.*;
 
 
 public class GrammarTests {
@@ -53,7 +47,7 @@ public class GrammarTests {
             parser.removeErrorListeners();
             parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
-            FichierContext program = parser.fichier();
+            parser.fichier();
 
             return true;
         } 

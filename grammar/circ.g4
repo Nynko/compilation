@@ -1,6 +1,6 @@
 grammar circ;
 @header {
-    package main.grammar;
+    package compilateur.grammar;
  }
 
 fichier : decl* EOF;

@@ -1,4 +1,4 @@
-package main;
+package compilateur;
 
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.Recognizer;
