@@ -1,5 +1,7 @@
 int main (){
-    int azert, b;
-    azert = 30 + 10 + 20 * 5;
-    return azert;
+    int a;
+    int ab, c;
+    a = 20;
+    ab = 2;
+    c = 0;
 }
