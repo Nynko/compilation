@@ -1,8 +1,11 @@
 package compilateur;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -40,16 +43,19 @@ public class GrammarTests {
 
     @TestFactory
     Stream<DynamicTest> dynamicTestsFromStreamInJava8() {
-        
-        List<String> testFiles = Arrays.asList(
-            "Caractere.Good.exp",
-            "DeclType.Bad.exp",
-            "DeclType.Good.exp",
-            "DeclType2.Bad.exp",
-            "Fct.Good.exp",
-            "noFct.Bad.exp",
-            "nomIDF.Good.exp"
-        );
+
+        List<String> testFiles = new ArrayList<String>();
+        File[] files = new File("./examples/").listFiles();
+
+        Pattern pattern = Pattern.compile(".*\\.((Good)|(Bad))\\.exp$");
+        for (File file : files) {
+            if (file.isFile()) {
+                Matcher m = pattern.matcher(file.getName());
+                if(m.matches()) {
+                    testFiles.add(file.getName());
+                }
+            }
+        }
             
         return testFiles.stream()
         .map((file) -> {
