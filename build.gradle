@@ -30,7 +30,7 @@ test {
 }
 
 application {
-    mainClass = 'main.Main'
+    mainClass = 'compilateur.Main'
 }
 
 sourceSets {
