@@ -1,1 +1,95 @@
+\documentclass[french]{article}
+\usepackage[utf8]{inputenc}
 
+
+\title{Compte Rendu 2}
+\author{Thibaut Hansmann}
+\date{Réunion du Mercredi 10 Novembre}
+
+
+\usepackage{natbib}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{multirow}
+
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots. http://texdoc.net/texmf-dist/doc/latex/geometry/geometry.pdf
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+
+%Amélioration tableaux : https://fr.overleaf.com/learn/latex/Tables
+\renewcommand{\arraystretch}{1.5} %The height of each row is set to 1.5 relative to its default height.
+\setlength{\tabcolsep}{18pt}%The space between the text and the left/right border of its containing cell is set to 18pt with this command. Again, you may use other units if needed.
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+\begin{flushleft}
+ \begin{tabular}{|m{4cm}|m{8cm}|}
+    \hline
+    Motif/Type de Réunion :  & Avancement du projet  \\
+    \hline
+    Lieu:  & TELECOM Nancy (Salle de travail) \\
+    \hline
+    Présents:  & Tout le groupe \\
+    \hline \hline
+    Date/heure début:  & Mercredi 10 novembre 16h \\
+    \hline
+    Durée: & 20min \\
+    \hline
+ \end{tabular}
+\end{flushleft}
+
+\section*{Ordre du jour}
+
+\begin{enumerate}
+    \item Avancement grammaire \\
+    \item Test pour la grammaire \\
+    \item AST \\
+    \item Rapport d'activité
+\end{enumerate}
+
+\section*{Avancement grammaire}
+
+Jean Charles et Nicolas ont résolu un problème sur la grammaire. On avait deux terminaux qui possédaient une règle redondante. La grammaire est pour l'instant finie à défaut de faire de nouveaux tests.
+
+\section*{Test pour la grammaire}
+
+Thibaut et Nicolas ont commencé à faire les tests pour la grammaire. Nicolas se concentre sur tester les règles de la grammaire avec des cas simples (identifiquation, boucle if simple, etc). Thibaut s'occupe des cas plus particulier (boucle if imbriqué, enchaînement de if-else, etc). Jean Charles va commencer à travailler sur les tests.
+
+\section*{AST}
+
+Pour l'AST, on doit se répartir les différents visiteurs. Pour les visiteurs on reprend la structure du td 2 de Trad. Tom va créer les visiteurs et les fichiers de l'AST et push pour que chacun puisse modifier sa branche. La répartition se fera au cours de la semaine.
+
+\section*{Rapport d'activité}
+
+Le rapport d'activité sera rediscuté dimanche. Le rapport doit contenir : les CR, les choix importants réalisés pendant le développement de la grammaire, les tests et leur AST. 
+
+\section*{TO-DO List}
+
+\begin{itemize}
+    \item Tests unitaires : Nicolas et Jean-Charles, deadline : Mercredi 17
+    \item AST : Tom, Thibaut, Jean-Charles, Nicolas, deadline : Samedi soir
+    \item Rapport d'activité : Dimanche soir
+\end{itemize}
+
+\section*{Prochaine Réunion}
+
+Date et Heure : Mercredi 17 Novembre 13h30.
+
+\section*{Annexes}
+RAS
+
+\end{document}
