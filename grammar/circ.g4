@@ -6,7 +6,7 @@ grammar circ;
 fichier : decl* EOF;
 decl : decl_typ | decl_fct;
 decl_vars : 'int' IDF (','IDF)* ';'
-		| 'struct' IDF (',''*' IDF)*';';
+		| 'struct' IDF '*' IDF (',''*' IDF)*';';
 decl_typ : 'struct' IDF '{' decl_vars* '}' ';';
 decl_fct : 'int' IDF '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
 		| 'struct' IDF '*' IDF '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
