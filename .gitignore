@@ -11,7 +11,7 @@ bin
 .vscode
 
 # Ignore build of grammar
-src/main/grammar
+src/main/compilateur/grammar
 
 
 #Ignore macOs folders
