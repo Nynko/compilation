@@ -11,7 +11,7 @@ bin
 .vscode
 
 # Ignore build of grammar
-src/main/compilateur/grammar
+src/main/compilateur/grammar/*
 
 
 #Ignore macOs folders
@@ -23,4 +23,3 @@ src/main/compilateur/grammar
 #ANTLR
 .antlr
 grammar/.antlr
-
