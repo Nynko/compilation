@@ -19,4 +19,5 @@ public interface AstVisitor<T> {
     public T visit(IfThenElse ifThenElse);
     public T visit(While while1);
     public T visit(Return return1);
+    public T visit(Bloc bloc);
 }

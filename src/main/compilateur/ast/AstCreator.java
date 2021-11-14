@@ -258,14 +258,20 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitBloc(circParser.BlocContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitBloc(circParser.BlocContext ctx) {
+		ArrayList<Ast> instList = new ArrayList<Ast>();
+		for (int i = 1; i < ctx.getChildCount()-1; i++) {
+			instList.add(ctx.getChild(i).accept(this));
+		}
+		return new Bloc(instList);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitExpr(circParser.ExprContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitExpr(circParser.ExprContext ctx) { return ctx.getChild(0).accept(this); }
 	/**
 	 * {@inheritDoc}
 	 *
