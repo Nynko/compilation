@@ -55,7 +55,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitDeclVarInt(circParser.Decl_varsContext ctx) { 
 		ArrayList<Ast> idf = new ArrayList<>();
 		for (int i = 1; i < ctx.getChildCount(); i += 2) {
-			idf.add(ctx.getChild(i).accept(this));
+			idf.add(new Idf(ctx.getChild(i).toString()));
 		}
 		return new DeclVarInt(idf);
 	}
@@ -67,9 +67,9 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitDeclVarStruct(circParser.Decl_varsContext ctx) { 
 		ArrayList<Ast> idf = new ArrayList<>();
-		idf.add(ctx.getChild(1).accept(this));
+		idf.add(new Idf(ctx.getChild(1).toString()));
 		for (int i = 3; i < ctx.getChildCount(); i += 3) {
-			idf.add(ctx.getChild(i).accept(this));
+			idf.add(new Idf(ctx.getChild(1).toString()));
 		}
 		return new DeclVarStruct(idf);
 	}
@@ -79,21 +79,43 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	//@Override public Ast enterDecl_typ(circParser.Decl_typContext ctx) { }
+	@Override public Ast visitDecl_typ(circParser.Decl_typContext ctx) { 
+		String StrIdf = ctx.getChild(1).toString();
+		Ast idf = new Idf(StrIdf);
+
+		ArrayList<Ast> decl = new ArrayList<>();
+		int i = 3;
+		while(!ctx.getChild(i).equals('}')) {
+			decl.add(ctx.getChild(i).accept(this));
+			i++;
+		}
+		return new Decl_typ(idf,decl);
+	}
 	
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	//@Override public Ast exitDecl_typ(circParser.Decl_typContext ctx) { }
+	@Override public Ast visitDeclFctInt(circParser.Decl_typContext ctx) {
+		Ast idf = new Idf(ctx.getChild(1).toString());
+		Ast param = ctx.getChild(3).accept(this);
+		Ast bloc = ctx.getChild(5).accept(this);
+		return new DeclFctInt(idf, param, bloc);
+	 }
 	
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	//@Override public Ast enterDecl_fct(circParser.Decl_fctContext ctx) { }
+	@Override public Ast visitDeclFctStruct(circParser.Decl_fctContext ctx) {
+		Ast idf0 = new Idf(ctx.getChild(1).toString());
+		Ast idf1 = new Idf(ctx.getChild(3).toString());
+		Ast param = ctx.getChild(5).accept(this);
+		Ast bloc = ctx.getChild(7).accept(this);
+		return new DeclFctStruct(idf0, idf1, param, bloc);
+	 }
 	
 	/**
 	 * {@inheritDoc}
