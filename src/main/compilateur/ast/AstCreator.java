@@ -1,5 +1,7 @@
 package compilateur.ast;
 
+import java.util.ArrayList;
+
 import compilateur.grammar.circBaseVisitor;
 import compilateur.grammar.circParser;
 
@@ -36,7 +38,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	//@Override public Ast enterDecl(circParser.DeclContext ctx) { }
+	@Override public Ast enterDecl(circParser.DeclContext ctx) { return ctx.getChild(0).accept(this); }
 	
 	/**
 	 * {@inheritDoc}
@@ -50,14 +52,27 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	//@Override public Ast enterDecl_vars(circParser.Decl_varsContext ctx) { }
+	@Override public Ast visitDeclVarInt(circParser.Decl_varsContext ctx) { 
+		ArrayList<Ast> idf = new ArrayList<>();
+		for (int i = 1; i < ctx.getChildCount(); i += 2) {
+			idf.add(ctx.getChild(i).accept(this));
+		}
+		return new DeclVarInt(idf);
+	}
 	
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	//@Override public Ast exitDecl_vars(circParser.Decl_varsContext ctx) { }
+	@Override public Ast visitDeclVarStruct(circParser.Decl_varsContext ctx) { 
+		ArrayList<Ast> idf = new ArrayList<>();
+		idf.add(ctx.getChild(1).accept(this));
+		for (int i = 3; i < ctx.getChildCount(); i += 3) {
+			idf.add(ctx.getChild(i).accept(this));
+		}
+		return new DeclVarStruct(idf);
+	}
 	
 	/**
 	 * {@inheritDoc}
