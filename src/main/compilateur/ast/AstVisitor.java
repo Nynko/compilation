@@ -15,4 +15,8 @@ public interface AstVisitor<T> {
     public T visit(Sizeof sizeof);
     public T visit(IdfParenthesis idfParenthesis);
     public T visit(IdfParenthesisEmpty idfParenthesisEmpty);
+    public T visit(IfThen ifThen);
+    public T visit(IfThenElse ifThenElse);
+    public T visit(While while1);
+    public T visit(Return return1);
 }

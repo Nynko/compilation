@@ -199,42 +199,59 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitInstExpr(circParser.InstExprContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitInstExpr(circParser.InstExprContext ctx) { return ctx.getChild(0).accept(this); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitIfThen(circParser.IfThenContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitIfThen(circParser.IfThenContext ctx) {
+		Ast condition = ctx.getChild(2).accept(this);
+		Ast thenBlock = ctx.getChild(4).accept(this);
+		return new IfThen(condition, thenBlock);
+
+	 }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitIfThenElse(circParser.IfThenElseContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitIfThenElse(circParser.IfThenElseContext ctx) {
+		Ast condition = ctx.getChild(2).accept(this);
+		Ast thenBlock = ctx.getChild(4).accept(this);
+		Ast elseBlock = ctx.getChild(6).accept(this);
+		return new IfThenElse(condition, thenBlock, elseBlock);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitWhile(circParser.WhileContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitWhile(circParser.WhileContext ctx) {
+		Ast condition = ctx.getChild(2).accept(this);
+		Ast doBlock = ctx.getChild(4).accept(this);
+		return new While(condition, doBlock);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitInstBloc(circParser.InstBlocContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitInstBloc(circParser.InstBlocContext ctx) { return ctx.getChild(0).accept(this); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitReturn(circParser.ReturnContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitReturn(circParser.ReturnContext ctx) {
+		Ast expr = ctx.getChild(1).accept(this);
+		return new Return(expr);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
