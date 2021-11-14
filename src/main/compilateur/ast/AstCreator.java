@@ -341,14 +341,14 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitInteger(circParser.IntegerContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitInteger(circParser.IntegerContext ctx) { return new IntNode(Integer.parseInt(ctx.getChild(0).toString())); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitChar(circParser.CharContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitChar(circParser.CharContext ctx) { return new CharNode(ctx.getChild(0).toString()); }
 	
 	/**
 	 * {@inheritDoc}

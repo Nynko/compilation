@@ -20,4 +20,6 @@ public interface AstVisitor<T> {
     public T visit(While while1);
     public T visit(Return return1);
     public T visit(Bloc bloc);
+    public T visit(CharNode charNode);
+    public T visit(IntNode intNode);
 }
