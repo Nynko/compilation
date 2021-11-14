@@ -25,7 +25,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitDecl(circParser.DeclContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitDecl(circParser.DeclContext ctx) { return ctx.getChild(0).accept(this); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -102,77 +102,97 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitParamListMulti(circParser.ParamListMultiContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitParamListMulti(circParser.ParamListMultiContext ctx) {
+		ArrayList<Ast> paramList = new ArrayList<Ast>();
+		for (int i = 0; i < ctx.getChildCount(); i++) {
+			paramList.add(ctx.getChild(i).accept(this));
+		}
+		return new ParamListMulti(paramList);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitParamListNone(circParser.ParamListNoneContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitParamListNone(circParser.ParamListNoneContext ctx) { return ctx.accept(this);}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitParamInt(circParser.ParamIntContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitParamInt(circParser.ParamIntContext ctx) { 
+		Ast idf = new Idf(ctx.getChild(1).toString());
+		return new ParamInt(idf);
+	 }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitParamStruct(circParser.ParamStructContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitParamStruct(circParser.ParamStructContext ctx) {
+		Ast idf0 = new Idf(ctx.getChild(1).toString());
+		Ast idf1 = new Idf(ctx.getChild(3).toString());
+		return new ParamStruct(idf0, idf1);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitValue(circParser.ValueContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitValue(circParser.ValueContext ctx) { return ctx.getChild(0).accept(this); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitIdf(circParser.IdfContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitIdf(circParser.IdfContext ctx) { return new Idf(ctx.getChild(0).toString());}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitIdfParenthesisEmpty(circParser.IdfParenthesisEmptyContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitIdfParenthesisEmpty(circParser.IdfParenthesisEmptyContext ctx) { return new IdfParenthesisEmpty(new Idf(ctx.getChild(0).toString())); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitIdfParenthesis(circParser.IdfParenthesisContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitIdfParenthesis(circParser.IdfParenthesisContext ctx) {
+		Ast idf = new Idf(ctx.getChild(0).toString());
+		ArrayList<Ast> exprList = new ArrayList<Ast>();
+		for (int i = 2; i < ctx.getChildCount(); i= i+2) {
+			exprList.add(ctx.getChild(i).accept(this));
+		}
+		return new IdfParenthesis(idf, exprList);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitSizeof(circParser.SizeofContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitSizeof(circParser.SizeofContext ctx) { return new Sizeof(new Idf(ctx.getChild(3).toString())); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitParenthesis(circParser.ParenthesisContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitParenthesis(circParser.ParenthesisContext ctx) { return ctx.getChild(1).accept(this); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return ctx.getChild(0).accept(this);}
 	/**
 	 * {@inheritDoc}
 	 *
