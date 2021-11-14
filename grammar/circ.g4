@@ -18,7 +18,7 @@ param_liste :  param (',' param)*								#ParamListMulti
 param : 'int' IDF												#ParamInt
 	| 'struct' IDF '*' IDF										#ParamStruct
 	;
-expr_primaire : valeur											#Valeur
+expr_primaire : valeur											#Value
 	| IDF														#Idf
 	| IDF '(' ')'												#IdfParenthesisEmpty
 	| IDF '(' expr ( ',' expr)* ')'								#IdfParenthesis
