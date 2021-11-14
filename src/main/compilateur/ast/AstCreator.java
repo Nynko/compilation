@@ -34,7 +34,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitDeclVarInt(circParser.DeclVarIntContext ctx) { 
 		ArrayList<Ast> idf = new ArrayList<>();
-		for (int i = 1; i < ctx.getChildCount(); i += 2) {
+		for (int i = 1; i < ctx.getChildCount() - 1; i += 2) {
 			idf.add(new Idf(ctx.getChild(i).toString()));
 		}
 		return new DeclVarInt(idf);
@@ -48,7 +48,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitDeclVarStruct(circParser.DeclVarStructContext ctx) { 
 		ArrayList<Ast> idf = new ArrayList<>();
 		idf.add(new Idf(ctx.getChild(1).toString()));
-		for (int i = 3; i < ctx.getChildCount(); i += 3) {
+		for (int i = 3; i < ctx.getChildCount() - 1; i += 3) {
 			idf.add(new Idf(ctx.getChild(1).toString()));
 		}
 		return new DeclVarStruct(idf);
@@ -104,7 +104,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitParamListMulti(circParser.ParamListMultiContext ctx) {
 		ArrayList<Ast> paramList = new ArrayList<Ast>();
-		for (int i = 0; i < ctx.getChildCount(); i++) {
+		for (int i = 0; i < ctx.getChildCount() - 1; i++) {
 			paramList.add(ctx.getChild(i).accept(this));
 		}
 		return new ParamListMulti(paramList);
@@ -278,28 +278,69 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitAffectation(circParser.AffectationContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitAffectation(circParser.AffectationContext ctx) { 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		
+		for (int i=0; 2*i < ctx.getChildCount() - 1; i++) {
+			
+			Ast right = ctx.getChild(2*(i+1)).accept(this);
+			noeudTemporaire = new Affectation(noeudTemporaire, right);
+		}
+		return noeudTemporaire;
+		
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitExpr_ou(circParser.Expr_ouContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitExpr_ou(circParser.Expr_ouContext ctx) { 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
+			Ast right = ctx.getChild(2*(i+1)).accept(this);
+			noeudTemporaire = new Expr_ou(noeudTemporaire, right);
+		}
+		return noeudTemporaire;
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitExpr_et(circParser.Expr_etContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitExpr_et(circParser.Expr_etContext ctx) { 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
+			Ast right = ctx.getChild(2*(i+1)).accept(this);
+			noeudTemporaire = new Expr_et(noeudTemporaire, right);
+		}
+		return noeudTemporaire;
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitComparaison(circParser.ComparaisonContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitComparaison(circParser.ComparaisonContext ctx) { 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
+
+			String signe = ctx.getChild(2 * i + 1).toString();
+			Ast right = ctx.getChild(2*(i+1)).accept(this);
+			switch (signe) {
+				case "==" :
+					noeudTemporaire = new Egal(noeudTemporaire, right);
+					break;
+				case "!=" :
+					noeudTemporaire = new Different(noeudTemporaire, right);
+					break;
+				default :
+					break;
+			}
+		}
+		return noeudTemporaire;}
 	/**
 	 * {@inheritDoc}
 	 *
