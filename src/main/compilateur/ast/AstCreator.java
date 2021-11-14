@@ -18,6 +18,294 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		Ast prgm = ctx.getChild(0).accept(this);
 		return new Fichier(prgm);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitDecl(circParser.DeclContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitDeclVarInt(circParser.DeclVarIntContext ctx) { 
+		ArrayList<Ast> idf = new ArrayList<>();
+		for (int i = 1; i < ctx.getChildCount(); i += 2) {
+			idf.add(new Idf(ctx.getChild(i).toString()));
+		}
+		return new DeclVarInt(idf);
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitDeclVarStruct(circParser.DeclVarStructContext ctx) { 
+		ArrayList<Ast> idf = new ArrayList<>();
+		idf.add(new Idf(ctx.getChild(1).toString()));
+		for (int i = 3; i < ctx.getChildCount(); i += 3) {
+			idf.add(new Idf(ctx.getChild(1).toString()));
+		}
+		return new DeclVarStruct(idf);
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitDecl_typ(circParser.Decl_typContext ctx) { 
+		String StrIdf = ctx.getChild(1).toString();
+		Ast idf = new Idf(StrIdf);
+
+		ArrayList<Ast> decl = new ArrayList<>();
+		int i = 3;
+		while(!ctx.getChild(i).equals('}')) {
+			decl.add(ctx.getChild(i).accept(this));
+			i++;
+		}
+		return new Decl_typ(idf,decl);
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitDeclFctInt(circParser.DeclFctIntContext ctx) {
+		Ast idf = new Idf(ctx.getChild(1).toString());
+		Ast param = ctx.getChild(3).accept(this);
+		Ast bloc = ctx.getChild(5).accept(this);
+		return new DeclFctInt(idf, param, bloc);
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitDeclFctStruct(circParser.DeclFctStructContext ctx) {
+		Ast idf0 = new Idf(ctx.getChild(1).toString());
+		Ast idf1 = new Idf(ctx.getChild(3).toString());
+		Ast param = ctx.getChild(5).accept(this);
+		Ast bloc = ctx.getChild(7).accept(this);
+		return new DeclFctStruct(idf0, idf1, param, bloc);
+	 }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitParamListMulti(circParser.ParamListMultiContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitParamListNone(circParser.ParamListNoneContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitParamInt(circParser.ParamIntContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitParamStruct(circParser.ParamStructContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitValue(circParser.ValueContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitIdf(circParser.IdfContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitIdfParenthesisEmpty(circParser.IdfParenthesisEmptyContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitIdfParenthesis(circParser.IdfParenthesisContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitSizeof(circParser.SizeofContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitParenthesis(circParser.ParenthesisContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitInstExpr(circParser.InstExprContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitIfThen(circParser.IfThenContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitIfThenElse(circParser.IfThenElseContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitWhile(circParser.WhileContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitInstBloc(circParser.InstBlocContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitReturn(circParser.ReturnContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitBloc(circParser.BlocContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitExpr(circParser.ExprContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitAffectation(circParser.AffectationContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitExpr_ou(circParser.Expr_ouContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitExpr_et(circParser.Expr_etContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitComparaison(circParser.ComparaisonContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitOrdre(circParser.OrdreContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitAddition(circParser.AdditionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitMultiplication(circParser.MultiplicationContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitFleche(circParser.FlecheContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitInteger(circParser.IntegerContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitChar(circParser.CharContext ctx) { return visitChildren(ctx); }
 	
 	/**
 	 * {@inheritDoc}
@@ -38,7 +326,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public Ast enterDecl(circParser.DeclContext ctx) { return ctx.getChild(0).accept(this); }
+	// @Override public Ast enterDecl(circParser.DeclContext ctx) { return ctx.getChild(0).accept(this); }
 	
 	/**
 	 * {@inheritDoc}
@@ -47,75 +335,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	//@Override public Ast exitDecl(circParser.DeclContext ctx) { }
 	
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public Ast visitDeclVarInt(circParser.Decl_varsContext ctx) { 
-		ArrayList<Ast> idf = new ArrayList<>();
-		for (int i = 1; i < ctx.getChildCount(); i += 2) {
-			idf.add(new Idf(ctx.getChild(i).toString()));
-		}
-		return new DeclVarInt(idf);
-	}
 	
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public Ast visitDeclVarStruct(circParser.Decl_varsContext ctx) { 
-		ArrayList<Ast> idf = new ArrayList<>();
-		idf.add(new Idf(ctx.getChild(1).toString()));
-		for (int i = 3; i < ctx.getChildCount(); i += 3) {
-			idf.add(new Idf(ctx.getChild(1).toString()));
-		}
-		return new DeclVarStruct(idf);
-	}
 	
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public Ast visitDecl_typ(circParser.Decl_typContext ctx) { 
-		String StrIdf = ctx.getChild(1).toString();
-		Ast idf = new Idf(StrIdf);
-
-		ArrayList<Ast> decl = new ArrayList<>();
-		int i = 3;
-		while(!ctx.getChild(i).equals('}')) {
-			decl.add(ctx.getChild(i).accept(this));
-			i++;
-		}
-		return new Decl_typ(idf,decl);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public Ast visitDeclFctInt(circParser.Decl_typContext ctx) {
-		Ast idf = new Idf(ctx.getChild(1).toString());
-		Ast param = ctx.getChild(3).accept(this);
-		Ast bloc = ctx.getChild(5).accept(this);
-		return new DeclFctInt(idf, param, bloc);
-	 }
-	
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public Ast visitDeclFctStruct(circParser.Decl_fctContext ctx) {
-		Ast idf0 = new Idf(ctx.getChild(1).toString());
-		Ast idf1 = new Idf(ctx.getChild(3).toString());
-		Ast param = ctx.getChild(5).accept(this);
-		Ast bloc = ctx.getChild(7).accept(this);
-		return new DeclFctStruct(idf0, idf1, param, bloc);
-	 }
 	
 	/**
 	 * {@inheritDoc}
