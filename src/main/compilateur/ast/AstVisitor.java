@@ -33,4 +33,8 @@ public interface AstVisitor<T> {
     public T visit (SuperieurEgal supEgal);
     public T visit (Plus plus);
     public T visit (Minus minus);
+    public T visit (Division div);
+    public T visit (Multiplication mult);
+    public T visit (Fleche fleche);
+    public T visit (Unaire unaire);
 }

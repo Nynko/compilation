@@ -392,8 +392,9 @@ public class AstCreator extends circBaseVisitor<Ast>{
 				default :
 					break;
 			}
+		}
 		return noeudTemporaire; 
-	}
+}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -416,6 +417,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 				default :
 					break;
 			}
+		}
 		return noeudTemporaire; 
 	}
 	/**
@@ -430,7 +432,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 
 
 
-		ArrayList<String> listeSignes ; 
+		ArrayList<String> listeSignes; 
 		while (i < ctx.getChildCount() && (signe.equals("!") || signe.equals("-"))) {
 			String signe2 = ctx.getChild(i+1).toString();
 
@@ -440,15 +442,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 				return new Unaire(listeSignes,right);
 			}
 			
-			switch (signe) {
-				case signe2 :
-					// Double négation
-					break;
-				case "-":
-					listeSignes.add(signe);
-					break;
-				default :
-					break;
+			if(!signe.equals(signe2)){
+				listeSignes.add(signe);
 			}
 
 			i++;
