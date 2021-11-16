@@ -347,14 +347,52 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitOrdre(circParser.OrdreContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitOrdre(circParser.OrdreContext ctx) { 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
+
+			String signe = ctx.getChild(2 * i + 1).toString();
+			Ast right = ctx.getChild(2*(i+1)).accept(this);
+			switch (signe) {
+				case "<" :
+					noeudTemporaire = new Inferieur(noeudTemporaire, right);
+					break;
+				case "<=" :
+					noeudTemporaire = new InferieurEgal(noeudTemporaire, right);
+					break;
+				case ">" :
+					noeudTemporaire = new Superieur(noeudTemporaire, right);
+					break;
+				case ">=" :
+					noeudTemporaire = new SuperieurEgal(noeudTemporaire, right);
+				default :
+					break;
+			}
+		}
+		return noeudTemporaire; }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitAddition(circParser.AdditionContext ctx) { return visitChildren(ctx); }
+	@Override public Ast visitAddition(circParser.AdditionContext ctx) { 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
+
+			String signe = ctx.getChild(2 * i + 1).toString();
+			Ast right = ctx.getChild(2*(i+1)).accept(this);
+			switch (signe) {
+				case "+" :
+					noeudTemporaire = new Plus(noeudTemporaire, right);
+					break;
+				case "-":
+					noeudTemporaire = new Minus(noeudTemporaire, right);
+					break;
+				default :
+					break;
+			}
+		return noeudTemporaire; }
 	/**
 	 * {@inheritDoc}
 	 *

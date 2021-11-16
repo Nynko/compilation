@@ -27,4 +27,10 @@ public interface AstVisitor<T> {
     public T visit(Expr_et expr_et);
     public T visit(Egal egal);
     public T visit(Different dif);
+    public T visit(Inferieur inf);
+    public T visit (InferieurEgal infEgal);
+    public T visit (Superieur sup);
+    public T visit (SuperieurEgal supEgal);
+    public T visit (Plus plus);
+    public T visit (Minus minus);
 }
