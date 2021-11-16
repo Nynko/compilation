@@ -432,7 +432,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 
 
 
-		ArrayList<String> listeSignes; 
+		ArrayList<String> listeSignes = new ArrayList<String>(); 
 		while (i < ctx.getChildCount() && (signe.equals("!") || signe.equals("-"))) {
 			String signe2 = ctx.getChild(i+1).toString();
 
@@ -463,7 +463,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitFleche(circParser.FlecheContext ctx) { 
 		
 		Ast left = ctx.getChild(0).accept(this);
-		ArrayList<Ast> liste ;
+		ArrayList<Ast> liste = new ArrayList<Ast>(); 
 
 		for(int i=0 ; 2*i < ctx.getChildCount() - 1 ; i++){
 			// String fleche = ctx.getChild(2 * i + 1).toString();
