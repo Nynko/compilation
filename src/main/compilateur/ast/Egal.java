@@ -5,8 +5,8 @@ public class Egal implements Ast {
         return visitor.visit(this);
     }
     
-    Ast left;
-    Ast right;
+    public Ast left;
+    public Ast right;
 
     public Egal(Ast left, Ast right) {
         this.left = left;

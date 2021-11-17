@@ -6,10 +6,10 @@ public class DeclFctStruct implements Ast{
         return visitor.visit(this);
     }
 
-    Ast Idf0;
-    Ast Idf1;
-    Ast param;
-    Ast bloc;
+    public Ast Idf0;
+    public Ast Idf1;
+    public Ast param;
+    public Ast bloc;
 
     public DeclFctStruct(Ast idf0, Ast idf1, Ast param, Ast bloc) {
         this.Idf0 = idf0;

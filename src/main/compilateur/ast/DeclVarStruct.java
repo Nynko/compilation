@@ -8,7 +8,7 @@ public class DeclVarStruct implements Ast {
         return visitor.visit(this);
     }
 
-    ArrayList<Ast> idf;
+    public ArrayList<Ast> idf;
 
     public DeclVarStruct(ArrayList<Ast> idf) {
         this.idf = idf;

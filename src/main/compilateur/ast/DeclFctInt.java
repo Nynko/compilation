@@ -6,9 +6,9 @@ public class DeclFctInt implements Ast{
         return visitor.visit(this);
     }
 
-    Ast Idf;
-    Ast param;
-    Ast bloc;
+    public Ast Idf;
+    public Ast param;
+    public Ast bloc;
 
     public DeclFctInt(Ast idf, Ast param, Ast bloc) {
         this.Idf = idf;

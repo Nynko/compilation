@@ -8,8 +8,8 @@ public class Decl_typ implements Ast {
         return visitor.visit(this);
     }
 
-    Ast idf;
-    ArrayList<Ast> decl;
+    public Ast idf;
+    public ArrayList<Ast> decl;
 
     public Decl_typ(Ast idf, ArrayList<Ast> decl) {
         this.idf = idf;

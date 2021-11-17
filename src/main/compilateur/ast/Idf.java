@@ -6,7 +6,7 @@ public class Idf implements Ast{
         return visitor.visit(this);
     }
 
-    String name;
+    public String name;
 
     public Idf(String name) {
         this.name = name;
