@@ -49,7 +49,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		ArrayList<Ast> idf = new ArrayList<>();
 		idf.add(new Idf(ctx.getChild(1).toString()));
 		for (int i = 3; i < ctx.getChildCount() - 1; i += 3) {
-			idf.add(new Idf(ctx.getChild(1).toString()));
+			idf.add(new Idf(ctx.getChild(i).toString()));
 		}
 		return new DeclVarStruct(idf);
 	}
@@ -64,11 +64,14 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		Ast idf = new Idf(StrIdf);
 
 		ArrayList<Ast> decl = new ArrayList<>();
-		int i = 3;
-		while(!ctx.getChild(i).equals('}')) {
-			decl.add(ctx.getChild(i).accept(this));
-			i++;
+		// int i = 3;
+		for (int j = 3; j < ctx.getChildCount()-2; j++) {
+			decl.add(ctx.getChild(j).accept(this));
 		}
+		// while(!ctx.getChild(i).equals('}')) {
+		// 	decl.add(ctx.getChild(i).accept(this));
+		// 	i++;
+		// }
 		return new Decl_typ(idf,decl);
 	}
 	/**
@@ -104,7 +107,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitParamListMulti(circParser.ParamListMultiContext ctx) {
 		ArrayList<Ast> paramList = new ArrayList<Ast>();
-		for (int i = 0; i < ctx.getChildCount(); i++) {
+		for (int i = 0; i < ctx.getChildCount(); i= i+2) {
 			paramList.add(ctx.getChild(i).accept(this));
 		}
 		return new ParamListMulti(paramList);
@@ -281,12 +284,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitAffectation(circParser.AffectationContext ctx) { 
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
-		
-		for (int i=0; 2*i < ctx.getChildCount() - 1; i++) {
-			
-			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			noeudTemporaire = new Affectation(noeudTemporaire, right);
+		Ast noeudTemporaire = ctx.getChild(ctx.getChildCount()-1).accept(this);
+		for (int i=ctx.getChildCount()-3; i >= 0; i=i-2) {
+			Ast right = ctx.getChild(i).accept(this);
+			noeudTemporaire = new Affectation(right, noeudTemporaire);
 		}
 		return noeudTemporaire;
 		

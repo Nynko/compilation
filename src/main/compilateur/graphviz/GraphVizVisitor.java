@@ -88,14 +88,10 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override public String visit(Fichier fichier){
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "Fichier");
-        // try {
-        //     String instructionsState =fichier.instructions.accept(this);
-        //     this.addTransition(nodeIdentifier, instructionsState);
-        // } catch (NullPointerException e) {
-        //     // nothing
-        // }
-        String instructionsState =fichier.instructions.accept(this);
+        if (fichier.instructions != null) {
+            String instructionsState =fichier.instructions.accept(this);
             this.addTransition(nodeIdentifier, instructionsState);
+        }
         return nodeIdentifier;
     }
     @Override public String visit(Idf idf){
@@ -259,7 +255,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
     @Override public String visit(CharNode charNode){
         String nodeIdentifier = this.nextState();
-        this.addTransition(nodeIdentifier, charNode.string);
+        this.addNode(nodeIdentifier, charNode.string);
         
         return nodeIdentifier;
     }
