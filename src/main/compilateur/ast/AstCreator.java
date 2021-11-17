@@ -428,12 +428,12 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
 		
-		Ast noeud;
+		Ast noeud = ctx.getChild(1).accept(this);
 		
-		for (int i = 0; i < ctx.getChildCount() -1 ; i) {
+		for (int i = 0; i < ctx.getChildCount() -1 ; i++) {
 
 			String signe = ctx.getChild(i).toString();
-			Ast noeud = ctx.getChild(i + 1).accept(this);
+			noeud = ctx.getChild(i + 1).accept(this);
 			switch (signe) {
 				case "!" :
 					noeud = new Negation(noeud);
@@ -447,11 +447,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		}
 		return noeud; 
 	}
-		// Cas ou l'on ne passe pas dans le while = cas ou il n'y a pas d'opération unaire
-		Ast right = ctx.getChild(i+1).accept(this);
-		return new Unaire(listeSignes,right);
 	
-	}
 	/**
 	 * {@inheritDoc}
 	 *
