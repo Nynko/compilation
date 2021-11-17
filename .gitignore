@@ -26,4 +26,4 @@ grammar/.antlr
 
 #GraphVizVsitor
 *.svg
-
+out/

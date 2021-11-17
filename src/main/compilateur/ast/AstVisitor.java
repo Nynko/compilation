@@ -4,7 +4,6 @@ public interface AstVisitor<T> {
     public T visit(Fichier fichier);
     public T visit(Idf idf);
     public T visit(DeclVarInt declVarInt);
-    public T visit(Decl decl);
     public T visit(DeclVarStruct declVarStruct);
     public T visit(Decl_typ decl_typ);
     public T visit(DeclFctInt declFctInt);

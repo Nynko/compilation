@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import compilateur.ast.AstVisitor;
 import compilateur.ast.Affectation;
+import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
-import compilateur.ast.Decl;
 import compilateur.ast.DeclFctInt;
 import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
@@ -103,13 +103,15 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
     @Override public String visit(DeclVarInt declVarInt){
         String nodeIdentifier = this.nextState();
-        this.addNode(nodeIdentifier, "A faire");
-        return nodeIdentifier;
-    }
-    @Override public String visit(Decl decl){
-        String nodeIdentifier = this.nextState();
-        this.addNode(nodeIdentifier, "A faire");
-        return nodeIdentifier;
+        this.addNode(nodeIdentifier, "DeclVarInt");
+        for (Ast ast:declVarInt.idf){
+
+            String astState = ast.accept(this);
+            this.addTransition(nodeIdentifier, astState);
+
+        }
+
+                return nodeIdentifier;
     }
     @Override public String visit(DeclVarStruct declVarStruct){
         String nodeIdentifier = this.nextState();
