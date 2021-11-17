@@ -58,7 +58,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
             
         FileOutputStream output = new FileOutputStream(filepath);
 
-        String buffer = this.nodeBuffer + this.linkBuffer;
+        String buffer = this.nodeBuffer + this.linkBuffer + "}";
         byte[] strToBytes = buffer.getBytes();
 
         output.write(strToBytes);
@@ -101,18 +101,66 @@ public class GraphVizVisitor implements AstVisitor<String> {
 
         return nodeIdentifier;
     }
-    @Override public String visit(DeclVarInt declVarInt){ return ""; }
-    @Override public String visit(Decl decl){ return ""; }
-    @Override public String visit(DeclVarStruct declVarStruct){ return ""; }
-    @Override public String visit(Decl_typ decl_typ){ return ""; }
-    @Override public String visit(DeclFctInt declFctInt){ return ""; }
-    @Override public String visit(DeclFctStruct declFctStruct){ return ""; }
-    @Override public String visit(ParamListMulti paramListMulti){ return ""; }
-    @Override public String visit(ParamInt paramInt){ return ""; }
-    @Override public String visit(ParamStruct paramStruct){ return ""; }
-    @Override public String visit(Sizeof sizeof){ return ""; }
-    @Override public String visit(IdfParenthesis idfParenthesis){ return ""; }
-    @Override public String visit(IdfParenthesisEmpty idfParenthesisEmpty){ return ""; }
+    @Override public String visit(DeclVarInt declVarInt){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Decl decl){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(DeclVarStruct declVarStruct){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Decl_typ decl_typ){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(DeclFctInt declFctInt){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(DeclFctStruct declFctStruct){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(ParamListMulti paramListMulti){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(ParamInt paramInt){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(ParamStruct paramStruct){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Sizeof sizeof){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(IdfParenthesis idfParenthesis){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(IdfParenthesisEmpty idfParenthesisEmpty){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
     @Override public String visit(IfThen ifThen){
         String nodeIdentifier = this.nextState();
 
@@ -141,10 +189,26 @@ public class GraphVizVisitor implements AstVisitor<String> {
 
         return nodeIdentifier;
     }
-    @Override public String visit(While while1){ return ""; }
-    @Override public String visit(Return return1){ return ""; }
-    @Override public String visit(Bloc bloc){ return ""; }
-    @Override public String visit(CharNode charNode){ return ""; }
+    @Override public String visit(While while1){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Return return1){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Bloc bloc){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(CharNode charNode){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
     @Override public String visit(IntNode intNode){
         String nodeIdentifier = this.nextState();
 
@@ -165,14 +229,46 @@ public class GraphVizVisitor implements AstVisitor<String> {
 
         return nodeIdentifier;
     }
-    @Override public String visit(Expr_ou expr_ou){ return ""; }
-    @Override public String visit(Expr_et expr_et){ return ""; }
-    @Override public String visit(Egal egal){ return ""; }
-    @Override public String visit(Different dif){ return ""; }
-    @Override public String visit(Inferieur inf){ return ""; }
-    @Override public String visit (InferieurEgal infEgal){ return ""; }
-    @Override public String visit (Superieur sup){ return ""; }
-    @Override public String visit (SuperieurEgal supEgal){ return ""; }
+    @Override public String visit(Expr_ou expr_ou){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Expr_et expr_et){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Egal egal){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Different dif){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit(Inferieur inf){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit (InferieurEgal infEgal){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit (Superieur sup){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit (SuperieurEgal supEgal){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
     @Override public String visit (Plus plus){
         String nodeIdentifier = this.nextState();
 
@@ -225,9 +321,21 @@ public class GraphVizVisitor implements AstVisitor<String> {
 
         return nodeIdentifier;
     }
-    @Override public String visit (Fleche fleche){ return ""; }
-    @Override public String visit (MoinsUnaire unaire){ return ""; }
-    @Override public String visit (Negation unaire){ return ""; }
+    @Override public String visit (Fleche fleche){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit (MoinsUnaire unaire){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
+    @Override public String visit (Negation unaire){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "A faire");
+        return nodeIdentifier;
+    }
 
 
     // @Override

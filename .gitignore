@@ -23,3 +23,7 @@ src/main/compilateur/grammar/*
 #ANTLR
 .antlr
 grammar/.antlr
+
+#GraphVizVsitor
+*.svg
+

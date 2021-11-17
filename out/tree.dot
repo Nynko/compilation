@@ -1,0 +1,10 @@
+digraph "ast"{
+
+	nodesep=1;
+	ranksep=1;
+
+	N1 [label="A faire", shape="box"];
+	N0 [label="Fichier", shape="box"];
+
+	N0 -> N1; 
+}
