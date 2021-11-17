@@ -1,6 +1,5 @@
 package compilateur.ast;
 
-import java.util.ArrayList;
 
 public class Fleche implements Ast {
     public <T> T accept(AstVisitor<T> visitor){
@@ -8,11 +7,11 @@ public class Fleche implements Ast {
     }
 
     public Ast left;
-    public ArrayList<Ast> listeIdf;
+    public Ast right;
 
-    public Fleche(Ast left,ArrayList<Ast> listeIdf) {
+    public Fleche(Ast left, Ast right) {
         this.left = left;
-        this.listeIdf = listeIdf;
+        this.right = right;
     }
 
 

@@ -36,5 +36,6 @@ public interface AstVisitor<T> {
     public T visit (Division div);
     public T visit (Multiplication mult);
     public T visit (Fleche fleche);
-    public T visit (Unaire unaire);
+    public T visit (MoinsUnaire unaire);
+    public T visit (Negation unaire);
 }

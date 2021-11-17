@@ -427,28 +427,26 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
-		int i= 0;
-		String signe = ctx.getChild(i).toString();
+		
+		Ast noeud;
+		
+		for (int i = 0; i < ctx.getChildCount() -1 ; i) {
 
-
-
-		ArrayList<String> listeSignes = new ArrayList<String>(); 
-		while (i < ctx.getChildCount() && (signe.equals("!") || signe.equals("-"))) {
-			String signe2 = ctx.getChild(i+1).toString();
-
-			if( !(signe2.equals("!") || signe2.equals("-")) ){
-				listeSignes.add(signe);
-				Ast right = ctx.getChild(i+1).accept(this);
-				return new Unaire(listeSignes,right);
+			String signe = ctx.getChild(i).toString();
+			Ast noeud = ctx.getChild(i + 1).accept(this);
+			switch (signe) {
+				case "!" :
+					noeud = new Negation(noeud);
+					break;
+				case "-":
+					noeud = new MoinsUnaire(noeud);
+					break;
+				default :
+					break;
 			}
-			
-			if(!signe.equals(signe2)){
-				listeSignes.add(signe);
-			}
-
-			i++;
-
 		}
+		return noeud; 
+	}
 		// Cas ou l'on ne passe pas dans le while = cas ou il n'y a pas d'opération unaire
 		Ast right = ctx.getChild(i+1).accept(this);
 		return new Unaire(listeSignes,right);
@@ -462,16 +460,14 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitFleche(circParser.FlecheContext ctx) { 
 		
-		Ast left = ctx.getChild(0).accept(this);
-		ArrayList<Ast> liste = new ArrayList<Ast>(); 
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 
-		for(int i=0 ; 2*i < ctx.getChildCount() - 1 ; i++){
-			// String fleche = ctx.getChild(2 * i + 1).toString();
+			// String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			liste.add(right);
+			noeudTemporaire = new Multiplication(noeudTemporaire, right);
 		}
-
-		return new Fleche(left,liste);
+		return noeudTemporaire; 
 	
 	}
 	/**
