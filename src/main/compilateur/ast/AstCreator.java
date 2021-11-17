@@ -104,7 +104,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitParamListMulti(circParser.ParamListMultiContext ctx) {
 		ArrayList<Ast> paramList = new ArrayList<Ast>();
-		for (int i = 0; i < ctx.getChildCount() - 1; i++) {
+		for (int i = 0; i < ctx.getChildCount(); i++) {
 			paramList.add(ctx.getChild(i).accept(this));
 		}
 		return new ParamListMulti(paramList);

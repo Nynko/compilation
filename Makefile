@@ -10,4 +10,8 @@ java:
 test: grammar
 	./gradlew test
 
+ast:
+	./gradlew run
+	dot -Tsvg ./out/tree.dot -o ./out/tree.svg
+
 FORCE:
