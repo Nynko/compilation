@@ -5,8 +5,8 @@ public class SuperieurEgal implements Ast {
         return visitor.visit(this);
     }
     
-    Ast left;
-    Ast right;
+    public Ast left;
+    public Ast right;
 
     public SuperieurEgal(Ast left, Ast right) {
         this.left = left;
