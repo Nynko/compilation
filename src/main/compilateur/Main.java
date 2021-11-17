@@ -23,12 +23,12 @@ public class Main {
 
     public static void main(String[] args){
 
-        /*if (args.length < 1){
+        if (args.length < 1){
             System.out.println("Error : Expected 1 argument filepath, found 0");
             return;
-        }*/
+        }
 
-        String testFile = "./examples/empty.exp";
+        String testFile = args[0];
 
         try {
 

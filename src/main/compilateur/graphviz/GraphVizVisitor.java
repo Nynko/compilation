@@ -35,6 +35,7 @@ import compilateur.ast.ParamListMulti;
 import compilateur.ast.ParamStruct;
 import compilateur.ast.Plus;
 import compilateur.ast.Return;
+import compilateur.ast.Semicolon;
 import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
@@ -87,12 +88,14 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override public String visit(Fichier fichier){
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "Fichier");
-        try {
-            String instructionsState =fichier.instructions.accept(this);
+        // try {
+        //     String instructionsState =fichier.instructions.accept(this);
+        //     this.addTransition(nodeIdentifier, instructionsState);
+        // } catch (NullPointerException e) {
+        //     // nothing
+        // }
+        String instructionsState =fichier.instructions.accept(this);
             this.addTransition(nodeIdentifier, instructionsState);
-        } catch (NullPointerException e) {
-            // nothing
-        }
         return nodeIdentifier;
     }
     @Override public String visit(Idf idf){
@@ -143,7 +146,9 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "DeclFctInt");
         this.addTransition(nodeIdentifier, declFctInt.Idf.accept(this));
-        this.addTransition(nodeIdentifier, declFctInt.param.accept(this));
+        if (declFctInt.param != null) {
+            this.addTransition(nodeIdentifier, declFctInt.param.accept(this));
+        }
         this.addTransition(nodeIdentifier, declFctInt.bloc.accept(this));
         return nodeIdentifier;
     }
@@ -403,6 +408,13 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "!");
         this.addTransition(nodeIdentifier, unaire.noeud.accept(this));
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(Semicolon semicolon) {
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "InstEmpty");
         return nodeIdentifier;
     }
 

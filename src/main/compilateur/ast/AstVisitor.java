@@ -37,4 +37,5 @@ public interface AstVisitor<T> {
     public T visit (Fleche fleche);
     public T visit (MoinsUnaire unaire);
     public T visit (Negation unaire);
+    public T visit(Semicolon semicolon);
 }

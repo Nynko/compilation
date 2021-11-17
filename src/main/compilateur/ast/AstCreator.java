@@ -115,7 +115,9 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitParamListNone(circParser.ParamListNoneContext ctx) { return ctx.accept(this);}
+	@Override public Ast visitParamListNone(circParser.ParamListNoneContext ctx) { 
+		return null;
+	 }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -192,7 +194,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return ctx.getChild(0).accept(this);}
+	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return new Semicolon();}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -427,8 +429,12 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
-		
-		Ast noeud = ctx.getChild(1).accept(this);
+		Ast noeud;
+		if (ctx.getChildCount() == 1) {
+			noeud = ctx.getChild(0).accept(this);
+		}else{
+			noeud = ctx.getChild(1).accept(this);
+		}
 		
 		for (int i = 0; i < ctx.getChildCount() -1 ; i++) {
 
