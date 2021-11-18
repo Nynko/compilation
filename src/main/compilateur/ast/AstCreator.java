@@ -7,7 +7,7 @@ import compilateur.grammar.circParser;
 
 public class AstCreator extends circBaseVisitor<Ast>{
 
-    	
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -464,14 +464,11 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitFleche(circParser.FlecheContext ctx) { 
 		
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
-		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
-
-			// String signe = ctx.getChild(2 * i + 1).toString();
-			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			noeudTemporaire = new Multiplication(noeudTemporaire, right);
+		for (int i = 1; i * 2 < ctx.getChildCount(); i++) {
+			Ast right = new Idf(ctx.getChild(2*i).toString());
+			noeudTemporaire = new Fleche(noeudTemporaire, right);
 		}
-		return noeudTemporaire; 
-	
+		return noeudTemporaire;
 	}
 	/**
 	 * {@inheritDoc}

@@ -13,6 +13,4 @@ public class Fleche implements Ast {
         this.left = left;
         this.right = right;
     }
-
-
 }
