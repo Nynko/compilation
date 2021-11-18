@@ -1,6 +1,12 @@
 package compilateur;
 
 import java.io.IOException;
+import java.util.Arrays;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
