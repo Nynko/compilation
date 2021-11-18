@@ -5,29 +5,34 @@ grammar circ;
 
 fichier : decl* EOF;
 decl : decl_typ | decl_fct;
-decl_vars : 'int' IDF (','IDF)* ';'
-		| 'struct' IDF '*' IDF (',''*' IDF)*';';
+decl_vars : 'int' IDF (','IDF)* ';' 							#DeclVarInt
+		| 'struct' IDF '*' IDF (',''*' IDF)*';'					#DeclVarStruct
+		;
 decl_typ : 'struct' IDF '{' decl_vars* '}' ';';
-decl_fct : 'int' IDF '(' param_liste ')' bloc							//(param (',' param)*)? ')' bloc
-		| 'struct' IDF '*' IDF '(' param_liste ')' bloc; 				//(param (',' param)*)? ')' bloc
-param_liste :  param (',' param)*
-			|;
-param : 'int' IDF
-	| 'struct' IDF '*' IDF;
-expr_primaire : valeur
-	| IDF
-	| IDF '(' ')'
-	| IDF '(' expr ( ',' expr)* ')'
-	| 'sizeof' '(' 'struct' IDF ')'
-	| '(' expr ')';
-
-instruction : ';'
-			| expr ';'
-			| 'if' '(' expr ')' instruction
-			| 'if' '(' expr ')' instruction 'else' instruction
-			| 'while' '(' expr ')' instruction
-			| bloc
-			| 'return' expr ';' ;
+decl_fct : 'int' IDF '(' param_liste ')' bloc					#DeclFctInt
+		| 'struct' IDF '*' IDF '(' param_liste ')' bloc 		#DeclFctStruct
+		;
+param_liste :  param (',' param)*								#ParamListMulti
+			|													#ParamListNone
+			;
+param : 'int' IDF												#ParamInt
+	| 'struct' IDF '*' IDF										#ParamStruct
+	;
+expr_primaire : valeur											#Value
+	| IDF														#Idf
+	| IDF '(' ')'												#IdfParenthesisEmpty
+	| IDF '(' expr ( ',' expr)* ')'								#IdfParenthesis
+	| 'sizeof' '(' 'struct' IDF ')'								#Sizeof
+	| '(' expr ')'												#Parenthesis
+	;
+instruction : ';'												#Semicolon
+			| expr ';'											#InstExpr
+			| 'if' '(' expr ')' instruction						#IfThen
+			| 'if' '(' expr ')' instruction 'else' instruction	#IfThenElse
+			| 'while' '(' expr ')' instruction					#While
+			| bloc												#InstBloc
+			| 'return' expr ';'									#Return
+			;
 bloc : '{' decl_vars* instruction* '}';
 
 expr: affectation;
@@ -42,7 +47,9 @@ multiplication : unaire (('*'|'/') unaire)*;
 unaire : ('!'|'-')* fleche;
 fleche : expr_primaire ('->' IDF)*;
 
-valeur : ENTIER | CARACTERE; 
+valeur : ENTIER													#Integer
+		| CARACTERE												#Char
+		; 
 
 
 
@@ -62,5 +69,5 @@ CARACTERE:'\''('\u0021'
 ENTIER: '0'|('1'..'9')('0'..'9')*;
 IDF: ('a'..'z' |'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
 WS: ('\n' | '\t' | ' ')+ -> skip;
-COM: '//'(.)*?('\n'|EOF) -> skip;
-COMBIS : '/*'(.|'\n')*?'*/' -> skip;
+COMLINE: '//'(.)*?('\n'|EOF) -> skip;
+COMMULTILINE : '/*'(.|'\n')*?'*/' -> skip;

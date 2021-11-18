@@ -12,8 +12,12 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
-import compilateur.grammar.*;
+import compilateur.ast.Ast;
+import compilateur.ast.AstCreator;
+import compilateur.grammar.circLexer;
+import compilateur.grammar.circParser;
 import compilateur.grammar.circParser.FichierContext;
+import compilateur.graphviz.GraphVizVisitor;
 
 public class Main {
 
@@ -44,17 +48,26 @@ public class Main {
             FichierContext program = parser.fichier();
 
             // code d'affichage de l'arbre syntaxique
-            JFrame frame = new JFrame("Antlr AST");
-            JPanel panel = new JPanel();
-            TreeViewer viewer = new TreeViewer(Arrays.asList(
-                    parser.getRuleNames()),program);
-            viewer.setScale(1.5); // Scale a little
-            panel.add(viewer);
-            frame.add(panel);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.pack();
-            frame.setVisible(true);
+            // JFrame frame = new JFrame("Antlr AST");
+            // JPanel panel = new JPanel();
+            // TreeViewer viewer = new TreeViewer(Arrays.asList(
+            //         parser.getRuleNames()),program);
+            // viewer.setScale(1.5); // Scale a little
+            // panel.add(viewer);
+            // frame.add(panel);
+            // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            // frame.pack();
+            // frame.setVisible(true);
 
+            // Visiteur de création de l'AST + création de l'AST
+            AstCreator creator = new AstCreator();
+            Ast ast = program.accept(creator);
+
+            // Visiteur de représentation graphique + appel
+            GraphVizVisitor graphViz = new GraphVizVisitor();
+            ast.accept(graphViz);
+        
+            graphViz.dumpGraph("./out/tree.dot");
 
         } 
         catch (IOException e) {
