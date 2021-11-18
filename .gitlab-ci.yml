@@ -1,7 +1,7 @@
 stages:
     - tests-grammaire
     - compilation
-#    - tests-unitaires
+    - tests-unitaires
 
 antlr4:
     image: "any0ne22/antlr4"
@@ -17,7 +17,17 @@ compil-java:
     image: "gradle:jdk17"
     stage: compilation
     script:
-        - ./gradlew build
+        - ./gradlew build -Dskip.tests
+    artifacts:
+        paths:
+            - build
+            - src
+
+test-java:
+    image: "gradle:jdk17"
+    stage: tests-unitaires
+    script:
+        - ./gradlew test
     artifacts:
         paths:
             - build

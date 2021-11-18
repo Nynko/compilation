@@ -11,7 +11,19 @@ make grammar
 Compiler le Java :
 
 ```bash
-make java
+make build
+```
+
+Lancer les tests unitaires :
+
+```bash
+make test
+```
+
+Afficher un arbre syntaxique
+
+```bash
+make run -- ARGS="examples/good.exp"
 ```
 
 Compiler l'intégralité du projet :

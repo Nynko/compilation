@@ -1,11 +1,19 @@
-all: grammar java
+all: grammar build test
+
+
 
 # targets
 grammar: FORCE
 	antlr4 -o src/main/compilateur -visitor -Dlanguage=Java grammar/*.g4
 
-java:
-	./gradlew run
+build:
+	./gradlew build -Dskip.tests
+
+java: build
+
+.PHONY: run
+run: FORCE
+	./gradlew run --args "$(ARGS)"
 
 test: grammar
 	./gradlew test
