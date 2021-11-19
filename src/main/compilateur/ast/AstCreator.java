@@ -15,7 +15,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitFichier(circParser.FichierContext ctx) {
-		Ast prgm = ctx.getChild(0).accept(this);
+		ArrayList<Ast> prgm = new ArrayList<>();
+		for(int i= 0 ; i <ctx.getChildCount()-1 ; i++){
+			prgm.add(ctx.getChild(i).accept(this));
+		}
 		return new Fichier(prgm);
 	}
 

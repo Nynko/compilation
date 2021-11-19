@@ -89,8 +89,14 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "Fichier");
         if (fichier.instructions != null) {
-            String instructionsState =fichier.instructions.accept(this);
-            this.addTransition(nodeIdentifier, instructionsState);
+
+            for (Ast ast:fichier.instructions){
+
+                String instructionsState =ast.accept(this);
+                this.addTransition(nodeIdentifier, instructionsState);
+    
+            }
+
         }
         return nodeIdentifier;
     }
