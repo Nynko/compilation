@@ -433,29 +433,27 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
-		Ast noeud;
+		Ast noeud; 
 		if (ctx.getChildCount() == 1) {
 			noeud = ctx.getChild(0).accept(this);
-		}else{
-			noeud = ctx.getChild(1).accept(this);
+			return noeud;
 		}
-		
-		for (int i = 0; i < ctx.getChildCount() -1 ; i++) {
-
-			String signe = ctx.getChild(i).toString();
-			noeud = ctx.getChild(i + 1).accept(this);
+		else {
+			String signe = ctx.getChild(0).toString();
+			ctx.children.remove(0);
 			switch (signe) {
 				case "!" :
-					noeud = new Negation(noeud);
+					noeud = new Negation(ctx.accept(this));
 					break;
 				case "-":
-					noeud = new MoinsUnaire(noeud);
+					noeud = new MoinsUnaire(ctx.accept(this));
 					break;
 				default :
-					break;
+					throw new Error();
 			}
+			return noeud;
 		}
-		return noeud; 
+		
 	}
 	
 	/**
