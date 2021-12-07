@@ -1,5 +1,6 @@
 package compilateur.TDS;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import compilateur.ast.AstVisitor;
@@ -11,6 +12,8 @@ public class Tds {
     private String nomSymbole;
     private int deplacement;
     private Tds pointeurPere;
+
+    private ArrayList<Symbole> listeSymboles;
     
 
     public Tds(){
@@ -27,10 +30,10 @@ public class Tds {
         this.pointeurPere = tds;
     }
 
-
-    public void accept(){
-
+    public void addSymbole(Symbole symbole){
+        this.listeSymboles.add(symbole);
     }
+
 
     
 }

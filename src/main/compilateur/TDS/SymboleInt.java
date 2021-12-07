@@ -1,15 +1,20 @@
 package compilateur.TDS;
 
-public class SymboleInt implements Symbole{
+import compilateur.ast.AstVisitor;
 
-    public SymboleInt(){
+public class SymboleInt{
 
+    public int value;
+    public String name;
+
+    public SymboleInt(int value){
+        this.value = value;
     }
 
-    public <T> T accept(AstVisitor<T> visitor){
-        return visitor.visit(this);
+    public SymboleInt(int value, String name){
+        this.value = value;
+        this.name = name;
     }
 
-    
     
 }
