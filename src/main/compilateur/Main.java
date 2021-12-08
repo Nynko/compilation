@@ -1,12 +1,7 @@
 package compilateur;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -18,6 +13,7 @@ import compilateur.grammar.circLexer;
 import compilateur.grammar.circParser;
 import compilateur.grammar.circParser.FichierContext;
 import compilateur.graphviz.GraphVizVisitor;
+import compilateur.utils.ErrorAggregator;
 
 public class Main {
 
@@ -34,16 +30,18 @@ public class Main {
 
             //chargement du fichier et construction du parser
             CharStream input = CharStreams.fromFileName(testFile);
-            circLexer lexer = new circLexer(input); 
+            circLexer lexer = new circLexer(input);
+
+            ParserErrorListener errList = new ParserErrorListener();
 
             lexer.removeErrorListeners();
-            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+            lexer.addErrorListener(errList);
 
             CommonTokenStream stream = new CommonTokenStream(lexer);
             circParser parser = new circParser(stream);
 
             parser.removeErrorListeners();
-            parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+            parser.addErrorListener(errList);
 
             FichierContext program = parser.fichier();
 
@@ -63,11 +61,23 @@ public class Main {
             AstCreator creator = new AstCreator();
             Ast ast = program.accept(creator);
 
-            // Visiteur de représentation graphique + appel
-            GraphVizVisitor graphViz = new GraphVizVisitor();
-            ast.accept(graphViz);
-        
-            graphViz.dumpGraph("./out/tree.dot");
+            // Récupération des erreurs syntaxiques et lexicales
+            ErrorAggregator agg = errList.getAggregator();
+
+
+
+            if(agg.noError()) {
+                // Visiteur de représentation graphique + appel
+                GraphVizVisitor graphViz = new GraphVizVisitor();
+                ast.accept(graphViz);
+            
+                
+                graphViz.dumpGraph("./out/tree.dot");
+            } else {
+                System.out.println("==== Erreurs ====");
+                agg.printErrors();
+                System.out.println("==== Erreurs ====\n\n");
+            }
 
         } 
         catch (IOException e) {
