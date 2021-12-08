@@ -2,7 +2,7 @@ package compilateur.TDS;
 
 import compilateur.ast.AstVisitor;
 
-public class SymboleInt{
+public class SymboleInt extends Symbole{
 
     public int value;
     public String name;

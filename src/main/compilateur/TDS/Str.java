@@ -1,6 +1,6 @@
 package compilateur.TDS;
 
-public class Str implements Symbole{
+public class Str extends Symbole{
 
     public String str;
     
