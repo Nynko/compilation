@@ -21,8 +21,18 @@ public class Tds {
         this.pointeurPere = pointeurPere;
     }
 
+    public Tds(Tds pointeurpointeurPere, int numRegion){
+        this.imbrication = pointeurPere.getImbrication() + 1;
+        this.pointeurPere = pointeurPere;
+        this.numRegion = numRegion;
+    }
+
     public void addPere(Tds tds){
         this.pointeurPere = tds;
+    }
+
+    public void addnumRegion(int numRegion){
+        this.numRegion = numRegion;
     }
 
     public Tds getPere(){
