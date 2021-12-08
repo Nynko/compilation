@@ -1,5 +1,9 @@
 package compilateur.TDS;
 
-public interface Symbole {
+public abstract class Symbole {
+    private int definitionLine;
     
+    public int getDefinitionLine() {
+        return this.definitionLine;
+    }
 }
