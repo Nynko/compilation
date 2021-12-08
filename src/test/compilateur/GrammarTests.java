@@ -18,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 
 import compilateur.grammar.*;
@@ -69,30 +67,24 @@ public class GrammarTests {
     }
 
     public boolean testFile(String testFile) throws IOException {
-        try {
-            //chargement du fichier et construction du parser
-            CharStream input = CharStreams.fromFileName(testFile);
-            
-            circLexer lexer = new circLexer(input); 
+        //chargement du fichier et construction du parser
+        CharStream input = CharStreams.fromFileName(testFile);
+        
+        circLexer lexer = new circLexer(input); 
 
-            lexer.removeErrorListeners();
-            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+        ParserErrorListener errList = new ParserErrorListener();
 
-            CommonTokenStream stream = new CommonTokenStream(lexer);
-            circParser parser = new circParser(stream);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errList);
 
-            parser.removeErrorListeners();
-            parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+        CommonTokenStream stream = new CommonTokenStream(lexer);
+        circParser parser = new circParser(stream);
 
-            parser.fichier();
+        parser.removeErrorListeners();
+        parser.addErrorListener(errList);
 
-            return true;
-        } 
-        catch (RecognitionException e) {
-            e.printStackTrace();
-            return false;
-        } catch (ParseCancellationException e) {
-            return false;
-        }
+        parser.fichier();
+
+        return errList.getAggregator().noError();
     }
 }

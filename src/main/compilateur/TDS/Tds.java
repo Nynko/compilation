@@ -61,7 +61,7 @@ public class Tds {
 
     public void addSymbole(String name, Symbole symbole) throws SymbolAlreadyExistsException {
         if(this.listeSymboles.get(name) != null) {
-            throw new SymbolAlreadyExistsException(name, listeSymboles.get(name).getDefinitionLine());
+            throw new SymbolAlreadyExistsException(name,0, listeSymboles.get(name).getDefinitionLine());
         }
         this.listeSymboles.put(name, symbole);
     }
