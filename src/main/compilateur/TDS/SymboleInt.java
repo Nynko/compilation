@@ -6,6 +6,7 @@ public class SymboleInt{
 
     public int value;
     public String name;
+    public int deplacement;
 
     public SymboleInt(int value){
         this.value = value;
