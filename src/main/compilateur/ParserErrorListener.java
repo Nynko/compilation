@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import compilateur.utils.ErrorAggregator;
-import compilateur.utils.CompilerErrorException;
+import compilateur.utils.SyntaxErrorException;
 
 public class ParserErrorListener extends BaseErrorListener {
 
@@ -14,7 +14,7 @@ public class ParserErrorListener extends BaseErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
         throws ParseCancellationException {
-            CompilerErrorException err = new CompilerErrorException(line, charPositionInLine + " " + msg);
+            SyntaxErrorException err = new SyntaxErrorException(line, charPositionInLine + " " + msg);
             this.aggregator.addError(err);
     }
 
