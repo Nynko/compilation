@@ -2,7 +2,7 @@ package compilateur.TDS;
 
 public abstract class SymboleBloc extends Symbole {
 
-    private Tds tds;
+    protected Tds tds;
 
     public SymboleBloc(Tds tds){
         this.tds = tds;

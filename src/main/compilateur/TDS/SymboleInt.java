@@ -1,12 +1,10 @@
 package compilateur.TDS;
 
-import compilateur.ast.AstVisitor;
-
 public class SymboleInt extends Symbole{
 
-    public int value;
-    public String name;
-    public int deplacement;
+    private int value;
+    private String name;
+    private int deplacement;
 
     public SymboleInt(int value){
         this.value = value;
@@ -15,6 +13,18 @@ public class SymboleInt extends Symbole{
     public SymboleInt(int value, String name){
         this.value = value;
         this.name = name;
+    }
+
+    public int getValue(){
+        return this.value;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public int getDeplacement(){
+        return this.deplacement;
     }
 
     

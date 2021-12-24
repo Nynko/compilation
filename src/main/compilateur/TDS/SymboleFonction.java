@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class SymboleFonction extends SymboleBlocNomme {
 
+    private String returnType;
     private ArrayList<Symbole> args; 
 
     public SymboleFonction(String name, Tds tds){
@@ -12,6 +13,12 @@ public class SymboleFonction extends SymboleBlocNomme {
 
     public SymboleFonction(String name, Tds tds, ArrayList<Symbole> args){
         super(name,tds);
+        this.args = args;
+    }
+
+    public SymboleFonction(String returnType, String name, Tds tds, ArrayList<Symbole> args){
+        super(name,tds);
+        this.returnType = returnType;
         this.args = args;
     }
 
@@ -24,11 +31,15 @@ public class SymboleFonction extends SymboleBlocNomme {
     }
 
     public Tds getTds(){
-        return this.getTds();
+        return this.tds;
     }
 
     public Boolean isNamed(String nom){
-        return nom.equals(this.getName());
+        return nom.equals(this.name);
+    }
+
+    public String getReturnType(){
+        return this.returnType;
     }
 
     

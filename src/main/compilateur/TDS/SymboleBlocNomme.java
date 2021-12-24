@@ -2,7 +2,7 @@ package compilateur.TDS;
 
 public class SymboleBlocNomme extends SymboleBloc{
 
-    private String name;
+    protected String name;
 
     public SymboleBlocNomme(Tds tds){
         super(tds);
