@@ -38,6 +38,7 @@ import compilateur.ast.MoinsUnaire;
 import compilateur.ast.Negation;
 import compilateur.ast.While;
 
+
 public interface TdsVisitor<T>{
 
     public T visit(Fichier fichier, Tds tds);

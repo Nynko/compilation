@@ -1,20 +1,17 @@
 package compilateur.TDS;
 
 
-public class SymboleStruct {
+public class SymboleStruct extends SymboleBlocNomme {
     private Tds tds;
     private String nom;
 
-    public SymboleStruct(String nom, Tds tds){
-        this.tds = tds;
-        this.nom = nom;
+    public SymboleStruct(String name, Tds tds){
+        super(name,tds);
     }
 
-    public Tds getTds(){
-        return this.tds;
+    public SymboleStruct(Tds tds){
+        super(tds);
     }
+    
 
-    public Boolean isNamed(String nom){
-        return nom.equals(this.nom);
-    }
 }

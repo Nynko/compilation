@@ -1,6 +1,6 @@
 package compilateur.TDS;
 
-public abstract class SymboleBlocNomme extends SymboleBloc{
+public class SymboleBlocNomme extends SymboleBloc{
 
     private String name;
 

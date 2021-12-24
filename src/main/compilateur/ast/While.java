@@ -1,4 +1,5 @@
 package compilateur.ast;
+import compilateur.TDS.*;
 
 public class While implements Ast{
 
@@ -6,6 +7,10 @@ public class While implements Ast{
         return visitor.visit(this);
     }
 
+    public <T> T accept(TdsVisitor<T> visitor, Tds tds){
+        return visitor.visit(this, tds);
+    }
+    
     public Ast condition;
     public Ast doBlock;
 

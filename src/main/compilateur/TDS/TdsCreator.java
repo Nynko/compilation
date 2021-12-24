@@ -47,14 +47,26 @@ import compilateur.ast.While;
 public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(Fichier fichier, Tds tds){
-        // Symbole symbole = new Symbole();
+
+        // tds.addnumRegion(0);
 
         // if (fichier.instructions != null) {
 
-        //     for (Ast ast:fichier.instructions, Tds tds){
-        //         Symbole instructionsState = ast.accept(this);
-        //         if(instructionsState!= null, Tds tds){
-        //             instructionsState.linkPere(symbole);
+        //     for (Ast ast:fichier.instructions){
+        //         Symbole instruction= ast.accept(this,tds);
+        //         if(instruction!= null){
+
+        //             if(instruction instanceof SymboleFonction){
+        //                 tds.addSymbole(((SymboleFonction)instruction).getName(), instruction);
+        //             }
+
+        //             else if (instruction instanceof SymboleStruct){ 
+        //                 tds.addSymbole(((SymboleStruct)instruction).getName(), instruction);
+        //             }
+
+        //             else{
+        //                 throw new Error("Erreur de remontée des symboles, instruction doit être un symbole de struct ou de fonciton");
+        //             }
         //         }
         //     }
         // }
