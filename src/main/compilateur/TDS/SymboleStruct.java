@@ -1,14 +1,32 @@
 package compilateur.TDS;
 
 
-public class SymboleStruct extends SymboleBlocNomme {
+public class SymboleStruct extends Symbole {
 
-    public SymboleStruct(String name, Tds tds){
-        super(name,tds);
+    private DeclStruct struct;
+    private String name;
+    private int deplacement;
+
+
+    public SymboleStruct(String name){
+        this.name = name;
     }
 
-    public SymboleStruct(Tds tds){
-        super(tds);
+    public SymboleStruct(DeclStruct struct, String name){
+        this.struct = struct;
+        this.name = name;
+    }
+
+    public DeclStruct getStruct(){
+        return this.struct;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public int getDeplacement(){
+        return this.deplacement;
     }
 
 }
