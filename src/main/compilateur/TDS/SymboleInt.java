@@ -6,8 +6,8 @@ public class SymboleInt extends Symbole{
     private String name;
     private int deplacement;
 
-    public SymboleInt(int value){
-        this.value = value;
+    public SymboleInt(String name){
+        this.name = name;
     }
 
     public SymboleInt(int value, String name){

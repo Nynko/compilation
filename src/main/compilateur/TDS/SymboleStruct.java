@@ -1,7 +1,7 @@
 package compilateur.TDS;
 
 
-public class SymboleStruct extends Symbole {
+public class SymboleStruct extends Symbole implements CloningStructPrototype{
 
     private DeclStruct struct;
     private String name;
@@ -27,6 +27,10 @@ public class SymboleStruct extends Symbole {
 
     public int getDeplacement(){
         return this.deplacement;
+    }
+
+    public Symbole clone(){
+        return new SymboleInt(this.name);
     }
 
 }
