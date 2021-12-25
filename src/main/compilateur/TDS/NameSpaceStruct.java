@@ -20,5 +20,9 @@ public class NameSpaceStruct{
             this.dicoStruct.put(name,declStruct);
         }
     }
+
+    public boolean doesContains(String str){
+        return dicoStruct.containsKey(str);
+    }
     
 }

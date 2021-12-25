@@ -7,6 +7,7 @@ public class Tds {
     private static int compteur;
     private int numRegion = compteur++;
     private Tds pointeurPere;
+    private NameSpaceStruct nameSpaceStruct; 
 
     private HashMap<String,Symbole> listeSymboles;
     
@@ -19,6 +20,7 @@ public class Tds {
     public Tds(Tds pointeurPere){
         this.imbrication = pointeurPere.getImbrication()+1;
         this.pointeurPere = pointeurPere;
+        this.nameSpaceStruct = pointeurPere.getNameSpaceStruct();
     }
 
     public Tds(Tds pointeurpointeurPere, int numRegion){
@@ -27,8 +29,21 @@ public class Tds {
         this.numRegion = numRegion;
     }
 
+    public void addNameSpaceStruct(NameSpaceStruct nameSpaceStruct){
+        this.nameSpaceStruct = nameSpaceStruct;
+    }
+
+    public boolean isNameSpaceStructContains(String str){
+        return this.nameSpaceStruct.doesContains(str);
+    }
+
+    public NameSpaceStruct getNameSpaceStruct(){
+        return this.nameSpaceStruct;
+    }
+
     public void addPere(Tds tds){
         this.pointeurPere = tds;
+        this.nameSpaceStruct = pointeurPere.getNameSpaceStruct();
     }
 
     public void addnumRegion(int numRegion){
