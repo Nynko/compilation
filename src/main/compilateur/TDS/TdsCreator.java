@@ -5,6 +5,8 @@ import compilateur.ast.AstVisitor;
 
 import java.util.ArrayList;
 
+import org.antlr.v4.parse.ATNBuilder.subrule_return;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
@@ -48,30 +50,41 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(Fichier fichier, Tds tds){
 
-        // tds.addnumRegion(0);
+        tds.addnumRegion(0);
+        tds.addNameSpaceStruct(new NameSpaceStruct());
 
-        // if (fichier.instructions != null) {
+        if (fichier.instructions != null) {
 
-        //     for (Ast ast:fichier.instructions){
-        //         Symbole instruction= ast.accept(this,tds);
-        //         if(instruction!= null){
+            for (Ast ast:fichier.instructions){
+                Symbole instruction= ast.accept(this,tds);
+                if(instruction!= null){
 
-        //             if(instruction instanceof SymboleFonction){
-        //                 tds.addSymbole(((SymboleFonction)instruction).getName(), instruction);
-        //             }
+                    if(instruction instanceof SymboleFonction){
+                        try {
+                            tds.addSymbole(((SymboleFonction)instruction).getName(), instruction);
+                        } catch (SymbolAlreadyExistsException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
 
-        //             else if (instruction instanceof SymboleStruct){ 
-        //                 tds.addSymbole(((SymboleStruct)instruction).getName(), instruction);
-        //             }
+                    else if (instruction instanceof DeclStruct){ 
+                        try {
+                            tds.getNameSpaceStruct().addDeclStruct(((DeclStruct)instruction));
+                        } catch (SymbolAlreadyExistsException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
 
-        //             else{
-        //                 throw new Error("Erreur de remontée des symboles, instruction doit être un symbole de struct ou de fonciton");
-        //             }
-        //         }
-        //     }
-        // }
+                    else{
+                        throw new Error("Erreur de remontée des symboles, instruction doit être une déclaration de struct ou de fonction");
+                    }
+                }
+            }
+        }
 
-        return new Str("");
+        return null;
     }
 
     @Override public Symbole visit(Idf idf, Tds tds){
@@ -104,18 +117,33 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         return new Str("");
     }
-    @Override public Symbole visit(Decl_typ decl_typ, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "DeclTyp");
-        // Symbole idf = decl_typ.idf.accept(this);
-        // this.addTransition(nodeIdentifier, idf);
-        // for (Ast ast:decl_typ.decl, Tds tds){
-        //     Symbole astState = ast.accept(this);
-        //     this.addTransition(nodeIdentifier, astState);
-        // }
 
-        return new Str("");
+
+    @Override public Symbole visit(Decl_typ decl_typ, Tds tds){
+        
+        Str identifiant = (Str) decl_typ.idf.accept(this,tds);
+        String idf = identifiant.getString();
+
+        ArrayList<Symbole> listeVars = new ArrayList<Symbole>();
+
+        for (Ast ast:decl_typ.decl){
+            Symbole symbole = ast.accept(this, tds);
+            
+            if(symbole instanceof SymboleInt || symbole instanceof SymboleStruct ){
+                listeVars.add(symbole);
+            }
+
+            else{
+                throw new Error("Erreur de remontée des symboles, symbole doit être un SymboleInt ou un SymboleStruct");
+            }
+
+        }
+
+        return new DeclStruct(idf, listeVars);
     }
+
+
+
     @Override public Symbole visit(DeclFctInt declFctInt, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "DeclFctInt");
