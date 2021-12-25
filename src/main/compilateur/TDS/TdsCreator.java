@@ -1,8 +1,9 @@
 package compilateur.TDS;
 
 
+import java.sql.Struct;
 import java.util.ArrayList;
-
+import java.util.NoSuchElementException;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
@@ -89,30 +90,43 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     }
 
     @Override public Symbole visit(DeclVarInt declVarInt, Tds tds){
+        ListeSymbole listeSymbole = new ListeSymbole();
 
-        // ArrayList<Ast> liste = declVarInt.idf;
-        // int size = liste.size();
-
-        // Tds tds = new Tds();
-
-        // for(int i = 0 ; i < size -1 ; i++){
-        //     tds.addSymbole(liste.get(i).accept(this));             
-        // }
-        
-        return new Str("");
+        for(Ast identifiants : declVarInt.idf){
+            Str nameStr = (Str) identifiants.accept(this,tds);
+            Symbole symbole = new SymboleInt(nameStr.getString());
+            listeSymbole.addSymbole(symbole);
+        }
+    
+        return listeSymbole;
     }
     @Override public Symbole visit(DeclVarStruct declVarStruct, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "DeclVarStruct");
+
+        ArrayList<Ast> liste =  declVarStruct.idf;
         
-        // for (Ast ast:declVarStruct.idf, Tds tds){
+        Symbole nameSymbole = liste.get(0).accept(this, tds);
+        String nameStruct = ((Str) nameSymbole).getString();
 
-        //     Symbole astState = ast.accept(this);
-        //     this.addTransition(nodeIdentifier, astState);
-
-        // }
-
-        return new Str("");
+        // Clone de la structure
+        DeclStruct struct ; 
+        try {
+            DeclStruct structToClone = tds.getNameSpaceStruct().getStruct(nameStruct);
+            struct =  (DeclStruct) structToClone.cloneSymbole();
+        } catch (NoSuchElementException e) {
+            // throw new UndefinedStructureException(nameStruct,nameSymbole.getDefinitionLine());
+            struct = new DeclStruct(nameStruct);// A DELETE avec gestion d'erreur ou pas
+        }
+        // Fin clone de la structure
+       
+        liste.remove(0);      
+        ListeSymbole listeSymbole = new ListeSymbole();
+        for(Ast identifiants :liste){
+            Str nameStr = (Str) identifiants.accept(this,tds);
+            Symbole symbole = new SymboleStruct(struct,nameStr.getString());
+            listeSymbole.addSymbole(symbole);
+        }
+    
+        return listeSymbole;
     }
 
 
@@ -125,13 +139,16 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         for (Ast ast:decl_typ.decl){
             Symbole symbole = ast.accept(this, tds);
-            
-            if(symbole instanceof SymboleInt || symbole instanceof SymboleStruct ){
-                listeVars.add(symbole);
+
+            if(symbole instanceof ListeSymbole){
+                ListeSymbole liste = (ListeSymbole) symbole;
+                for(Symbole elem : liste.getList()){
+                    listeVars.add(elem);
+                } 
             }
 
             else{
-                throw new Error("Erreur de remontée des symboles, symbole doit être un SymboleInt ou un SymboleStruct");
+                throw new Error("Erreur de remontée des symboles, symbole doit être une liste de Symbole (contenant des SymboleInt ou SymboleStruct)");
             }
 
         }
