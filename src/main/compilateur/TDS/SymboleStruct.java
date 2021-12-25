@@ -29,7 +29,7 @@ public class SymboleStruct extends Symbole implements CloningStructPrototype{
         return this.deplacement;
     }
 
-    public Symbole clone(){
+    public Symbole cloneSymbole(){
         return new SymboleInt(this.name);
     }
 

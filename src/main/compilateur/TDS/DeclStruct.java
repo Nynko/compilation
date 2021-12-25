@@ -29,16 +29,18 @@ public class DeclStruct extends Symbole implements CloningStructPrototype{
         return this.declVars;
     }
 
-    public Symbole clone(){
+    public Symbole cloneSymbole(){
         DeclStruct declStructClone =  new DeclStruct(this.name);
         for(Symbole symbole : declVars){
 
             if( symbole instanceof SymboleInt ){
-                declStructClone.getListDeclVars().add(((SymboleInt)symbole).clone());
+                SymboleInt clone = (SymboleInt) ((SymboleInt) symbole).cloneSymbole();
+                declStructClone.getListDeclVars().add(clone);
             }
 
             else if (symbole instanceof SymboleStruct){
-                declStructClone.getListDeclVars().add(((SymboleStruct)symbole).clone());
+                SymboleStruct clone = (SymboleStruct) ((SymboleStruct) symbole).cloneSymbole();
+                declStructClone.getListDeclVars().add(clone);
             }
 
             else{
