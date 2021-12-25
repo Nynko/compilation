@@ -1,11 +1,8 @@
 package compilateur.TDS;
 
 
-import compilateur.ast.AstVisitor;
-
 import java.util.ArrayList;
 
-import org.antlr.v4.parse.ATNBuilder.subrule_return;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
