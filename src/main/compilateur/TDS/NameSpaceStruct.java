@@ -1,6 +1,7 @@
 package compilateur.TDS;
 
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class NameSpaceStruct{
 
@@ -23,6 +24,18 @@ public class NameSpaceStruct{
 
     public boolean doesContains(String str){
         return dicoStruct.containsKey(str);
+    }
+
+    public DeclStruct getStruct(String name) throws NoSuchElementException{
+        DeclStruct declStruct = dicoStruct.get(name);
+
+        if(declStruct!=null){
+            return declStruct;
+        }
+        
+        else{
+            throw new NoSuchElementException();
+        }
     }
     
 }
