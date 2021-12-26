@@ -22,4 +22,9 @@ ast: FORCE
 		./gradlew run --args "$(ARGS)"
 		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
 
+tds : FORCE
+		./gradlew run --args "$(ARGS)"
+		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
+		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
+
 FORCE:

@@ -7,11 +7,14 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
+import compilateur.TDS.Tds;
+import compilateur.TDS.TdsCreator;
 import compilateur.ast.Ast;
 import compilateur.ast.AstCreator;
 import compilateur.grammar.circLexer;
 import compilateur.grammar.circParser;
 import compilateur.grammar.circParser.FichierContext;
+import compilateur.graphviz.GraphVizTdsVisitor;
 import compilateur.graphviz.GraphVizVisitor;
 import compilateur.utils.ErrorAggregator;
 
@@ -70,9 +73,16 @@ public class Main {
                 // Visiteur de représentation graphique + appel
                 GraphVizVisitor graphViz = new GraphVizVisitor();
                 ast.accept(graphViz);
-            
-                
                 graphViz.dumpGraph("./out/tree.dot");
+
+                // TDS
+                GraphVizTdsVisitor graphVizTds = new GraphVizTdsVisitor();
+                Tds tds = new Tds();
+                TdsCreator tdsCreator = new TdsCreator();
+                ast.accept(tdsCreator, tds);
+                graphVizTds.createGraph(tds);
+                graphVizTds.dumpGraph("./out/tds.dot");
+
             } else {
                 System.out.println("==== Erreurs ====");
                 agg.printErrors();
