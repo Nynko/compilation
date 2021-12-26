@@ -23,6 +23,10 @@ public class Tds {
         this.nameSpaceStruct = pointeurPere.getNameSpaceStruct();
     }
 
+    public HashMap<String,Symbole> getListeSymboles(){
+        return this.listeSymboles;
+    }
+
     public void addNameSpaceStruct(NameSpaceStruct nameSpaceStruct){
         this.nameSpaceStruct = nameSpaceStruct;
     }
