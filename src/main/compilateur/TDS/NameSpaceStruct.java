@@ -11,6 +11,10 @@ public class NameSpaceStruct{
         this.dicoStruct = new HashMap<String,SymboleDeclStruct>();
     }
 
+    public HashMap<String,SymboleDeclStruct> getHashMap(){
+        return this.dicoStruct;
+    }
+
     public void addSymboleDeclStruct(SymboleDeclStruct declStruct) throws SymbolAlreadyExistsException{
         String name = declStruct.getName();
         if(dicoStruct.containsKey(name)){

@@ -15,11 +15,13 @@ public class Tds {
     public Tds(){
         this.imbrication = 0;
         this.pointeurPere = null;
+        this.listeSymboles = new HashMap<String,Symbole>();
     }
 
     public Tds(Tds pointeurPere){
         this.imbrication = pointeurPere.getImbrication()+1;
         this.pointeurPere = pointeurPere;
+        this.listeSymboles = new HashMap<String,Symbole>();
         this.nameSpaceStruct = pointeurPere.getNameSpaceStruct();
     }
 
