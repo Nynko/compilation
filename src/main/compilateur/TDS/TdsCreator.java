@@ -298,7 +298,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         
         return listeSymbole; 
     }
-    
+
     @Override public Symbole visit(ParamInt paramInt, Tds tds){
         
         Str symboleName = (Str) paramInt.name.accept(this, tds);
@@ -338,6 +338,8 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, sizeof.name.accept(this));
         return new Str(""); 
     }
+
+
     @Override public Symbole visit(IdfParenthesis idfParenthesis, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addTransition(nodeIdentifier, idfParenthesis.idf.accept(this));
@@ -347,52 +349,73 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // }
         return new Str(""); 
     }
+
+
     @Override public Symbole visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addTransition(nodeIdentifier, idfParenthesisEmpty.idf.accept(this));
         return new Str(""); 
     }
+
+
     @Override public Symbole visit(IfThen ifThen, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
+       
+        Tds newTds = new Tds(tds);
+        SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
+        try {
+            tds.addSymbole("ifThen", bloc); // il n'y aura qu'au plus un symbole nommé ifThen dans la tds
+        } catch (SymbolAlreadyExistsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+        ifThen.thenBlock.accept(this, newTds);
 
-        // Symbole conditionState = ifThen.condition.accept(this);
-        // Symbole thenBlockState = ifThen.thenBlock.accept(this);
-
-        // this.addNode(nodeIdentifier, "IfThen");
-
-        // this.addTransition(nodeIdentifier, conditionState);
-        // this.addTransition(nodeIdentifier, thenBlockState);
-
-        return new Str(""); 
+        return null; 
     }
+
+
     @Override public Symbole visit(IfThenElse ifThenElse, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
 
-        // Symbole conditionState = ifThenElse.condition.accept(this);
-        // Symbole thenBlockState = ifThenElse.thenBlock.accept(this);
-        // Symbole elseBlockState = ifThenElse.elseBlock.accept(this);
+        Tds newTds = new Tds(tds);
+        SymboleBlocAnonyme blocThen = new SymboleBlocAnonyme(newTds);
+        SymboleBlocAnonyme blocElse = new SymboleBlocAnonyme(newTds);
+        try {
+            tds.addSymbole("ifThen", blocThen); // il n'y aura qu'au plus un symbole nommé ifThenElse dans la tds
+            tds.addSymbole("ifElse", blocElse); // il n'y aura qu'au plus un symbole nommé ifElse dans la tds
+        } catch (SymbolAlreadyExistsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
         
-        // this.addNode(nodeIdentifier, "IfThenElse");
+        ifThenElse.thenBlock.accept(this, newTds);
+        ifThenElse.elseBlock.accept(this, newTds);
 
-        // this.addTransition(nodeIdentifier, conditionState);
-        // this.addTransition(nodeIdentifier, thenBlockState);
-        // this.addTransition(nodeIdentifier, elseBlockState);
-
-        return new Str(""); 
+        return null; 
     }
     @Override public Symbole visit(While while1, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "While");
-        // this.addTransition(nodeIdentifier, while1.condition.accept(this));
-        // this.addTransition(nodeIdentifier, while1.doBlock.accept(this));
-        return new Str(""); 
+
+        Tds newTds = new Tds(tds);
+        SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
+        try {
+            tds.addSymbole("While", bloc); // il n'y aura qu'au plus un symbole nommé While dans la tds
+        } catch (SymbolAlreadyExistsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+        
+        while1.doBlock.accept(this, newTds);
+
+        return null; 
     }
+
+    
     @Override public Symbole visit(Return return1, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "Return");
         // this.addTransition(nodeIdentifier, return1.expr.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit(Bloc bloc, Tds tds){
 
         int i = 0;
@@ -411,12 +434,35 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         int longueurListe = listeAst.size();
 
         while(i < longueurListe){
-            // gestion des blocs --> accept si if ou ifelse ou while ou bloc 
-            // --> dans ces cas création d'une nouvelle tds soit bloc anonyme, soit bloc 
-        }
-    
+            Ast astInstruction = listeAst.get(i);
+            i++;
+            // On ne va modifier la TDS que pour les instructions générants un nouveau bloc
+            if(astInstruction instanceof IfThen){
+                astInstruction.accept(this, tds);
+            }
 
-        return new Str(""); 
+            else if (astInstruction instanceof IfThenElse){
+                astInstruction.accept(this, tds);
+            }
+
+            else if (astInstruction instanceof While){
+                astInstruction.accept(this, tds);
+            }
+
+            else if (astInstruction instanceof Bloc){
+                Tds newTds = new Tds(tds);
+                Symbole symbole = astInstruction.accept(this, newTds);
+                try {
+                    tds.addSymbole("Bloc", symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
+                } catch (SymbolAlreadyExistsException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        return new SymboleBlocAnonyme(tds); 
     }
     @Override public Symbole visit(CharNode charNode, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
