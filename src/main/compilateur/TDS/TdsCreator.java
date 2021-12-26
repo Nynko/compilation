@@ -5,6 +5,8 @@ import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+import javax.lang.model.util.ElementScanner6;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
@@ -76,7 +78,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                     }
 
                     else{
-                        throw new Error("Erreur de remontée des symboles, instruction doit être une déclaration de struct ou de fonction");
+                        throw new Error("Erreur de remontée des symboles visit(Fichier...), instruction doit être DeclStruct ou SymboleFonction");
                     }
                 }
             }
@@ -148,7 +150,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
             }
 
             else{
-                throw new Error("Erreur de remontée des symboles, symbole doit être une liste de Symbole (contenant des SymboleInt ou SymboleStruct)");
+                throw new Error("Erreur de remontée des symboles dans visit(Decl_typ...), symbole doit être une liste de Symbole (contenant des SymboleInt ou SymboleStruct)");
             }
 
         }
@@ -159,14 +161,82 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
 
     @Override public Symbole visit(DeclFctInt declFctInt, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "DeclFctInt");
-        // this.addTransition(nodeIdentifier, declFctInt.Idf.accept(this));
-        // if (declFctInt.param != null) {
-        //     this.addTransition(nodeIdentifier, declFctInt.param.accept(this));
-        // }
-        // this.addTransition(nodeIdentifier, declFctInt.bloc.accept(this));
-        return new Str("");
+        Symbole nameSymbole = declFctInt.Idf.accept(this,tds);
+        String nameFunction = ((Str) nameSymbole).getString();
+
+        Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
+        SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
+
+        int deplacementParam = -1;
+        if (declFctInt.param != null) {
+           ListeSymbole listeSymbole = (ListeSymbole) declFctInt.param.accept(this,tds);
+           for(Symbole symbole : listeSymbole.getList()){
+                if(symbole instanceof SymboleInt){
+                    //UPDATE du déplacement
+                    ((SymboleInt)symbole).setDeplacement(deplacementParam);
+                    deplacementParam -= 1;
+
+                    symboleFonction.addArg(symbole);                    
+                }
+
+                else if(symbole instanceof SymboleStruct){
+                    //UPDATE du déplacement
+                    ((SymboleStruct)symbole).setDeplacement(deplacementParam);
+                    deplacementParam -= 1;
+
+                    symboleFonction.addArg(symbole);   
+                }
+
+                else{
+                    throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
+                }
+
+           }
+        }
+
+        if (declFctInt.bloc != null){
+            ListeSymbole listeSymboleBloc = (ListeSymbole)declFctInt.bloc.accept(this,tdsFunction);
+            
+            for(Symbole symbole : listeSymboleBloc.getList()){
+
+                if(symbole instanceof SymboleInt){
+                    //UPDATE du déplacement
+                    SymboleInt symboleInt = (SymboleInt) symbole;
+                    symboleInt.setDeplacement(deplacementParam);
+                    deplacementParam -= 1;
+
+                    try {
+                        tdsFunction.addSymbole(symboleInt.getName(), symbole);
+                    } catch (SymbolAlreadyExistsException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+
+                else if(symbole instanceof SymboleStruct){
+                    //UPDATE du déplacement
+                    SymboleStruct symboleStruct = (SymboleStruct) symbole;
+                    symboleStruct.setDeplacement(deplacementParam);
+                    deplacementParam -= 1;
+
+                    
+                    try {
+                        tdsFunction.addSymbole(symboleStruct.getName(), symbole);
+                    } catch (SymbolAlreadyExistsException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } 
+                }
+
+                else{
+                    throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
+                }
+
+            }
+
+        }
+
+        return symboleFonction;
     }
     @Override public Symbole visit(DeclFctStruct declFctStruct, Tds tds){
         // Symbole nodeIdentifier = this.nextState();

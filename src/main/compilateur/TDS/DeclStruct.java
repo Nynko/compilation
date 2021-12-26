@@ -2,7 +2,7 @@ package compilateur.TDS;
 
 import java.util.ArrayList;
 
-public class DeclStruct extends Symbole implements CloningStructPrototype{
+public class DeclStruct extends Symbole{
 
     private String name;
     private ArrayList<Symbole> declVars;
@@ -29,25 +29,4 @@ public class DeclStruct extends Symbole implements CloningStructPrototype{
         return this.declVars;
     }
 
-    public Symbole cloneSymbole(){
-        DeclStruct declStructClone =  new DeclStruct(this.name);
-        for(Symbole symbole : declVars){
-
-            if( symbole instanceof SymboleInt ){
-                SymboleInt clone = (SymboleInt) ((SymboleInt) symbole).cloneSymbole();
-                declStructClone.getListDeclVars().add(clone);
-            }
-
-            else if (symbole instanceof SymboleStruct){
-                SymboleStruct clone = (SymboleStruct) ((SymboleStruct) symbole).cloneSymbole();
-                declStructClone.getListDeclVars().add(clone);
-            }
-
-            else{
-                throw new Error("La structure " + this.name + " contient des symboles différents de SymboleInt et SymboleStruct");
-            }
-        }
-
-        return declStructClone;
-    }
 }

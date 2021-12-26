@@ -1,6 +1,6 @@
 package compilateur.TDS;
 
-public class SymboleInt extends Symbole implements CloningStructPrototype{
+public class SymboleInt extends Symbole{
 
     private int value;
     private String name;
@@ -29,10 +29,6 @@ public class SymboleInt extends Symbole implements CloningStructPrototype{
 
     public void setDeplacement(int deplacement){
         this.deplacement = deplacement;
-    }
-
-    public Symbole cloneSymbole(){
-        return new SymboleInt(this.name);
     }
 
     
