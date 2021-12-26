@@ -201,36 +201,12 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
         symboleFonction.setReturnType("int");
 
-        int deplacementParam = -1;
         if (declFctInt.param != null) {
-           ListeSymbole listeSymbole = (ListeSymbole) declFctInt.param.accept(this,tds);
-           for(Symbole symbole : listeSymbole.getList()){
-                if(symbole instanceof SymboleInt){
-                    //UPDATE du déplacement
-                    ((SymboleInt)symbole).setDeplacement(deplacementParam);
-                    deplacementParam -= 1;
-
-                    symboleFonction.addArg(symbole);                    
-                }
-
-                else if(symbole instanceof SymboleStruct){
-                    //UPDATE du déplacement
-                    ((SymboleStruct)symbole).setDeplacement(deplacementParam);
-                    deplacementParam -= 1;
-
-                    symboleFonction.addArg(symbole);   
-                }
-
-                else{
-                    throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
-                }
-
-           }
-        }
+            declFctInt.param.accept(this,tdsFunction);  
+         }
 
         if (declFctInt.bloc != null){
             declFctInt.bloc.accept(this,tdsFunction);
-
         }
 
         return symboleFonction;
@@ -254,31 +230,8 @@ public class TdsCreator implements TdsVisitor<Symbole>{
             // throw new UndefinedStructureException(nameStruct, nameStructSymbole.getDefinitionLine());
         }
 
-        int deplacementParam = -1;
         if (declFctStruct.param != null) {
-           ListeSymbole listeSymbole = (ListeSymbole) declFctStruct.param.accept(this,tds);
-           for(Symbole symbole : listeSymbole.getList()){
-                if(symbole instanceof SymboleInt){
-                    //UPDATE du déplacement
-                    ((SymboleInt)symbole).setDeplacement(deplacementParam);
-                    deplacementParam -= 1;
-
-                    symboleFonction.addArg(symbole);                    
-                }
-
-                else if(symbole instanceof SymboleStruct){
-                    //UPDATE du déplacement
-                    ((SymboleStruct)symbole).setDeplacement(deplacementParam);
-                    deplacementParam -= 1;
-
-                    symboleFonction.addArg(symbole);   
-                }
-
-                else{
-                    throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
-                }
-
-           }
+           declFctStruct.param.accept(this,tdsFunction);  
         }
 
         if (declFctStruct.bloc != null){
@@ -290,13 +243,29 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
 
     @Override public Symbole visit(ParamListMulti paramListMulti, Tds tds){
-        ListeSymbole listeSymbole = new ListeSymbole();
 
+        int deplacementParam = -1;
         for (Ast ast:paramListMulti.paramList){
-            listeSymbole.addSymbole((ListeSymbole)ast.accept(this,tds));
+            Symbole symbole = ast.accept(this,tds);
+
+            if(symbole instanceof SymboleInt){
+                //UPDATE du déplacement
+                ((SymboleInt)symbole).setDeplacement(deplacementParam);
+                deplacementParam -= 1;
+            }
+
+            else if(symbole instanceof SymboleStruct){
+                //UPDATE du déplacement
+                ((SymboleStruct)symbole).setDeplacement(deplacementParam);
+                deplacementParam -= 1;
+            }
+
+            else{
+                throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
+            }
         }
         
-        return listeSymbole; 
+        return null; 
     }
 
     @Override public Symbole visit(ParamInt paramInt, Tds tds){
@@ -408,7 +377,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         return null; 
     }
 
-    
+
     @Override public Symbole visit(Return return1, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "Return");
