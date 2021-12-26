@@ -1,11 +1,9 @@
 package compilateur.TDS;
 
 
-import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-import javax.lang.model.util.ElementScanner6;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
@@ -47,6 +45,42 @@ import compilateur.ast.Negation;
 import compilateur.ast.While;
 
 public class TdsCreator implements TdsVisitor<Symbole>{
+
+    private static final int OFFSETVALUE = 4;
+
+    public void addSymboleIntStructToTds(Symbole symbole, int deplacement, Tds tds, String nomFonctionAppellante){
+        if(symbole instanceof SymboleInt){
+            //UPDATE du déplacement
+            SymboleInt symboleInt = (SymboleInt) symbole;
+            symboleInt.setDeplacement(deplacement);
+
+            try {
+                tds.addSymbole(symboleInt.getName(), symbole);
+            } catch (SymbolAlreadyExistsException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        else if(symbole instanceof SymboleStruct){
+            //UPDATE du déplacement
+            SymboleStruct symboleStruct = (SymboleStruct) symbole;
+            symboleStruct.setDeplacement(deplacement);
+
+            
+            try {
+                tds.addSymbole(symboleStruct.getName(), symbole);
+            } catch (SymbolAlreadyExistsException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } 
+        }
+
+        else{
+            throw new Error("Erreur de remontée des symboles dans" + nomFonctionAppellante + ", symbole doit être SymboleInt ou SymboleStruct)");
+        }
+    }
+
 
     @Override public Symbole visit(Fichier fichier, Tds tds){
 
@@ -112,8 +146,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // Clone de la structure
         DeclStruct struct ; 
         try {
-            DeclStruct structToClone = tds.getNameSpaceStruct().getStruct(nameStruct);
-            struct =  (DeclStruct) structToClone.cloneSymbole();
+            struct = tds.getNameSpaceStruct().getStruct(nameStruct);
         } catch (NoSuchElementException e) {
             // throw new UndefinedStructureException(nameStruct,nameSymbole.getDefinitionLine());
             struct = new DeclStruct(nameStruct);// A DELETE avec gestion d'erreur ou pas
@@ -197,42 +230,9 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         if (declFctInt.bloc != null){
             ListeSymbole listeSymboleBloc = (ListeSymbole)declFctInt.bloc.accept(this,tdsFunction);
             
-            for(Symbole symbole : listeSymboleBloc.getList()){
+            // for(Symbole symbole : listeSymboleBloc.getList()){
 
-                if(symbole instanceof SymboleInt){
-                    //UPDATE du déplacement
-                    SymboleInt symboleInt = (SymboleInt) symbole;
-                    symboleInt.setDeplacement(deplacementParam);
-                    deplacementParam -= 1;
-
-                    try {
-                        tdsFunction.addSymbole(symboleInt.getName(), symbole);
-                    } catch (SymbolAlreadyExistsException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-
-                else if(symbole instanceof SymboleStruct){
-                    //UPDATE du déplacement
-                    SymboleStruct symboleStruct = (SymboleStruct) symbole;
-                    symboleStruct.setDeplacement(deplacementParam);
-                    deplacementParam -= 1;
-
-                    
-                    try {
-                        tdsFunction.addSymbole(symboleStruct.getName(), symbole);
-                    } catch (SymbolAlreadyExistsException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } 
-                }
-
-                else{
-                    throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
-                }
-
-            }
+            // }
 
         }
 
@@ -333,13 +333,27 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         return new Str(""); 
     }
     @Override public Symbole visit(Bloc bloc, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "Bloc");
-        
-        // for (Ast ast:bloc.instList, Tds tds){
-        //     Symbole astState = ast.accept(this);
-        //     this.addTransition(nodeIdentifier, astState);
-        // }
+
+        int i = 0;
+        ArrayList<Ast> listeAst =  bloc.instList ; 
+        Ast ast = listeAst.get(i);  
+        int deplacement = 0; 
+        while( (ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct)){ // Tant qu'objet de types decl_vars
+            Symbole symbole = ast.accept(this, tds);
+            addSymboleIntStructToTds(symbole,deplacement,tds,"visit(Bloc...)");
+            i ++;
+            deplacement += OFFSETVALUE; 
+            ast = listeAst.get(i);
+        }
+
+        // types instructions
+        int longueurListe = listeAst.size();
+
+        while(i < longueurListe){
+            // gestion des blocs --> accept si if ou ifelse ou while ou bloc 
+            // --> dans ces cas création d'une nouvelle tds soit bloc anonyme, soit bloc 
+        }
+    
 
         return new Str(""); 
     }
