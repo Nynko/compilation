@@ -29,6 +29,10 @@ public class SymboleStruct extends Symbole implements CloningStructPrototype{
         return this.deplacement;
     }
 
+    public void setDeplacement(int deplacement){
+        this.deplacement = deplacement;
+    }
+
     public Symbole cloneSymbole(){
         return new SymboleInt(this.name);
     }

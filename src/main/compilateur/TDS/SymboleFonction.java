@@ -9,6 +9,7 @@ public class SymboleFonction extends SymboleBlocNomme {
 
     public SymboleFonction(String name, Tds tds){
         super(name,tds);
+        this.args = new ArrayList<Symbole>();
     }
 
     public SymboleFonction(String name, Tds tds, ArrayList<Symbole> args){
@@ -24,6 +25,10 @@ public class SymboleFonction extends SymboleBlocNomme {
 
     public void addArgs(ArrayList<Symbole> args){
         this.args = args;
+    }
+
+    public void addArg(Symbole arg){
+        this.args.add(arg);
     }
 
     public ArrayList<Symbole> getArgs(){
