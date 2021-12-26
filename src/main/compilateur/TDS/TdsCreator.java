@@ -392,10 +392,12 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         Ast ast = listeAst.get(i);  
         int deplacement = 0; 
         while( (ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct)){ // Tant qu'objet de types decl_vars
-            Symbole symbole = ast.accept(this, tds);
-            addSymboleIntStructToTds(symbole,deplacement,tds,"visit(Bloc...)");
+            ListeSymbole listeSymbole = (ListeSymbole) ast.accept(this, tds);
+            for(Symbole symbole : listeSymbole.getList()){
+                addSymboleIntStructToTds(symbole,deplacement,tds,"visit(Bloc...)");
+                deplacement += OFFSETVALUE; 
+            }
             i ++;
-            deplacement += OFFSETVALUE; 
             ast = listeAst.get(i);
         }
 
