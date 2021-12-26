@@ -35,6 +35,10 @@ public class Tds {
         return this.nameSpaceStruct;
     }
 
+    public SymboleDeclStruct getNameSpaceStruct(String name){
+        return this.nameSpaceStruct.getStruct(name);
+    }
+
     public void addPere(Tds tds){
         this.pointeurPere = tds;
         this.nameSpaceStruct = pointeurPere.getNameSpaceStruct();

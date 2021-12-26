@@ -47,5 +47,9 @@ public class SymboleFonction extends SymboleBlocNomme {
         return this.returnType;
     }
 
+    public void setReturnType(String str){
+        this.returnType = str;
+    }
+
     
 }

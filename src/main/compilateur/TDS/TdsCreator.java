@@ -102,9 +102,9 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                         }
                     }
 
-                    else if (instruction instanceof DeclStruct){ 
+                    else if (instruction instanceof SymboleDeclStruct){ 
                         try {
-                            tds.getNameSpaceStruct().addDeclStruct(((DeclStruct)instruction));
+                            tds.getNameSpaceStruct().addSymboleDeclStruct(((SymboleDeclStruct)instruction));
                         } catch (SymbolAlreadyExistsException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -112,7 +112,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                     }
 
                     else{
-                        throw new Error("Erreur de remontée des symboles visit(Fichier...), instruction doit être DeclStruct ou SymboleFonction");
+                        throw new Error("Erreur de remontée des symboles visit(Fichier...), instruction doit être SymboleDeclStruct ou SymboleFonction");
                     }
                 }
             }
@@ -143,16 +143,16 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         Symbole nameSymbole = liste.get(0).accept(this, tds);
         String nameStruct = ((Str) nameSymbole).getString();
 
-        // Clone de la structure
-        DeclStruct struct ; 
+        // Récupération de la structure
+        SymboleDeclStruct struct ; 
         try {
             struct = tds.getNameSpaceStruct().getStruct(nameStruct);
         } catch (NoSuchElementException e) {
             // throw new UndefinedStructureException(nameStruct,nameSymbole.getDefinitionLine());
-            struct = new DeclStruct(nameStruct);// A DELETE avec gestion d'erreur ou pas
+            struct = new SymboleDeclStruct(nameStruct);// A DELETE avec gestion d'erreur ou pas
         }
-        // Fin clone de la structure
        
+
         liste.remove(0);      
         ListeSymbole listeSymbole = new ListeSymbole();
         for(Ast identifiants :liste){
@@ -166,7 +166,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
 
     @Override public Symbole visit(Decl_typ decl_typ, Tds tds){
-        
+        // Création d'une struct que l'on va ajouter dans le NameSpace et pouvoir la référencer.
         Str identifiant = (Str) decl_typ.idf.accept(this,tds);
         String idf = identifiant.getString();
 
@@ -188,7 +188,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         }
 
-        return new DeclStruct(idf, listeVars);
+        return new SymboleDeclStruct(idf, listeVars);
     }
 
 
@@ -199,6 +199,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
+        symboleFonction.setReturnType("int");
 
         int deplacementParam = -1;
         if (declFctInt.param != null) {
@@ -228,49 +229,109 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         }
 
         if (declFctInt.bloc != null){
-            ListeSymbole listeSymboleBloc = (ListeSymbole)declFctInt.bloc.accept(this,tdsFunction);
-            
-            // for(Symbole symbole : listeSymboleBloc.getList()){
-
-            // }
+            declFctInt.bloc.accept(this,tdsFunction);
 
         }
 
         return symboleFonction;
     }
-    @Override public Symbole visit(DeclFctStruct declFctStruct, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "DeclFctStruct");
-        // this.addTransition(nodeIdentifier, declFctStruct.Idf0.accept(this));
-        // this.addTransition(nodeIdentifier, declFctStruct.Idf1.accept(this));
-        // this.addTransition(nodeIdentifier, declFctStruct.param.accept(this));
-        // this.addTransition(nodeIdentifier, declFctStruct.bloc.accept(this));
-        return new Str(""); 
-    }
-    @Override public Symbole visit(ParamListMulti paramListMulti, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "ParamListMulti");
 
-        // for (Ast ast:paramListMulti.paramList, Tds tds){
-        //     Symbole astState = ast.accept(this);
-        //     this.addTransition(nodeIdentifier, astState);
-        // }
+
+    @Override public Symbole visit(DeclFctStruct declFctStruct, Tds tds){
+        Symbole nameStructSymbole = declFctStruct.Idf0.accept(this, tds);
+        String nameStruct = ((Str) nameStructSymbole).getString();
+
+        Symbole nameSymbole = declFctStruct.Idf1.accept(this,tds);
+        String nameFunction = ((Str) nameSymbole).getString();
+
+        Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
+        SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
+        if(tds.isNameSpaceStructContains(nameStruct)){
+            symboleFonction.setReturnType(nameStruct);
+        }
+
+        else{
+            // throw new UndefinedStructureException(nameStruct, nameStructSymbole.getDefinitionLine());
+        }
+
+        int deplacementParam = -1;
+        if (declFctStruct.param != null) {
+           ListeSymbole listeSymbole = (ListeSymbole) declFctStruct.param.accept(this,tds);
+           for(Symbole symbole : listeSymbole.getList()){
+                if(symbole instanceof SymboleInt){
+                    //UPDATE du déplacement
+                    ((SymboleInt)symbole).setDeplacement(deplacementParam);
+                    deplacementParam -= 1;
+
+                    symboleFonction.addArg(symbole);                    
+                }
+
+                else if(symbole instanceof SymboleStruct){
+                    //UPDATE du déplacement
+                    ((SymboleStruct)symbole).setDeplacement(deplacementParam);
+                    deplacementParam -= 1;
+
+                    symboleFonction.addArg(symbole);   
+                }
+
+                else{
+                    throw new Error("Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
+                }
+
+           }
+        }
+
+        if (declFctStruct.bloc != null){
+            declFctStruct.bloc.accept(this,tdsFunction);
+        }
+
+        return symboleFonction;
+    }
+
+
+    @Override public Symbole visit(ParamListMulti paramListMulti, Tds tds){
+        ListeSymbole listeSymbole = new ListeSymbole();
+
+        for (Ast ast:paramListMulti.paramList){
+            listeSymbole.addSymbole((ListeSymbole)ast.accept(this,tds));
+        }
         
-        return new Str(""); 
+        return listeSymbole; 
     }
+    
     @Override public Symbole visit(ParamInt paramInt, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "ParamInt");
-        // this.addTransition(nodeIdentifier, paramInt.name.accept(this));
-        return new Str(""); 
+        
+        Str symboleName = (Str) paramInt.name.accept(this, tds);
+        String name = symboleName.getString();
+        SymboleInt symboleInt = new SymboleInt(name);
+
+        return symboleInt; 
     }
+
     @Override public Symbole visit(ParamStruct paramStruct, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "ParamStruct");
-        // this.addTransition(nodeIdentifier, paramStruct.idf0.accept(this));
-        // this.addTransition(nodeIdentifier, paramStruct.idf1.accept(this));
-        return new Str(""); 
+
+        Symbole nameStructSymbole = paramStruct.idf0.accept(this, tds);
+        String nameStruct = ((Str) nameStructSymbole).getString();
+
+        SymboleDeclStruct struct;
+
+        if(tds.isNameSpaceStructContains(nameStruct)){
+            struct = tds.getNameSpaceStruct(nameStruct);
+        }
+
+        else{
+            // throw new UndefinedStructureException(nameStruct, nameStructSymbole.getDefinitionLine());
+            struct = new SymboleDeclStruct(nameStruct);
+        }
+
+        Symbole symbole = paramStruct.idf1.accept(this, tds);
+        String nameVar = ((Str) symbole).getString();
+        
+        return new SymboleStruct(struct, nameVar);
+
     }
+
+
     @Override public Symbole visit(Sizeof sizeof, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "Sizeof");
@@ -371,6 +432,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         return new Str(""); 
 
     }
+
     @Override public Symbole visit(Affectation affectation, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
 
@@ -383,6 +445,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         return new Str(""); 
     }
+
     @Override public Symbole visit(Expr_ou expr_ou, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "||");
@@ -390,6 +453,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, expr_ou.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit(Expr_et expr_et, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "&&");
@@ -397,6 +461,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, expr_et.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit(Egal egal, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "==");
@@ -404,6 +469,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, egal.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit(Different dif, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "!=");
@@ -411,6 +477,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, dif.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit(Inferieur inf, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "<");
@@ -418,6 +485,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, inf.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit (InferieurEgal infEgal, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "<=");
@@ -425,6 +493,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, infEgal.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit (Superieur sup, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, ">");
@@ -432,6 +501,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, sup.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit (SuperieurEgal supEgal, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, ">=");
@@ -439,6 +509,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, supEgal.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit (Plus plus, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
 
@@ -452,6 +523,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         return new Str(""); 
     }
+
     @Override public Symbole visit (Minus minus, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
 
@@ -465,6 +537,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         return new Str(""); 
     }
+
     @Override public Symbole visit (Division div, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
 
@@ -478,6 +551,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         return new Str(""); 
     }
+
     @Override public Symbole visit (Multiplication mult, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
 
@@ -491,6 +565,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         return new Str(""); 
     }
+
     @Override public Symbole visit (Fleche fleche, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "->");
@@ -498,12 +573,14 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, fleche.right.accept(this));
         return new Str(""); 
     }
+
     @Override public Symbole visit (MoinsUnaire unaire, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "-");
         // this.addTransition(nodeIdentifier, unaire.noeud.accept(this));
         return new Str(""); 
     }
+    
     @Override public Symbole visit (Negation unaire, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "!");

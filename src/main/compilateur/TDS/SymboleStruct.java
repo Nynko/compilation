@@ -3,7 +3,7 @@ package compilateur.TDS;
 
 public class SymboleStruct extends Symbole{
 
-    private DeclStruct struct;
+    private SymboleDeclStruct struct;
     private String name;
     private int deplacement;
 
@@ -12,12 +12,12 @@ public class SymboleStruct extends Symbole{
         this.name = name;
     }
 
-    public SymboleStruct(DeclStruct struct, String name){
+    public SymboleStruct(SymboleDeclStruct struct, String name){
         this.struct = struct;
         this.name = name;
     }
 
-    public DeclStruct getStruct(){
+    public SymboleDeclStruct getStruct(){
         return this.struct;
     }
 

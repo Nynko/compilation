@@ -5,16 +5,16 @@ import java.util.NoSuchElementException;
 
 public class NameSpaceStruct{
 
-    private HashMap<String,DeclStruct> dicoStruct;
+    private HashMap<String,SymboleDeclStruct> dicoStruct;
 
     public NameSpaceStruct(){
-        this.dicoStruct = new HashMap<String,DeclStruct>();
+        this.dicoStruct = new HashMap<String,SymboleDeclStruct>();
     }
 
-    public void addDeclStruct(DeclStruct declStruct) throws SymbolAlreadyExistsException{
+    public void addSymboleDeclStruct(SymboleDeclStruct declStruct) throws SymbolAlreadyExistsException{
         String name = declStruct.getName();
         if(dicoStruct.containsKey(name)){
-            DeclStruct old = dicoStruct.get(name);
+            SymboleDeclStruct old = dicoStruct.get(name);
             throw new SymbolAlreadyExistsException(name, declStruct.getDefinitionLine(), old.getDefinitionLine() );
         }
         else{
@@ -26,8 +26,8 @@ public class NameSpaceStruct{
         return dicoStruct.containsKey(str);
     }
 
-    public DeclStruct getStruct(String name) throws NoSuchElementException{
-        DeclStruct declStruct = dicoStruct.get(name);
+    public SymboleDeclStruct getStruct(String name) throws NoSuchElementException{
+        SymboleDeclStruct declStruct = dicoStruct.get(name);
 
         if(declStruct!=null){
             return declStruct;
