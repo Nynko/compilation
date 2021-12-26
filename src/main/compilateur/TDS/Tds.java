@@ -23,12 +23,6 @@ public class Tds {
         this.nameSpaceStruct = pointeurPere.getNameSpaceStruct();
     }
 
-    public Tds(Tds pointeurpointeurPere, int numRegion){
-        this.imbrication = pointeurPere.getImbrication() + 1;
-        this.pointeurPere = pointeurPere;
-        this.numRegion = numRegion;
-    }
-
     public void addNameSpaceStruct(NameSpaceStruct nameSpaceStruct){
         this.nameSpaceStruct = nameSpaceStruct;
     }
