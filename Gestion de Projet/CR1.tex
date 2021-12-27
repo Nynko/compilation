@@ -1,0 +1,105 @@
+\documentclass[french]{article}
+\usepackage[utf8]{inputenc}
+
+
+\title{Compte Rendu 1}
+\author{Nicolas Beaudouin}
+\date{Réunion du Mercredi 03 Novembre}
+
+
+\usepackage{natbib}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{multirow}
+
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots. http://texdoc.net/texmf-dist/doc/latex/geometry/geometry.pdf
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+
+%Amélioration tableaux : https://fr.overleaf.com/learn/latex/Tables
+\renewcommand{\arraystretch}{1.5} %The height of each row is set to 1.5 relative to its default height.
+\setlength{\tabcolsep}{18pt}%The space between the text and the left/right border of its containing cell is set to 18pt with this command. Again, you may use other units if needed.
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+\begin{flushleft}
+ \begin{tabular}{|m{4cm}|m{8cm}|}
+    \hline
+    Motif/Type de Réunion :  & Disscussion autour de la grammaire  \\
+    \hline
+    Lieu:  & TELECOM Nancy (Salle S.13) \\
+    \hline
+    Présents:  & Tout le groupe \\
+    \hline \hline
+    Date/heure début:  & 14h \\
+    \hline
+    Durée: & 40min \\
+    \hline
+ \end{tabular}
+\end{flushleft}
+
+\section*{Ordre du jour}
+
+\begin{enumerate}
+    \item Ce qui a été fait\\
+    \item Grammaire \\
+    \item TDS \\
+    \item Tests sémantiques \\
+\end{enumerate}
+
+\section*{Ce qui a été fait}
+
+Tom a mis en place un pipeline et des fichiers gradle (ainsi qu'un makefile) facilitant le lancement de antlr4.
+Jean-Charles à commencé à la main une première version de la grammaire en tentant de la rendre LL(1) ce qui semble complexifier certains points.
+
+\section*{Grammaire}
+
+Nous avons discuté de la manière dont nous devions réaliser certains ordres de priorité dans la grammaire, notamment la question de la récursivité.
+Nous avons conclu sur le fait qu'il faut utiliser l'avantage d'ANTLER avec les "*" comme vu durant le TD1 pour pallier à la récursivité gauche.
+
+
+\section*{TDS}
+
+Bien que ce n'est pas le travail actuel, nous avons réfléchi aux TDS afin de mieux anticiper ce que nous allions faire durant la construction de l'arbre abstrait.
+Ce que l'on peut faire c'est au moment de la création de l'arbre abstrait et du parcours, on peut mettre les informations dans le TDS et donc simplifier directement notre arbre abstrait.
+Dans ce cas il faut aussi commencer à vérifier que les éléments ne soient pas déjà mis dans la TDS.
+
+Nous nous sommes aussi posé une question pour ce qui est des informations de débogages. Notamment, comment sait-on sur quelles lignes se situe l'erreur ? 
+- Soit Antler le sait.
+- Soit on garde les lignes dans la TDS.
+
+\section*{Tests sémantiques}
+
+Pour les tests sémantiques, il sera important que l'on réfléchisse tous ensemble des tests à faire avant de se les répartir.
+
+
+\section*{TO-DO List}
+
+\begin{itemize}
+    \item Jean-Charles et Nicolas : Faire la grammaire sur ANTLER
+    \item Thibaut et Tom : Réfléchir à la création de la table.
+\end{itemize}
+
+
+\section*{Prochaine Réunion}
+
+Date et Heure : Mercredi 10 Novembre 13h30.
+
+\section*{Annexes}
+RAS
+
+\end{document}
