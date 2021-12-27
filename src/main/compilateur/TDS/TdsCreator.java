@@ -244,7 +244,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(ParamListMulti paramListMulti, Tds tds){
 
-        int deplacementParam = -1;
+        int deplacementParam = -OFFSETVALUE; // On considère que l'on sera en "Empty ascending ou descending dans la stack" 
         for (Ast ast:paramListMulti.paramList){
             Symbole symbole = ast.accept(this,tds);
 
@@ -252,7 +252,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                 //UPDATE du déplacement
                 ((SymboleInt)symbole).setDeplacement(deplacementParam);
                 addSymboleIntStructToTds(symbole,deplacementParam,tds,"visit(ParamListMulti...)");
-                deplacementParam -= 1;
+                deplacementParam -= OFFSETVALUE;
 
                 
 
@@ -262,7 +262,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                 //UPDATE du déplacement
                 ((SymboleStruct)symbole).setDeplacement(deplacementParam);
                 addSymboleIntStructToTds(symbole,deplacementParam,tds,"visit(ParamListMulti...)");
-                deplacementParam -= 1;
+                deplacementParam -= OFFSETVALUE;
             }
 
             else{
