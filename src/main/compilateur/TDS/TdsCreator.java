@@ -394,20 +394,20 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         int i = 0;
         ArrayList<Ast> listeAst =  bloc.instList ; 
+        int longueurListe = listeAst.size();
         Ast ast = listeAst.get(i);  
         int deplacement = 0; 
-        while( (ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct)){ // Tant qu'objet de types decl_vars
+        while( i < longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))){ // Tant qu'objet de types decl_vars
             ListeSymbole listeSymbole = (ListeSymbole) ast.accept(this, tds);
             for(Symbole symbole : listeSymbole.getList()){
                 addSymboleIntStructToTds(symbole,deplacement,tds,"visit(Bloc...)");
                 deplacement += OFFSETVALUE; 
             }
             i ++;
-            ast = listeAst.get(i);
+            if(i < longueurListe) ast = listeAst.get(i);
         }
 
         // types instructions
-        int longueurListe = listeAst.size();
 
         while(i < longueurListe){
             Ast astInstruction = listeAst.get(i);
