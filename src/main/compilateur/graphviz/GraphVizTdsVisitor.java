@@ -58,9 +58,10 @@ public class GraphVizTdsVisitor {
         int numberOfColMax = 3;
         for(String key: hashmap.keySet()){
             int num = hashmap.get(key).getListDeclVars().size();
-            if(num > numberOfColMax) numberOfColMax = num;
+            if(num + 1 > numberOfColMax) numberOfColMax = num + 1;  // + 1 car on indente ensuite !
         }
         String colspan = String.format("colspan='%d'", numberOfColMax);
+        System.out.println(colspan);
 
         for(String key: hashmap.keySet()){
             SymboleDeclStruct symbole = hashmap.get(key);
