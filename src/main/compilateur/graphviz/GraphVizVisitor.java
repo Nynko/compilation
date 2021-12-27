@@ -195,6 +195,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
     @Override public String visit(IdfParenthesis idfParenthesis){
         String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "Appel Fonction");
         this.addTransition(nodeIdentifier, idfParenthesis.idf.accept(this));
         for (Ast ast:idfParenthesis.exprList){
             String astState = ast.accept(this);
@@ -204,6 +205,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
     @Override public String visit(IdfParenthesisEmpty idfParenthesisEmpty){
         String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "Appel Fonction");
         this.addTransition(nodeIdentifier, idfParenthesisEmpty.idf.accept(this));
         return nodeIdentifier;
     }
