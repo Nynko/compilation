@@ -114,40 +114,28 @@ public class GraphVizTdsVisitor {
 
             if(symbole instanceof SymboleInt){
                 SymboleInt sym = (SymboleInt) symbole;
-                // String idf = sym.getName() + region + imbrication;
-                // content = content + String.format("| { < %s > int | %s | %d } ", idf, sym.getName(), sym.getDeplacement() );
                 content = content + String.format("<tr><td> int </td> <td> %s </td> <td> %d </td></tr>", sym.getName(), sym.getDeplacement() );
             }
 
             else if(symbole instanceof SymboleStruct){
                 SymboleStruct sym = (SymboleStruct) symbole;
-                // String idf = sym.getName() + region + imbrication;
-                // content = content + String.format("| { < %s > Struct %s | %s | %d } ", idf, sym.getStruct().getName(), sym.getName(), sym.getDeplacement() );
                 content = content + String.format("<tr><td> Struct %s </td> <td> %s </td> <td> %d </td></tr>", sym.getStruct().getName(), sym.getName(), sym.getDeplacement() );
             }
 
             else if ( symbole instanceof SymboleBloc){
                 if(symbole instanceof SymboleFonction){
                     SymboleFonction sym = (SymboleFonction) symbole ; 
-                    // String idf = sym.getName()  + region + imbrication;
-                    // content = content + String.format("| {<%s> %s | return : %s } ", idf, sym.getName(), sym.getReturnType());
                     String newNode = this.nextState(); 
                     Tds newTds = sym.getTds();
                     addTds(sym.getName(),newNode, newTds);
-                    // int newRegion = newTds.getNumRegion();
-                    // this.linkBuffer = linkBuffer + String.format("\t%s:%s -> %s:%d;\n",node,idf,newNode,newRegion);
                     this.linkBuffer = linkBuffer + String.format("\t%s -> %s;\n",node,newNode);
                 }
 
                 else if(symbole instanceof SymboleBlocAnonyme){
                     SymboleBlocAnonyme sym = (SymboleBlocAnonyme) symbole ; 
-                    // String idf = symboleKey  + region + imbrication;
-                    // content = content + String.format("{<%s> %s }", idf,symboleKey);
                     String newNode = this.nextState(); // Change with recursive node creation 
                     Tds newTds = sym.getTds();
                     addTds(symboleKey, newNode, newTds);
-                    // int newRegion = newTds.getNumRegion();
-                    // this.linkBuffer = linkBuffer + String.format("\t%s:%s -> %s:%d;\n",node,idf,newNode,newRegion);
                     this.linkBuffer = linkBuffer + String.format("\t%s -> %s;\n",node,newNode);
                 }
             }
