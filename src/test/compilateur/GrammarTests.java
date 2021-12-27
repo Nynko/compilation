@@ -26,17 +26,17 @@ import compilateur.grammar.*;
 public class GrammarTests {
     @Test
     public void goodTest() throws IOException {
-        assertEquals(true, testFile("./examples/good.exp"));
+        assertEquals(true, testFile("./examples/good.c"));
     }
 
     @Test
     public void badTest() throws IOException {
-        assertEquals(false, testFile("./examples/bad.exp"));
+        assertEquals(false, testFile("./examples/bad.c"));
     }
 
     @Test
     public void emptyTest() throws IOException {
-        assertEquals(true, testFile("./examples/empty.exp"));
+        assertEquals(true, testFile("./examples/empty.c"));
     }
 
     @TestFactory
@@ -45,7 +45,7 @@ public class GrammarTests {
         List<String> testFiles = new ArrayList<String>();
         File[] files = new File("./examples/").listFiles();
 
-        Pattern pattern = Pattern.compile(".*\\.((Good)|(Bad))\\.exp$");
+        Pattern pattern = Pattern.compile(".*\\.((Good)|(Bad))\\.c$");
         for (File file : files) {
             if (file.isFile()) {
                 Matcher m = pattern.matcher(file.getName());
