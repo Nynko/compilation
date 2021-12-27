@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.swing.plaf.synth.SynthComboBoxUI;
 
 import compilateur.TDS.NameSpaceStruct;
-import compilateur.TDS.Str;
 import compilateur.TDS.Symbole;
 import compilateur.TDS.SymboleBloc;
 import compilateur.TDS.SymboleBlocAnonyme;
@@ -88,7 +86,7 @@ public class GraphVizTdsVisitor {
         this.nodeBuffer += String.format("\t%s [shape=\"record\",label=\" NameSpaceStruct %s \"];\n", node, content);
     }
 
-    private void addTds(String node, Tds tds){
+    private void addTds(String name, String node, Tds tds){
         int numRegion = tds.getNumRegion();
         int numImbrication = tds.getImbrication();
         String region = Integer.toString(numRegion);
@@ -117,36 +115,37 @@ public class GraphVizTdsVisitor {
                 if(symbole instanceof SymboleFonction){
                     SymboleFonction sym = (SymboleFonction) symbole ; 
                     String idf = sym.getName()  + region + imbrication;
-                    content = content + String.format("| {<%s> %s | return : %s } ", idf, sym.getName(), sym.getReturnType());
-                    String newNode = this.nextState(); // Change with recursive node creation 
+                    // content = content + String.format("| {<%s> %s | return : %s } ", idf, sym.getName(), sym.getReturnType());
+                    String newNode = this.nextState(); 
                     Tds newTds = sym.getTds();
-                    addTds(newNode, newTds);
+                    addTds(sym.getName(),newNode, newTds);
                     int newRegion = newTds.getNumRegion();
-                    this.linkBuffer = linkBuffer + String.format("\t%s:%s -> %s:%d;\n",node,idf,newNode,newRegion);
-
+                    // this.linkBuffer = linkBuffer + String.format("\t%s:%s -> %s:%d;\n",node,idf,newNode,newRegion);
+                    this.linkBuffer = linkBuffer + String.format("\t%s -> %s:%d;\n",node,newNode,newRegion);
                 }
 
                 else if(symbole instanceof SymboleBlocAnonyme){
                     SymboleBlocAnonyme sym = (SymboleBlocAnonyme) symbole ; 
                     String idf = symboleKey  + region + imbrication;
-                    content = content + String.format("{<%s> %s }", idf,symboleKey);
+                    // content = content + String.format("{<%s> %s }", idf,symboleKey);
                     String newNode = this.nextState(); // Change with recursive node creation 
                     Tds newTds = sym.getTds();
-                    addTds(newNode, newTds);
+                    addTds(symboleKey, newNode, newTds);
                     int newRegion = newTds.getNumRegion();
-                    this.linkBuffer = linkBuffer + String.format("\t%s:%s -> %s:%d;\n",node,idf,newNode,newRegion);
+                    // this.linkBuffer = linkBuffer + String.format("\t%s:%s -> %s:%d;\n",node,idf,newNode,newRegion);
+                    this.linkBuffer = linkBuffer + String.format("\t%s -> %s:%d;\n",node,newNode,newRegion);
                 }
             }
 
         }
 
-        this.nodeBuffer += String.format("\t%s [shape=\"record\",label=\" <%s> %s | %s %s \"];\n", node, region,region,imbrication, content);
+        this.nodeBuffer += String.format("\t%s [shape=\"record\",label=\" <%s> %s | %s | %s %s \"];\n", node, region,region,imbrication, name, content);
     }
 
 
     public void createGraph(Tds tds){
         addNameSpaceStruct(this.nextState(),tds);
-        addTds(this.nextState(), tds);
+        addTds("",this.nextState(), tds);
     }
     
 }
