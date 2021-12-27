@@ -251,12 +251,17 @@ public class TdsCreator implements TdsVisitor<Symbole>{
             if(symbole instanceof SymboleInt){
                 //UPDATE du déplacement
                 ((SymboleInt)symbole).setDeplacement(deplacementParam);
+                addSymboleIntStructToTds(symbole,deplacementParam,tds,"visit(ParamListMulti...)");
                 deplacementParam -= 1;
+
+                
+
             }
 
             else if(symbole instanceof SymboleStruct){
                 //UPDATE du déplacement
                 ((SymboleStruct)symbole).setDeplacement(deplacementParam);
+                addSymboleIntStructToTds(symbole,deplacementParam,tds,"visit(ParamListMulti...)");
                 deplacementParam -= 1;
             }
 
