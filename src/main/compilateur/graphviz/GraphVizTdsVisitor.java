@@ -2,9 +2,13 @@ package compilateur.graphviz;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.plaf.synth.SynthComboBoxUI;
+
 import compilateur.TDS.NameSpaceStruct;
+import compilateur.TDS.Str;
 import compilateur.TDS.Symbole;
 import compilateur.TDS.SymboleBloc;
 import compilateur.TDS.SymboleBlocAnonyme;
@@ -47,14 +51,42 @@ public class GraphVizTdsVisitor {
         return "N"+ returnedState;
     }
 
+    private String addStruct(Symbole symbole){
+        SymboleStruct symboleStruct =  (SymboleStruct) symbole;
+        String content = String.format("| Struct %s * %s ", symboleStruct.getStruct().getName(),symboleStruct.getName());
+        return content;
+    }
 
-    // private void addNameSpaceStruct(Tds tds){
-    //     NameSpaceStruct nameSpace = tds.getNameSpaceStruct();
-    //     HashMap<String,SymboleDeclStruct> hashmap = nameSpace.getHashMap();
-    //     for(String keys: hashmap.keySet()){
-    //         SymboleDeclStruct 
-    //     }
-    // }
+
+    private void addNameSpaceStruct(String node,Tds tds){
+        String content = "";
+        NameSpaceStruct nameSpace = tds.getNameSpaceStruct();
+        HashMap<String,SymboleDeclStruct> hashmap = nameSpace.getHashMap();
+        for(String key: hashmap.keySet()){
+            SymboleDeclStruct symbole = hashmap.get(key);
+            content = content + String.format("| {Struct %s", symbole.getName());
+
+            ArrayList<Symbole> declVars = symbole.getListDeclVars();
+            Boolean nonEmpty = ! declVars.isEmpty();
+            // if(nonEmpty) content = content + "|{";
+            for(Symbole symbole2 : declVars){
+                if(symbole2 instanceof SymboleStruct){
+                    content = content + addStruct(symbole2);
+                }
+
+                else if(symbole2 instanceof SymboleInt){
+                    SymboleInt symboleInt = (SymboleInt) symbole2;
+                    content = content + String.format("| int %s", symboleInt.getName());
+                }
+            }
+            if(nonEmpty) content = content + "}";
+        }
+        // if(!hashmap.isEmpty()){
+        //     content = content + "}";
+        // }
+
+        this.nodeBuffer += String.format("\t%s [shape=\"record\",label=\" NameSpaceStruct %s \"];\n", node, content);
+    }
 
     private void addTds(String node, Tds tds){
         int numRegion = tds.getNumRegion();
@@ -113,6 +145,7 @@ public class GraphVizTdsVisitor {
 
 
     public void createGraph(Tds tds){
+        addNameSpaceStruct(this.nextState(),tds);
         addTds(this.nextState(), tds);
     }
     
