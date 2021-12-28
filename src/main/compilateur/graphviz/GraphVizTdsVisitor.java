@@ -55,14 +55,13 @@ public class GraphVizTdsVisitor {
         HashMap<String,SymboleDeclStruct> hashmap = nameSpace.getHashMap();
 
         // Get max number of Col
-        int numberOfColMax = 3;
+        int numberOfColMax = 1;
         for(String key: hashmap.keySet()){
             int num = hashmap.get(key).getListDeclVars().size();
             if(num + 1 > numberOfColMax) numberOfColMax = num + 1;  // + 1 car on indente ensuite !
         }
         String colspan = String.format("colspan='%d'", numberOfColMax);
-        System.out.println(colspan);
-
+        
         for(String key: hashmap.keySet()){
             SymboleDeclStruct symbole = hashmap.get(key);
             content = content + String.format("<tr> <td>Struct %s </td> %s </tr>",symbole.getName(),"<td></td>".repeat(numberOfColMax - 1)) ;
