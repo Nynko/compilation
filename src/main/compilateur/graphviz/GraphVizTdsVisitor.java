@@ -61,13 +61,14 @@ public class GraphVizTdsVisitor {
             if(num + 1 > numberOfColMax) numberOfColMax = num + 1;  // + 1 car on indente ensuite !
         }
         String colspan = String.format("colspan='%d'", numberOfColMax);
-        
+
         for(String key: hashmap.keySet()){
             SymboleDeclStruct symbole = hashmap.get(key);
             content = content + String.format("<tr> <td>Struct %s </td> %s </tr>",symbole.getName(),"<td></td>".repeat(numberOfColMax - 1)) ;
            
             ArrayList<Symbole> declVars = symbole.getListDeclVars();
             int numberOfCol = declVars.size();
+
             if(numberOfCol > 0){
                 content = content + "<tr>" + "<td></td>"; // sur une nouvelle ligne "indentée";
             }
@@ -84,11 +85,10 @@ public class GraphVizTdsVisitor {
                 }
             }
 
-            if (numberOfColMax - numberOfCol -1 > 0){
-                content = content + "<td></td>".repeat(numberOfColMax-numberOfCol - 1);
-            }
-
             if(numberOfCol > 0){
+                if(numberOfColMax - numberOfCol -1 > 0){ // on ajout les cases manquantes
+                    content = content + "<td></td>".repeat(numberOfColMax-numberOfCol - 1);
+                }
                 content = content + "</tr>";
             }
         }
