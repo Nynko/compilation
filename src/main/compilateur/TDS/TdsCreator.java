@@ -363,7 +363,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         } 
         
         ifThenElse.thenBlock.accept(this, newTds);
-        ifThenElse.elseBlock.accept(this, newTds);
+        ifThenElse.elseBlock.accept(this, newTdsElse);
 
         return null; 
     }
