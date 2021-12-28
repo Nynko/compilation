@@ -139,7 +139,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     @Override public Symbole visit(DeclVarStruct declVarStruct, Tds tds){
 
         ArrayList<Ast> liste =  declVarStruct.idf;
-        
+
         Symbole nameSymbole = liste.get(0).accept(this, tds);
         String nameStruct = ((Str) nameSymbole).getString();
 
@@ -158,6 +158,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         for(Ast identifiants :liste){
             Str nameStr = (Str) identifiants.accept(this,tds);
             Symbole symbole = new SymboleStruct(struct,nameStr.getString());
+            symbole.addDefinitionLine(declVarStruct.line);
             listeSymbole.addSymbole(symbole);
         }
     
@@ -187,8 +188,10 @@ public class TdsCreator implements TdsVisitor<Symbole>{
             }
 
         }
+        SymboleDeclStruct symboleDeclSrtuct = new SymboleDeclStruct(idf, listeVars);
+        symboleDeclSrtuct.addDefinitionLine(decl_typ.line);
 
-        return new SymboleDeclStruct(idf, listeVars);
+        return symboleDeclSrtuct;
     }
 
 
@@ -200,6 +203,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
         symboleFonction.setReturnType("int");
+        symboleFonction.addDefinitionLine(declFctInt.line);
 
         if (declFctInt.param != null) {
             declFctInt.param.accept(this,tdsFunction);  
@@ -222,6 +226,8 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
+        symboleFonction.addDefinitionLine(declFctStruct.line);
+
         if(tds.isNameSpaceStructContains(nameStruct)){
             symboleFonction.setReturnType(nameStruct);
         }
@@ -277,7 +283,8 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         
         Str symboleName = (Str) paramInt.name.accept(this, tds);
         String name = symboleName.getString();
-        SymboleInt symboleInt = new SymboleInt(name);
+        SymboleInt symboleInt = new SymboleInt(name);   
+        symboleInt.addDefinitionLine(paramInt.line);
 
         return symboleInt; 
     }
@@ -301,7 +308,10 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         Symbole symbole = paramStruct.idf1.accept(this, tds);
         String nameVar = ((Str) symbole).getString();
         
-        return new SymboleStruct(struct, nameVar);
+        SymboleStruct symboleStruct = new SymboleStruct(struct, nameVar);
+        symboleStruct.addDefinitionLine(paramStruct.line);
+
+        return symboleStruct;
 
     }
 
@@ -336,6 +346,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
        
         Tds newTds = new Tds(tds);
         SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
+        bloc.addDefinitionLine(ifThen.line);
         try {
             tds.addSymbole("ifThen", bloc); // il n'y aura qu'au plus un symbole nommé ifThen dans la tds
         } catch (SymbolAlreadyExistsException e) {
@@ -354,6 +365,8 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         Tds newTdsElse = new Tds(tds);
         SymboleBlocAnonyme blocThen = new SymboleBlocAnonyme(newTds);
         SymboleBlocAnonyme blocElse = new SymboleBlocAnonyme(newTdsElse);
+        blocThen.addDefinitionLine(ifThenElse.lineIf);
+        blocElse.addDefinitionLine(ifThenElse.lineElse);
         try {
             tds.addSymbole("ifThen", blocThen); // il n'y aura qu'au plus un symbole nommé ifThenElse dans la tds
             tds.addSymbole("ifElse", blocElse); // il n'y aura qu'au plus un symbole nommé ifElse dans la tds
@@ -371,6 +384,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         Tds newTds = new Tds(tds);
         SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
+        bloc.addDefinitionLine(while1.line);
         try {
             tds.addSymbole("While", bloc); // il n'y aura qu'au plus un symbole nommé While dans la tds
         } catch (SymbolAlreadyExistsException e) {
@@ -429,6 +443,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
             else if (astInstruction instanceof Bloc){
                 Tds newTds = new Tds(tds);
                 Symbole symbole = astInstruction.accept(this, newTds);
+                symbole.addDefinitionLine(bloc.line);
                 try {
                     tds.addSymbole("Bloc", symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
                 } catch (SymbolAlreadyExistsException e) {

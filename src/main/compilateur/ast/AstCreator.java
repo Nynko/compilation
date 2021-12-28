@@ -2,6 +2,8 @@ package compilateur.ast;
 
 import java.util.ArrayList;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 import compilateur.grammar.circBaseVisitor;
 import compilateur.grammar.circParser;
 
@@ -240,7 +242,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		Ast thenBlock = ctx.getChild(4).accept(this);
 		Ast elseBlock = ctx.getChild(6).accept(this);
 		int line = ctx.getStart().getLine();
-		return new IfThenElse(condition, thenBlock, elseBlock, line);
+		int lineElse = ctx.getStop().getLine();
+		return new IfThenElse(condition, thenBlock, elseBlock, line, lineElse);
 	}
 	/**
 	 * {@inheritDoc}
