@@ -55,16 +55,16 @@ public class GraphVizTdsVisitor {
         HashMap<String,SymboleDeclStruct> hashmap = nameSpace.getHashMap();
 
         // Get max number of Col
-        int numberOfColMax = 1;
+        int numberOfColMax = 2;
         for(String key: hashmap.keySet()){
             int num = hashmap.get(key).getListDeclVars().size();
-            if(num + 1 > numberOfColMax) numberOfColMax = num + 1;  // + 1 car on indente ensuite !
+            if(num + 1 > numberOfColMax) numberOfColMax = num + 1 ;  // + 1 car on indente ensuite ! + 1 car on ajoute la ligne
         }
         String colspan = String.format("colspan='%d'", numberOfColMax);
 
         for(String key: hashmap.keySet()){
             SymboleDeclStruct symbole = hashmap.get(key);
-            content = content + String.format("<tr> <td>Struct %s </td> %s </tr>",symbole.getName(),"<td></td>".repeat(numberOfColMax - 1)) ;
+            content = content + String.format("<tr> <td> line .%d</td> <td>Struct %s </td> %s </tr>",symbole.getDefinitionLine(),symbole.getName(),"<td></td>".repeat(numberOfColMax - 2)) ;
            
             ArrayList<Symbole> declVars = symbole.getListDeclVars();
             int numberOfCol = declVars.size();
@@ -113,12 +113,12 @@ public class GraphVizTdsVisitor {
 
             if(symbole instanceof SymboleInt){
                 SymboleInt sym = (SymboleInt) symbole;
-                content = content + String.format("<tr><td> int </td> <td> %s </td> <td> %d </td></tr>", sym.getName(), sym.getDeplacement() );
+                content = content + String.format("<tr><td> int </td> <td> %s </td> <td> %d </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDeplacement(), sym.getDefinitionLine() );
             }
 
             else if(symbole instanceof SymboleStruct){
                 SymboleStruct sym = (SymboleStruct) symbole;
-                content = content + String.format("<tr><td> Struct %s </td> <td> %s </td> <td> %d </td></tr>", sym.getStruct().getName(), sym.getName(), sym.getDeplacement() );
+                content = content + String.format("<tr><td> Struct %s </td> <td> %s </td> <td> %d </td> <td> line . %d  </td> </tr>", sym.getStruct().getName(), sym.getName(), sym.getDeplacement(),sym.getDefinitionLine() );
             }
 
             else if ( symbole instanceof SymboleBloc){
@@ -141,7 +141,7 @@ public class GraphVizTdsVisitor {
 
         }
 
-        this.nodeBuffer += String.format("\t%s [shape=\"plaintext\",label=<<table border='1' cellborder='1' cellspacing='1'> <tr><td> <b> %s  </b></td>  <td> <b> Region %s </b></td> <td> <b> Imbrication %s </b></td>  </tr> %s </table>>];\n", node, name, region, imbrication, content);
+        this.nodeBuffer += String.format("\t%s [shape=\"plaintext\",label=<<table border='1' cellborder='1' cellspacing='1'> <tr><td> <b> %s  </b></td>  <td> <b> Region %s </b></td> <td> <b> Imbrication %s </b></td> <td></td>  </tr> %s </table>>];\n", node, name, region, imbrication, content);
     } 
 
 
