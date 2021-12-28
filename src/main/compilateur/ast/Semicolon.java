@@ -3,7 +3,7 @@ import compilateur.TDS.*;
 
 public class Semicolon implements Ast{
 
-    int line;
+    public int line;
 
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
