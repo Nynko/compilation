@@ -351,8 +351,9 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     @Override public Symbole visit(IfThenElse ifThenElse, Tds tds){
 
         Tds newTds = new Tds(tds);
+        Tds newTdsElse = new Tds(tds);
         SymboleBlocAnonyme blocThen = new SymboleBlocAnonyme(newTds);
-        SymboleBlocAnonyme blocElse = new SymboleBlocAnonyme(newTds);
+        SymboleBlocAnonyme blocElse = new SymboleBlocAnonyme(newTdsElse);
         try {
             tds.addSymbole("ifThen", blocThen); // il n'y aura qu'au plus un symbole nommé ifThenElse dans la tds
             tds.addSymbole("ifElse", blocElse); // il n'y aura qu'au plus un symbole nommé ifElse dans la tds
