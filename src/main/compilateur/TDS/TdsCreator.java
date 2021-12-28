@@ -127,10 +127,11 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(DeclVarInt declVarInt, Tds tds){
         ListeSymbole listeSymbole = new ListeSymbole();
-
+  
         for(Ast identifiants : declVarInt.idf){
             Str nameStr = (Str) identifiants.accept(this,tds);
             Symbole symbole = new SymboleInt(nameStr.getString());
+            symbole.addDefinitionLine(declVarInt.line);
             listeSymbole.addSymbole(symbole);
         }
     
@@ -175,7 +176,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         for (Ast ast:decl_typ.decl){
             Symbole symbole = ast.accept(this, tds);
-
+            symbole.addDefinitionLine(decl_typ.line);
             if(symbole instanceof ListeSymbole){
                 ListeSymbole liste = (ListeSymbole) symbole;
                 for(Symbole elem : liste.getList()){
