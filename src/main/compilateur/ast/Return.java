@@ -3,6 +3,8 @@ import compilateur.TDS.*;
 
 public class Return implements Ast{
 
+    int line;
+
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -13,8 +15,9 @@ public class Return implements Ast{
 
     public Ast expr;
 
-    public Return(Ast expr) {
+    public Return(Ast expr, int line) {
         this.expr = expr;
+        this.line = line;
     }
 
 }

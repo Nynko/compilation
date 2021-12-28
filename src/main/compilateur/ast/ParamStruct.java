@@ -3,6 +3,8 @@ import compilateur.TDS.*;
 
 public class ParamStruct implements Ast{
 
+    int line;
+
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -14,8 +16,9 @@ public class ParamStruct implements Ast{
     public Ast idf0;
     public Ast idf1;
 
-    public ParamStruct(Ast idf0, Ast idf1) {
+    public ParamStruct(Ast idf0, Ast idf1, int line) {
         this.idf0 = idf0;
         this.idf1 = idf1;
+        this.line = line;
     }
 }

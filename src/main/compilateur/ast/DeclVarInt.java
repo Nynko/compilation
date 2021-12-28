@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import compilateur.TDS.*;
 
 public class DeclVarInt implements Ast{
+
+    int line;
+
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -14,8 +17,9 @@ public class DeclVarInt implements Ast{
     
     public ArrayList<Ast> idf;
 
-    public DeclVarInt (ArrayList<Ast> idf) {
+    public DeclVarInt (ArrayList<Ast> idf, int line) {
         this.idf = idf;
+        this.line = line;
     }
     
 }

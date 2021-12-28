@@ -3,6 +3,8 @@ import compilateur.TDS.*;
 
 public class ParamInt implements Ast{
 
+    int line;
+
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -13,7 +15,8 @@ public class ParamInt implements Ast{
 
     public Ast name;
 
-    public ParamInt(Ast name) {
+    public ParamInt(Ast name, int line) {
         this.name = name;
+        this.line = line;
     }
 }

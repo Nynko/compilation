@@ -3,6 +3,8 @@ import compilateur.TDS.*;
 
 public class IntNode implements Ast{
 
+    int line;
+    
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -13,8 +15,9 @@ public class IntNode implements Ast{
 
     public int parseInt;
 
-    public IntNode(int parseInt) {
+    public IntNode(int parseInt, int line) {
         this.parseInt = parseInt;
+        this.line = line;
     }
 
 }

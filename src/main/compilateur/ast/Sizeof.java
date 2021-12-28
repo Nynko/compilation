@@ -4,6 +4,8 @@ import compilateur.TDS.*;
 
 public class Sizeof implements Ast{
 
+    int line;
+
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -14,7 +16,8 @@ public class Sizeof implements Ast{
 
     public Ast name;
 
-    public Sizeof(Ast name) {
+    public Sizeof(Ast name, int line) {
         this.name = name;
+        this.line = line;
     }
 }

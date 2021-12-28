@@ -3,6 +3,7 @@ import compilateur.TDS.*;
 
 public class CharNode implements Ast{
 
+    int line;
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
@@ -13,8 +14,9 @@ public class CharNode implements Ast{
 
     public String string; 
 
-    public CharNode(String string) {
+    public CharNode(String string, int line) {
         this.string = string;
+        this.line = line;
     }
 
 }
