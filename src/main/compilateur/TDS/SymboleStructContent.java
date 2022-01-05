@@ -11,7 +11,10 @@ public class SymboleStructContent extends Symbole{
     public SymboleStructContent(String name){
         this.name = name;
         this.declVars = new ArrayList<Symbole>();
-        this.tds = new Tds();
+    }
+
+    public void setTds(Tds tds) {
+        this.tds = tds;
     }
 
     public Tds getTds() {

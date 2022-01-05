@@ -47,6 +47,9 @@ public class TdsCreator implements TdsVisitor{
 
     private ErrorAggregator errors = new ErrorAggregator();
 
+    public ErrorAggregator getErrors() {
+        return this.errors;
+    }
 
     @Override public void visit(Fichier fichier, Tds tds){
 
@@ -90,8 +93,6 @@ public class TdsCreator implements TdsVisitor{
             errors.addError(new UndefinedStructureException(structName, declVarStruct.line));
         }
        
-        tds.findSymbole(structName);
-
         liste.remove(0);      
         for(Ast identifiants :liste){
             String idfName = ((Idf) identifiants).name;
@@ -112,7 +113,14 @@ public class TdsCreator implements TdsVisitor{
         SymboleStructContent symboleStruct = new SymboleStructContent(idf);
         symboleStruct.addDefinitionLine(decl_typ.line);
 
-        Tds structTds = symboleStruct.getTds();
+        Tds structTds = new Tds(tds);
+        symboleStruct.setTds(structTds);
+
+        try {
+            tds.addSymbole("struct_"+idf, symboleStruct);
+        } catch (SymbolAlreadyExistsException e) {
+            errors.addError(e);
+        }
 
         for (Ast ast:decl_typ.decl){
             if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct) {
@@ -229,25 +237,17 @@ public class TdsCreator implements TdsVisitor{
 
 
     @Override public void visit(Sizeof sizeof, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "Sizeof");
-        // this.addTransition(nodeIdentifier, sizeof.name.accept(this));
+
     }
 
 
     @Override public void visit(IdfParenthesis idfParenthesis, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addTransition(nodeIdentifier, idfParenthesis.idf.accept(this));
-        // for (Ast ast:idfParenthesis.exprList, Tds tds){
-        //     Symbole astState = ast.accept(this);
-        //     this.addTransition(nodeIdentifier, astState);
-        // }
+
     }
 
 
     @Override public void visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addTransition(nodeIdentifier, idfParenthesisEmpty.idf.accept(this));
+       
     }
 
 
@@ -289,6 +289,7 @@ public class TdsCreator implements TdsVisitor{
         bloc.addDefinitionLine(while1.line);
         try {
             tds.addSymbole("While", bloc); // il n'y aura qu'au plus un symbole nommé While dans la tds
+            System.out.println("BONJOUR");
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         } 
@@ -309,34 +310,33 @@ public class TdsCreator implements TdsVisitor{
         int longueurListe = listeAst.size();
         Ast ast = listeAst.get(i);
         
-        while( i < longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))){ // Tant qu'objet de types decl_vars
+        while(i < longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))){ // Tant qu'objet de types decl_vars
             ast.accept(this, tds);
             ast = listeAst.get(i++);
         }
 
         // types instructions
-
-        while(i < longueurListe){
-            Ast astInstruction = listeAst.get(i);
-            i++;
+        while(i <= longueurListe){
             // On ne va modifier la TDS que pour les instructions générants un nouveau bloc
-            if(astInstruction instanceof IfThen){
-                astInstruction.accept(this, tds);
-            } else if (astInstruction instanceof IfThenElse){
-                astInstruction.accept(this, tds);
-            } else if (astInstruction instanceof While){
-                astInstruction.accept(this, tds);
-            } else if (astInstruction instanceof Bloc){
+            if(ast instanceof IfThen){
+                ast.accept(this, tds);
+            } else if (ast instanceof IfThenElse){
+                ast.accept(this, tds);
+            } else if (ast instanceof While){
+                ast.accept(this, tds);
+            } else if (ast instanceof Bloc){
                 Tds newTds = new Tds(tds);
-                astInstruction.accept(this, newTds);
                 SymboleBlocAnonyme symbole = new SymboleBlocAnonyme(newTds);
                 try {
                     tds.addSymbole("Bloc", symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
                 } catch (SymbolAlreadyExistsException e) {
                     errors.addError(e);
                 }
+                ast.accept(this, newTds);
             }
-
+            System.out.println(ast);
+            if(i == longueurListe) break;
+            ast = listeAst.get(i++);
         }
     }
 

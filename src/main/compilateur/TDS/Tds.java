@@ -68,7 +68,7 @@ public class Tds {
         while(table.getImbrication() != 0 && table.pointeurPere != null) {
             table = table.getPere();
         }
-        SymboleStructContent s = (SymboleStructContent)this.listeSymboles.get(name);
+        SymboleStructContent s = (SymboleStructContent) table.listeSymboles.get(name);
         return s;
     }
 

@@ -10,6 +10,7 @@ struct a{
 
 int une_fonction(){
     int a,b;
+    int y;
 
     while(1){
         int c;

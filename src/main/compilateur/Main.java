@@ -80,6 +80,7 @@ public class Main {
                 Tds tds = new Tds();
                 TdsCreator tdsCreator = new TdsCreator();
                 ast.accept(tdsCreator, tds);
+                tdsCreator.getErrors().printErrors();
 
                 graphVizTds.createGraph(tds);
                 graphVizTds.dumpGraph("./out/tds.dot");
