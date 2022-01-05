@@ -1,10 +1,10 @@
 package compilateur.TDS;
 
-public class Str extends Symbole{
+public class SymboleName extends Symbole{
 
     private String str;
     
-    public Str(String str){
+    public SymboleName(String str){
         this.str = str;
     }
 

@@ -2,17 +2,17 @@ package compilateur.TDS;
 
 import java.util.ArrayList;
 
-public class SymboleDeclStruct extends Symbole{
+public class SymboleStructContent extends Symbole{
 
     private String name;
     private ArrayList<Symbole> declVars;
 
-    public SymboleDeclStruct(String name){
+    public SymboleStructContent(String name){
         this.name = name;
         this.declVars = new ArrayList<Symbole>();
     }
 
-    public SymboleDeclStruct(String name, ArrayList<Symbole> declVars){
+    public SymboleStructContent(String name, ArrayList<Symbole> declVars){
         this.name = name;
         this.declVars = declVars;
     }

@@ -10,7 +10,7 @@ import compilateur.TDS.NameSpaceStruct;
 import compilateur.TDS.Symbole;
 import compilateur.TDS.SymboleBloc;
 import compilateur.TDS.SymboleBlocAnonyme;
-import compilateur.TDS.SymboleDeclStruct;
+import compilateur.TDS.SymboleStructContent;
 import compilateur.TDS.SymboleFonction;
 import compilateur.TDS.SymboleInt;
 import compilateur.TDS.SymboleStruct;
@@ -52,7 +52,7 @@ public class GraphVizTdsVisitor {
     private void addNameSpaceStruct(String node,Tds tds){
         String content = "";
         NameSpaceStruct nameSpace = tds.getNameSpaceStruct();
-        HashMap<String,SymboleDeclStruct> hashmap = nameSpace.getHashMap();
+        HashMap<String,SymboleStructContent> hashmap = nameSpace.getHashMap();
 
         // Get max number of Col
         int numberOfColMax = 2;
@@ -63,7 +63,7 @@ public class GraphVizTdsVisitor {
         String colspan = String.format("colspan='%d'", numberOfColMax);
 
         for(String key: hashmap.keySet()){
-            SymboleDeclStruct symbole = hashmap.get(key);
+            SymboleStructContent symbole = hashmap.get(key);
             content = content + String.format("<tr> <td> line .%d</td> <td>Struct %s </td> %s </tr>",symbole.getDefinitionLine(),symbole.getName(),"<td></td>".repeat(numberOfColMax - 2)) ;
            
             ArrayList<Symbole> declVars = symbole.getListDeclVars();

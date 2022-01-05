@@ -41,7 +41,7 @@ public class Tds {
         return this.nameSpaceStruct;
     }
 
-    public SymboleDeclStruct getNameSpaceStruct(String name){
+    public SymboleStructContent getNameSpaceStruct(String name){
         return this.nameSpaceStruct.getStruct(name);
     }
 

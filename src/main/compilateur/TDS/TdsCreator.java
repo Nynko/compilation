@@ -102,9 +102,9 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                         }
                     }
 
-                    else if (instruction instanceof SymboleDeclStruct){ 
+                    else if (instruction instanceof SymboleStructContent){ 
                         try {
-                            tds.getNameSpaceStruct().addSymboleDeclStruct(((SymboleDeclStruct)instruction));
+                            tds.getNameSpaceStruct().addSymboleDeclStruct(((SymboleStructContent)instruction));
                         } catch (SymbolAlreadyExistsException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -112,7 +112,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
                     }
 
                     else{
-                        throw new Error("Erreur de remontée des symboles visit(Fichier...), instruction doit être SymboleDeclStruct ou SymboleFonction");
+                        throw new Error("Erreur de remontée des symboles visit(Fichier...), instruction doit être SymboleStructContent ou SymboleFonction");
                     }
                 }
             }
@@ -122,14 +122,14 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     }
 
     @Override public Symbole visit(Idf idf, Tds tds){
-        return new Str(idf.name);
+        return new SymboleName(idf.name);
     }
 
     @Override public Symbole visit(DeclVarInt declVarInt, Tds tds){
         ListeSymbole listeSymbole = new ListeSymbole();
   
         for(Ast identifiants : declVarInt.idf){
-            Str nameStr = (Str) identifiants.accept(this,tds);
+            SymboleName nameStr = (SymboleName) identifiants.accept(this,tds);
             Symbole symbole = new SymboleInt(nameStr.getString());
             symbole.addDefinitionLine(declVarInt.line);
             listeSymbole.addSymbole(symbole);
@@ -137,27 +137,30 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     
         return listeSymbole;
     }
+//CHANGEMENT ok 
+
+
     @Override public Symbole visit(DeclVarStruct declVarStruct, Tds tds){
 
         ArrayList<Ast> liste =  declVarStruct.idf;
 
         Symbole nameSymbole = liste.get(0).accept(this, tds);
-        String nameStruct = ((Str) nameSymbole).getString();
+        String nameStruct = ((SymboleName) nameSymbole).getString();
 
         // Récupération de la structure
-        SymboleDeclStruct struct ; 
+        SymboleStructContent struct ; 
         try {
             struct = tds.getNameSpaceStruct().getStruct(nameStruct);
         } catch (NoSuchElementException e) {
             // throw new UndefinedStructureException(nameStruct,nameSymbole.getDefinitionLine());
-            struct = new SymboleDeclStruct(nameStruct);// A DELETE avec gestion d'erreur ou pas
+            struct = new SymboleStructContent(nameStruct);
         }
        
 
         liste.remove(0);      
         ListeSymbole listeSymbole = new ListeSymbole();
         for(Ast identifiants :liste){
-            Str nameStr = (Str) identifiants.accept(this,tds);
+            SymboleName nameStr = (SymboleName) identifiants.accept(this,tds);
             Symbole symbole = new SymboleStruct(struct,nameStr.getString());
             symbole.addDefinitionLine(declVarStruct.line);
             listeSymbole.addSymbole(symbole);
@@ -165,11 +168,11 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     
         return listeSymbole;
     }
-
+// changement ok
 
     @Override public Symbole visit(Decl_typ decl_typ, Tds tds){
         // Création d'une struct que l'on va ajouter dans le NameSpace et pouvoir la référencer.
-        Str identifiant = (Str) decl_typ.idf.accept(this,tds);
+        SymboleName identifiant = (SymboleName) decl_typ.idf.accept(this,tds);
         String idf = identifiant.getString();
 
         ArrayList<Symbole> listeVars = new ArrayList<Symbole>();
@@ -189,7 +192,8 @@ public class TdsCreator implements TdsVisitor<Symbole>{
             }
 
         }
-        SymboleDeclStruct symboleDeclSrtuct = new SymboleDeclStruct(idf, listeVars);
+
+        SymboleStructContent symboleDeclSrtuct = new SymboleStructContent(idf, listeVars);
         symboleDeclSrtuct.addDefinitionLine(decl_typ.line);
 
         return symboleDeclSrtuct;
@@ -199,7 +203,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(DeclFctInt declFctInt, Tds tds){
         Symbole nameSymbole = declFctInt.Idf.accept(this,tds);
-        String nameFunction = ((Str) nameSymbole).getString();
+        String nameFunction = ((SymboleName) nameSymbole).getString();
 
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
@@ -220,10 +224,10 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(DeclFctStruct declFctStruct, Tds tds){
         Symbole nameStructSymbole = declFctStruct.Idf0.accept(this, tds);
-        String nameStruct = ((Str) nameStructSymbole).getString();
+        String nameStruct = ((SymboleName) nameStructSymbole).getString();
 
         Symbole nameSymbole = declFctStruct.Idf1.accept(this,tds);
-        String nameFunction = ((Str) nameSymbole).getString();
+        String nameFunction = ((SymboleName) nameSymbole).getString();
 
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(nameFunction, tdsFunction);
@@ -282,7 +286,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
     @Override public Symbole visit(ParamInt paramInt, Tds tds){
         
-        Str symboleName = (Str) paramInt.name.accept(this, tds);
+        SymboleName symboleName = (SymboleName) paramInt.name.accept(this, tds);
         String name = symboleName.getString();
         SymboleInt symboleInt = new SymboleInt(name);   
         symboleInt.addDefinitionLine(paramInt.line);
@@ -293,9 +297,9 @@ public class TdsCreator implements TdsVisitor<Symbole>{
     @Override public Symbole visit(ParamStruct paramStruct, Tds tds){
 
         Symbole nameStructSymbole = paramStruct.idf0.accept(this, tds);
-        String nameStruct = ((Str) nameStructSymbole).getString();
+        String nameStruct = ((SymboleName) nameStructSymbole).getString();
 
-        SymboleDeclStruct struct;
+        SymboleStructContent struct;
 
         if(tds.isNameSpaceStructContains(nameStruct)){
             struct = tds.getNameSpaceStruct(nameStruct);
@@ -303,17 +307,16 @@ public class TdsCreator implements TdsVisitor<Symbole>{
 
         else{
             // throw new UndefinedStructureException(nameStruct, nameStructSymbole.getDefinitionLine());
-            struct = new SymboleDeclStruct(nameStruct);
+            struct = new SymboleStructContent(nameStruct);
         }
 
         Symbole symbole = paramStruct.idf1.accept(this, tds);
-        String nameVar = ((Str) symbole).getString();
+        String nameVar = ((SymboleName) symbole).getString();
         
         SymboleStruct symboleStruct = new SymboleStruct(struct, nameVar);
         symboleStruct.addDefinitionLine(paramStruct.line);
 
         return symboleStruct;
-
     }
 
 
@@ -321,7 +324,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "Sizeof");
         // this.addTransition(nodeIdentifier, sizeof.name.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
 
@@ -332,14 +335,14 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         //     Symbole astState = ast.accept(this);
         //     this.addTransition(nodeIdentifier, astState);
         // }
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
 
     @Override public Symbole visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addTransition(nodeIdentifier, idfParenthesisEmpty.idf.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
 
@@ -403,7 +406,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "Return");
         // this.addTransition(nodeIdentifier, return1.expr.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit(Bloc bloc, Tds tds){
@@ -461,14 +464,14 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, charNode.Symbole);
         
-        return new Str(""); 
+        return new SymboleName(""); 
     }
     @Override public Symbole visit(IntNode intNode, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
 
         // this.addNode(nodeIdentifier, Symbole.valueOf(intNode.parseInt));
 
-        return new Str(""); 
+        return new SymboleName(""); 
 
     }
 
@@ -482,7 +485,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, idfState);
         // this.addTransition(nodeIdentifier, expressionState);
 
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit(Expr_ou expr_ou, Tds tds){
@@ -490,7 +493,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "||");
         // this.addTransition(nodeIdentifier, expr_ou.left.accept(this));
         // this.addTransition(nodeIdentifier, expr_ou.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit(Expr_et expr_et, Tds tds){
@@ -498,7 +501,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "&&");
         // this.addTransition(nodeIdentifier, expr_et.left.accept(this));
         // this.addTransition(nodeIdentifier, expr_et.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit(Egal egal, Tds tds){
@@ -506,7 +509,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "==");
         // this.addTransition(nodeIdentifier, egal.left.accept(this));
         // this.addTransition(nodeIdentifier, egal.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit(Different dif, Tds tds){
@@ -514,7 +517,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "!=");
         // this.addTransition(nodeIdentifier, dif.left.accept(this));
         // this.addTransition(nodeIdentifier, dif.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit(Inferieur inf, Tds tds){
@@ -522,7 +525,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "<");
         // this.addTransition(nodeIdentifier, inf.left.accept(this));
         // this.addTransition(nodeIdentifier, inf.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (InferieurEgal infEgal, Tds tds){
@@ -530,7 +533,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "<=");
         // this.addTransition(nodeIdentifier, infEgal.left.accept(this));
         // this.addTransition(nodeIdentifier, infEgal.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (Superieur sup, Tds tds){
@@ -538,7 +541,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, ">");
         // this.addTransition(nodeIdentifier, sup.left.accept(this));
         // this.addTransition(nodeIdentifier, sup.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (SuperieurEgal supEgal, Tds tds){
@@ -546,7 +549,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, ">=");
         // this.addTransition(nodeIdentifier, supEgal.left.accept(this));
         // this.addTransition(nodeIdentifier, supEgal.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (Plus plus, Tds tds){
@@ -560,7 +563,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, leftState);
         // this.addTransition(nodeIdentifier, rightState);
 
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (Minus minus, Tds tds){
@@ -574,7 +577,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, leftState);
         // this.addTransition(nodeIdentifier, rightState);
 
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (Division div, Tds tds){
@@ -588,7 +591,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, leftState);
         // this.addTransition(nodeIdentifier, rightState);
 
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (Multiplication mult, Tds tds){
@@ -602,7 +605,7 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addTransition(nodeIdentifier, leftState);
         // this.addTransition(nodeIdentifier, rightState);
 
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (Fleche fleche, Tds tds){
@@ -610,27 +613,27 @@ public class TdsCreator implements TdsVisitor<Symbole>{
         // this.addNode(nodeIdentifier, "->");
         // this.addTransition(nodeIdentifier, fleche.left.accept(this));
         // this.addTransition(nodeIdentifier, fleche.right.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override public Symbole visit (MoinsUnaire unaire, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "-");
         // this.addTransition(nodeIdentifier, unaire.noeud.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
     
     @Override public Symbole visit (Negation unaire, Tds tds){
         // Symbole nodeIdentifier = this.nextState();
         // this.addNode(nodeIdentifier, "!");
         // this.addTransition(nodeIdentifier, unaire.noeud.accept(this));
-        return new Str(""); 
+        return new SymboleName(""); 
     }
 
     @Override
     public Symbole visit(Semicolon semicolon, Tds tds) {
         // TODO Auto-generated method stub
-        return new Str("");
+        return new SymboleName("");
     }
     
 }

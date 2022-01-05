@@ -9,8 +9,7 @@ struct a{
 };
 
 int une_fonction(){
-    int a;
-    int b;
+    int a,b;
 
     while(1){
         int c;
