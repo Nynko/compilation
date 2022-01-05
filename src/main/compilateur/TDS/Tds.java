@@ -7,6 +7,7 @@ import compilateur.Offset;
 public class Tds {
     private int imbrication;
     private static int compteur;
+    private static int compteurSymbole;
     private int numRegion = compteur++;
     private Tds pointeurPere;
     private int deplacement = 0;
@@ -30,6 +31,9 @@ public class Tds {
         return this.listeSymboles;
     }
 
+    public static int getCompteurSymbole() {
+        return compteurSymbole;
+    }
 
     public void addPere(Tds tds){
         this.pointeurPere = tds;
@@ -84,6 +88,7 @@ public class Tds {
             this.deplacement += Offset.OFFSET;
         }
         this.listeSymboles.put(name, symbole);
+        compteurSymbole++;
     }
 
     public void addSymboleParam(String name, Symbole symbole) throws SymbolAlreadyExistsException {
@@ -98,6 +103,7 @@ public class Tds {
             this.deplacementParam -= Offset.OFFSET;
         }
         this.listeSymboles.put(name, symbole);
+        compteurSymbole++;
     }
 
 }

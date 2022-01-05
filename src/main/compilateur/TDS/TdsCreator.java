@@ -265,7 +265,6 @@ public class TdsCreator implements TdsVisitor{
 
 
     @Override public void visit(IfThenElse ifThenElse, Tds tds){
-
         Tds newTds = new Tds(tds);
         Tds newTdsElse = new Tds(tds);
         SymboleBlocAnonyme blocThen = new SymboleBlocAnonyme(newTds);
@@ -273,14 +272,21 @@ public class TdsCreator implements TdsVisitor{
         blocThen.addDefinitionLine(ifThenElse.lineIf);
         blocElse.addDefinitionLine(ifThenElse.lineElse);
         try {
-            tds.addSymbole("ifThen", blocThen); // il n'y aura qu'au plus un symbole nommé ifThenElse dans la tds
-            tds.addSymbole("ifElse", blocElse); // il n'y aura qu'au plus un symbole nommé ifElse dans la tds
+            tds.addSymbole("ifThen"+Tds.getCompteurSymbole(), blocThen);
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
-        } 
-        
+        }
+
+        try {
+            tds.addSymbole("ifElse"+Tds.getCompteurSymbole(), blocElse);
+        } catch (SymbolAlreadyExistsException e) {
+            errors.addError(e);
+        }
+        System.out.println("SALUT");
         ifThenElse.thenBlock.accept(this, newTds);
         ifThenElse.elseBlock.accept(this, newTdsElse);
+        System.out.println("AU REVOIR");
+
     }
 
     @Override public void visit(While while1, Tds tds){
@@ -288,8 +294,7 @@ public class TdsCreator implements TdsVisitor{
         SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
         bloc.addDefinitionLine(while1.line);
         try {
-            tds.addSymbole("While", bloc); // il n'y aura qu'au plus un symbole nommé While dans la tds
-            System.out.println("BONJOUR");
+            tds.addSymbole("While"+Tds.getCompteurSymbole(), bloc);
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         } 
@@ -299,19 +304,20 @@ public class TdsCreator implements TdsVisitor{
 
 
     @Override public void visit(Return return1, Tds tds){
-        // Symbole nodeIdentifier = this.nextState();
-        // this.addNode(nodeIdentifier, "Return");
-        // this.addTransition(nodeIdentifier, return1.expr.accept(this));
+
     }
 
     @Override public void visit(Bloc bloc, Tds tds){
         int i = 0;
         ArrayList<Ast> listeAst =  bloc.instList ; 
         int longueurListe = listeAst.size();
-        Ast ast = listeAst.get(i);
-        
-        while(i < longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))){ // Tant qu'objet de types decl_vars
+        Ast ast = null;
+        if(i < longueurListe) ast = listeAst.get(i++);
+
+
+        while(i <= longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))){ // Tant qu'objet de types decl_vars
             ast.accept(this, tds);
+            if(i == longueurListe) break;
             ast = listeAst.get(i++);
         }
 
@@ -328,13 +334,12 @@ public class TdsCreator implements TdsVisitor{
                 Tds newTds = new Tds(tds);
                 SymboleBlocAnonyme symbole = new SymboleBlocAnonyme(newTds);
                 try {
-                    tds.addSymbole("Bloc", symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
+                    tds.addSymbole("Bloc"+Tds.getCompteurSymbole(), symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
                 } catch (SymbolAlreadyExistsException e) {
                     errors.addError(e);
                 }
                 ast.accept(this, newTds);
             }
-            System.out.println(ast);
             if(i == longueurListe) break;
             ast = listeAst.get(i++);
         }
