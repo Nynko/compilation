@@ -171,6 +171,7 @@ public class TdsCreator implements TdsVisitor{
 
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
+        symboleFonction.setReturnType("struct_"+structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
         if(!(tds.findSymbole(structName) instanceof SymboleStructContent)) {
