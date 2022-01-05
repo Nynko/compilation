@@ -6,15 +6,16 @@ public class SymboleStructContent extends Symbole{
 
     private String name;
     private ArrayList<Symbole> declVars;
+    private Tds tds;
 
     public SymboleStructContent(String name){
         this.name = name;
         this.declVars = new ArrayList<Symbole>();
+        this.tds = new Tds();
     }
 
-    public SymboleStructContent(String name, ArrayList<Symbole> declVars){
-        this.name = name;
-        this.declVars = declVars;
+    public Tds getTds() {
+        return this.tds;
     }
 
     public String getName(){

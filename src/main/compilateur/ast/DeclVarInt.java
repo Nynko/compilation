@@ -11,8 +11,8 @@ public class DeclVarInt implements Ast{
         return visitor.visit(this);
     }
 
-    public <T> T accept(TdsVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+        public void accept(TdsVisitor visitor, Tds tds){
+        visitor.visit(this, tds);
     }
     
     public ArrayList<Ast> idf;
