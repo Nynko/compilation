@@ -253,24 +253,21 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Sizeof sizeof, Tds tds) {
+        sizeof.name.accept(visitor, tds);
         return null;
 
     }
 
     @Override
     public Void visit(IdfParenthesis idfParenthesis, Tds tds) {
-        // nb d'arguments
-        // if (idfParenthesis.exprList.size() != tds.findSymbole(((Idf)idfParenthesis.idf).name{
-
-        // }
+        idfParenthesis.accept(visitor, tds);
         return null;
-
     }
 
     @Override
     public Void visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
+        idfParenthesisEmpty.accept(visitor, tds);
         return null;
-
     }
 
 
