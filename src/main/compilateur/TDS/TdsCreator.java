@@ -346,7 +346,13 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Affectation affectation, Tds tds) {
-        Idf idfLeft = (Idf) affectation.left;
+        Idf idfLeft = null;
+        try {
+            idfLeft = (Idf) affectation.left;
+        }
+        catch (ClassCastException e) {
+            errors.addError(new UnauthorizedOperationException(affectation.line));
+        }
         if (tds.findSymbole(idfLeft.name) == null) {
             errors.addError(new UndefinedSymboleException(affectation.left.toString(), affectation.line));
             return null;
