@@ -1,27 +1,34 @@
 package compilateur.TDS;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-
 import compilateur.Offset;
 
 public class Tds {
-    private int imbrication;
+    // Variables de classe
     private static int compteur;
     private static int compteurSymbole;
+
+    // Variables d'instances
+    private String name;
+    private int imbrication;
     private int numRegion = compteur++;
     private Tds pointeurPere;
     private int deplacement = 0;
     private int deplacementParam = -Offset.OFFSET;
     private HashMap<String,Symbole> listeSymboles;
+    private ArrayList<Tds> sousTDS = new ArrayList<>();
     
 
-    public Tds(){
+    public Tds(String name) {
+        this.name = name;
         this.imbrication = 0;
         this.pointeurPere = null;
         this.listeSymboles = new HashMap<String,Symbole>();
     }
 
-    public Tds(Tds pointeurPere){
+    public Tds(String name, Tds pointeurPere){
+        this.name = name;
         this.imbrication = pointeurPere.getImbrication()+1;
         this.pointeurPere = pointeurPere;
         this.listeSymboles = new HashMap<String,Symbole>();
@@ -41,6 +48,10 @@ public class Tds {
 
     public void addnumRegion(int numRegion){
         this.numRegion = numRegion;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public Tds getPere(){
@@ -106,4 +117,13 @@ public class Tds {
         compteurSymbole++;
     }
 
+    public Tds nouvelleSousTDS(String name) {
+        Tds nouvelleTds = new Tds(name, this);
+        this.sousTDS.add(nouvelleTds);
+        return nouvelleTds;
+    }
+
+    public ArrayList<Tds> getSousTDS() {
+        return this.sousTDS;
+    }
 }

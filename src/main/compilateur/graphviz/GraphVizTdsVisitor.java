@@ -6,8 +6,6 @@ import java.util.HashMap;
 
 
 import compilateur.TDS.Symbole;
-import compilateur.TDS.SymboleBloc;
-import compilateur.TDS.SymboleBlocAnonyme;
 import compilateur.TDS.SymboleStructContent;
 import compilateur.TDS.SymboleFonction;
 import compilateur.TDS.SymboleInt;
@@ -70,25 +68,16 @@ public class GraphVizTdsVisitor {
             } else if(symbole instanceof SymboleStructContent){
                 SymboleStructContent sym = (SymboleStructContent) symbole;
                 content = content + String.format("<tr><td> Struct %s </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getName(),sym.getDefinitionLine() );
-                String newNode = this.nextState(); 
-                addTds(sym.getName(),newNode, sym.getTds());
-                this.linkBuffer = linkBuffer + String.format("\t%s -> %s;\n",node,newNode);
-            } else if ( symbole instanceof SymboleBloc){
-                if(symbole instanceof SymboleFonction){
-                    SymboleFonction sym = (SymboleFonction) symbole ; 
-                    String newNode = this.nextState(); 
-                    Tds newTds = sym.getTds();
-                    addTds(sym.getName(),newNode, newTds);
-                    this.linkBuffer = linkBuffer + String.format("\t%s -> %s;\n",node,newNode);
-                }  else if(symbole instanceof SymboleBlocAnonyme){
-                    SymboleBlocAnonyme sym = (SymboleBlocAnonyme) symbole ; 
-                    String newNode = this.nextState(); // Change with recursive node creation 
-                    Tds newTds = sym.getTds();
-                    addTds(symboleKey, newNode, newTds);
-                    this.linkBuffer = linkBuffer + String.format("\t%s -> %s;\n",node,newNode);
-                }
+            } else if(symbole instanceof SymboleFonction) {
+                SymboleFonction sym = (SymboleFonction) symbole;
+                content = content + String.format("<tr><td> function %s </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getName(),sym.getDefinitionLine() );
             }
+        }
 
+        for(Tds subTds: tds.getSousTDS()) {
+            String newNode = this.nextState(); // Change with recursive node creation 
+            addTds(subTds.getName(), newNode, subTds);
+            this.linkBuffer = linkBuffer + String.format("\t%s -> %s;\n",node,newNode);
         }
 
         this.nodeBuffer += String.format("\t%s [shape=\"plaintext\",label=<<table border='1' cellborder='1' cellspacing='1'> <tr><td> <b> %s  </b></td>  <td> <b> Region %s </b></td> <td> <b> Imbrication %s </b></td> <td></td>  </tr> %s </table>>];\n", node, name, region, imbrication, content);
