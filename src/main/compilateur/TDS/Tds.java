@@ -71,7 +71,7 @@ public class Tds {
         if(s!=null) return s;
         Tds table = this.getPere();
         while(table != null) {
-            s = this.listeSymboles.get(name);
+            s = table.listeSymboles.get(name);
             if(s!=null) return s;
             table = table.getPere();
         }
