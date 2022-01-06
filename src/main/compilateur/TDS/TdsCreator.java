@@ -354,8 +354,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = affectation.left.accept(visitor, tds);
         String rightType = affectation.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type a l'affectation
+            errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
         return null;
     }
@@ -370,8 +369,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = expr_ou.left.accept(visitor, tds);
         String rightType = expr_ou.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(expr_ou.line, rightType, leftType));
         }
         return null;
     }
@@ -386,8 +384,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = expr_et.left.accept(visitor, tds);
         String rightType = expr_et.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(expr_et.line, rightType, leftType));
         }
         return null;
     }
@@ -402,8 +399,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = egal.left.accept(visitor, tds);
         String rightType = egal.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(egal.line, rightType, leftType));
         }
         return null;
     }
@@ -418,8 +414,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = dif.left.accept(visitor, tds);
         String rightType = dif.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(dif.line, rightType, leftType));
          }
         return null;
     }
@@ -434,8 +429,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = inf.left.accept(visitor, tds);
         String rightType = inf.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(inf.line, rightType, leftType));
         }   
         return null;
     }
@@ -450,8 +444,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = infEgal.left.accept(visitor, tds);
         String rightType = infEgal.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(infEgal.line, rightType, leftType));
         }   
         return null;
     }
@@ -466,8 +459,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = sup.left.accept(visitor, tds);
         String rightType = sup.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(sup.line, rightType, leftType));
         }   
         return null;
     }
@@ -482,8 +474,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = supEgal.left.accept(visitor, tds);
         String rightType = supEgal.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(supEgal.line, rightType, leftType));
         }    
         return null;
     }
@@ -498,8 +489,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = plus.left.accept(visitor, tds);
         String rightType = plus.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(plus.line, rightType, leftType));
         }   
         return null;
     }
@@ -514,8 +504,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = minus.left.accept(visitor, tds);
         String rightType = minus.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(minus.line, rightType, leftType));
         }    
         return null;
     }
@@ -530,8 +519,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = div.left.accept(visitor, tds);
         String rightType = div.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(div.line, rightType, leftType));
         }    
         return null;
     }
@@ -546,8 +534,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = mult.left.accept(visitor, tds);
         String rightType = mult.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
-            System.out.println(leftType + ",, " + rightType);
-            // TODO erreur de type
+            errors.addError(new TypeException(mult.line, rightType, leftType));
         }    
         return null;
 
@@ -565,7 +552,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         String rightType = fleche.right.accept(visitor, tdsStruct);
         if (rightType == null) {
-            // TODO erreur
+            errors.addError(new TypeException(fleche.line, rightType, leftType));
         }    
         return null;
     }
