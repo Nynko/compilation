@@ -271,6 +271,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IfThen ifThen, Tds tds) {
+        ifThen.condition.accept(visitor, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         ifThen.thenBlock.accept(this, newTds);
         return null;
@@ -278,6 +279,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IfThenElse ifThenElse, Tds tds) {
+        ifThenElse.condition.accept(visitor, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         Tds newTdsElse = tds.nouvelleSousTDS("elseblock");
         ifThenElse.thenBlock.accept(this, newTds);
