@@ -70,7 +70,7 @@ public class GraphVizTdsVisitor {
                 tableContent += String.format("<tr><td> struct_%s </td> <td> struct_type </td> <td> </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleFonction) {
                 SymboleFonction sym = (SymboleFonction) symbole;
-                tableContent += String.format("<tr><td> %s </td> <td> function </td> <td>  </td> <td> line . %d  </td> </tr>" , sym.getName(),sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> %s </td> <td> function (returns %s) </td> <td>  </td> <td> line . %d  </td> </tr>" , sym.getName(), sym.getReturnType(), sym.getDefinitionLine() );
             }
         }
 
