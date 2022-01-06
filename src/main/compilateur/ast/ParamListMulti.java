@@ -1,16 +1,17 @@
 package compilateur.ast;
+
 import compilateur.TDS.*;
 
 import java.util.ArrayList;
 
-public class ParamListMulti implements Ast{
+public class ParamListMulti implements Ast {
 
-    public <T> T accept(AstVisitor<T> visitor){
+    public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-        public void accept(TdsVisitor visitor, Tds tds){
-        visitor.visit(this, tds);
+    public <T> T accept(TdsVisitor<T> visitor, Tds tds) {
+        return visitor.visit(this, tds);
     }
 
     public ArrayList<Ast> paramList;

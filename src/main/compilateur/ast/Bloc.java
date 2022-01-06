@@ -12,8 +12,8 @@ public class Bloc implements Ast{
         return visitor.visit(this);
     }
 
-    public void accept(TdsVisitor visitor, Tds tds){
-        visitor.visit(this, tds);
+    public <T> T accept(TdsVisitor<T> visitor, Tds tds){
+        return visitor.visit(this, tds);
     }
 
     public ArrayList<Ast> instList;
