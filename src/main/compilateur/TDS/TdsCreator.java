@@ -306,40 +306,21 @@ public class TdsCreator implements TdsVisitor{
     }
 
     @Override public void visit(Bloc bloc, Tds tds){
-        int i = 0;
-        ArrayList<Ast> listeAst =  bloc.instList ; 
-        int longueurListe = listeAst.size();
-        Ast ast = null;
-        if(i < longueurListe) ast = listeAst.get(i++);
+        if (bloc.instList == null) return;
 
-
-        while(i <= longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))){ // Tant qu'objet de types decl_vars
-            ast.accept(this, tds);
-            if(i == longueurListe) break;
-            ast = listeAst.get(i++);
-        }
-
-        // types instructions
-        while(i <= longueurListe){
-            // On ne va modifier la TDS que pour les instructions générants un nouveau bloc
-            if(ast instanceof IfThen){
-                ast.accept(this, tds);
-            } else if (ast instanceof IfThenElse){
-                ast.accept(this, tds);
-            } else if (ast instanceof While){
-                ast.accept(this, tds);
-            } else if (ast instanceof Bloc){
+        for (Ast ast: bloc.instList){    
+            if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct || ast instanceof IfThen || ast instanceof IfThenElse || ast instanceof While){
+                ast.accept(this, tds); 
+            } else if(ast instanceof Bloc){
                 Tds newTds = new Tds(tds);
                 SymboleBlocAnonyme symbole = new SymboleBlocAnonyme(newTds);
                 try {
-                    tds.addSymbole("Bloc"+Tds.getCompteurSymbole(), symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
+                    tds.addSymbole("Bloc"+Tds.getCompteurSymbole(), symbole);
                 } catch (SymbolAlreadyExistsException e) {
                     errors.addError(e);
                 }
                 ast.accept(this, newTds);
             }
-            if(i == longueurListe) break;
-            ast = listeAst.get(i++);
         }
     }
 
