@@ -257,7 +257,7 @@ public class TdsCreator implements TdsVisitor{
         SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
         bloc.addDefinitionLine(ifThen.line);
         try {
-            tds.addSymbole("ifThen", bloc); // il n'y aura qu'au plus un symbole nommé ifThen dans la tds
+            tds.addSymbole("ifThen"+Tds.getCompteurSymbole(), bloc);
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         } 
