@@ -1,7 +1,8 @@
 package compilateur.TDS;
 
+import java.util.ArrayList;
+
 import compilateur.ast.Affectation;
-import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -48,10 +49,8 @@ public class TypeVisitor implements TdsVisitor<String> {
         return this.errors;
     }
 
-
     @Override
     public String visit(Fichier fichier, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -79,37 +78,31 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(DeclVarInt declVarInt, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(DeclVarStruct declVarStruct, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(Decl_typ decl_typ, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(DeclFctInt declFctInt, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(DeclFctStruct declFctStruct, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(ParamListMulti paramListMulti, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -130,47 +123,61 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
-        int nbParam = idfParenthesis.exprList.size();
-        String fctName = ((Idf)idfParenthesis.idf).name;
-        SymboleFonction sym = (SymboleFonction)tds.findSymbole(fctName);
-        // TODO nombre de parametre 
-        // sym.getTds().get
-        for (int i = 0; i < nbParam; i++) {
-             String paramTypeRef = "";
-            // =  sym.getParam(i)
-            String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
-            if (!paramType.equals(paramTypeRef)) {
-                //TODO erreur type parametre
+        try {
+            int nbParam = idfParenthesis.exprList.size();
+            String fctName = ((Idf) idfParenthesis.idf).name;
+            SymboleFonction sym = (SymboleFonction) tds.findSymbole(fctName);
+            ArrayList<SymboleVar> param = sym.getTds().getParams();
+            int min = param.size();
+            if (min != nbParam) {
+                if (nbParam < min) {
+                    min = nbParam;
+                }
+                // TODO ereur nb param
             }
+            for (int i = 0; i < min; i++) {
+                SymboleVar s = param.get(i);
+                String paramTypeRef = "";
+                if (s instanceof SymboleInt) {
+                    paramTypeRef = "int";
+                } else if (s instanceof SymboleStruct symstruct) {
+                    paramTypeRef = "struct_" + symstruct.getStruct().getName();
+                }
+                String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
+                if (!paramType.equals(paramTypeRef)) {
+                    // TODO erreur type parametre
+                }
+            }
+        } catch (Exception e) {
         }
         return idfParenthesis.idf.accept(this, tds);
     }
 
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
-        String fctName = ((Idf)idfParenthesisEmpty.idf).name;
-        SymboleFonction sym = (SymboleFonction)tds.findSymbole(fctName);
-        // if (sym.getParam() != 0) {
-        //     // TODO erreur nombre d'arguments
-        // }
+        try {
+            String fctName = ((Idf) idfParenthesisEmpty.idf).name;
+            SymboleFonction sym = (SymboleFonction) tds.findSymbole(fctName);
+            if (!sym.getTds().getParams().isEmpty()) {
+                // TODO erreur nombre d'arguments
+            }
+        } catch (Exception e) {
+        }
         return idfParenthesisEmpty.idf.accept(this, tds);
     }
 
     @Override
     public String visit(IfThen ifThen, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(IfThenElse ifThenElse, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String visit(While while1, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -181,7 +188,6 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Bloc bloc, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -378,7 +384,6 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Semicolon semicolon, Tds tds) {
-        // TODO Auto-generated method stub
         return null;
     }
 

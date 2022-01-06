@@ -304,8 +304,6 @@ public class TdsCreator implements TdsVisitor<Void> {
         for (Symbole sym : temp.getPere().getListeSymboles().values()) {
             if (sym instanceof SymboleFonction symfct && symfct.getTds().equals(temp)) {
                 String typeRetour = return1.accept(visitor, tds);
-                // System.out.println();
-                // System.out.println(symfct.getReturnType() +", " + return1.accept(visitor, tds)+ ", " + symfct.getName());
                 if (typeRetour == null) {
                     errors.addError(new UndefinedSymboleException(sym.getName(), return1.line));
                 } else if (!symfct.getReturnType().equals(typeRetour)) {
@@ -571,7 +569,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
-        if (type != "int") {
+        if (!type.equals("int")) {
             return null;
         }
         errors.addError(new UnauthorizedOperationException(unaire.line));
