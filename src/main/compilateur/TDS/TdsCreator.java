@@ -339,19 +339,11 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Affectation affectation, Tds tds) {
-        Idf idfLeft = null;
-        try {
-            idfLeft = (Idf) affectation.left;
-        } catch (ClassCastException e) {
-            errors.addError(new UnauthorizedOperationException(affectation.line));
-            return null;
-        }
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(affectation.left.toString(), affectation.line));
-            return null;
-        }
         String leftType = affectation.left.accept(visitor, tds);
         String rightType = affectation.right.accept(visitor, tds);
+        if (leftType == null) {
+            return null;
+        }
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
