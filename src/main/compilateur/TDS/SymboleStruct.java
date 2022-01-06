@@ -1,36 +1,15 @@
 package compilateur.TDS;
 
 
-public class SymboleStruct extends Symbole{
-
+public class SymboleStruct extends SymboleVar{
     private SymboleStructContent struct;
-    private String name;
-    private int deplacement;
-
-
-    public SymboleStruct(String name){
-        this.name = name;
-    }
 
     public SymboleStruct(SymboleStructContent struct, String name){
+        super(name);
         this.struct = struct;
-        this.name = name;
     }
 
     public SymboleStructContent getStruct(){
         return this.struct;
     }
-
-    public String getName(){
-        return this.name;
-    }
-
-    public int getDeplacement(){
-        return this.deplacement;
-    }
-
-    public void setDeplacement(int deplacement){
-        this.deplacement = deplacement;
-    }
-
 }

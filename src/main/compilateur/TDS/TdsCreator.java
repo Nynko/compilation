@@ -110,7 +110,7 @@ public class TdsCreator implements TdsVisitor{
         SymboleStructContent symboleStruct = new SymboleStructContent(idf);
         symboleStruct.addDefinitionLine(decl_typ.line);
 
-        Tds structTds = new Tds(tds);
+        Tds structTds = tds.nouvelleSousTDS("struct_"+idf);
         symboleStruct.setTds(structTds);
 
         try {
@@ -133,7 +133,7 @@ public class TdsCreator implements TdsVisitor{
     @Override public void visit(DeclFctInt declFctInt, Tds tds){
         String name = ((Idf)declFctInt.Idf).name;
 
-        Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
+        Tds tdsFunction = tds.nouvelleSousTDS("fn_"+name); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(name, tdsFunction);
         symboleFonction.setReturnType("int");
         symboleFonction.addDefinitionLine(declFctInt.line);
@@ -166,7 +166,7 @@ public class TdsCreator implements TdsVisitor{
         String structName = ((Idf)declFctStruct.Idf0).name;
         String functionName = ((Idf)declFctStruct.Idf1).name;
 
-        Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
+        Tds tdsFunction = tds.nouvelleSousTDS("fn_"+functionName); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
         symboleFonction.setReturnType("struct_"+structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
@@ -248,50 +248,20 @@ public class TdsCreator implements TdsVisitor{
 
 
     @Override public void visit(IfThen ifThen, Tds tds){
-        Tds newTds = new Tds(tds);
-        SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
-        bloc.addDefinitionLine(ifThen.line);
-        try {
-            tds.addSymbole("ifThen"+Tds.getCompteurSymbole(), bloc);
-        } catch (SymbolAlreadyExistsException e) {
-            errors.addError(e);
-        } 
+        Tds newTds = tds.nouvelleSousTDS("thenblock");
         ifThen.thenBlock.accept(this, newTds);
     }
 
 
     @Override public void visit(IfThenElse ifThenElse, Tds tds){
-        Tds newTds = new Tds(tds);
-        Tds newTdsElse = new Tds(tds);
-        SymboleBlocAnonyme blocThen = new SymboleBlocAnonyme(newTds);
-        SymboleBlocAnonyme blocElse = new SymboleBlocAnonyme(newTdsElse);
-        blocThen.addDefinitionLine(ifThenElse.lineIf);
-        blocElse.addDefinitionLine(ifThenElse.lineElse);
-        try {
-            tds.addSymbole("ifThen"+Tds.getCompteurSymbole(), blocThen);
-        } catch (SymbolAlreadyExistsException e) {
-            errors.addError(e);
-        }
-
-        try {
-            tds.addSymbole("ifElse"+Tds.getCompteurSymbole(), blocElse);
-        } catch (SymbolAlreadyExistsException e) {
-            errors.addError(e);
-        }
+        Tds newTds = tds.nouvelleSousTDS("thenblock");
+        Tds newTdsElse = tds.nouvelleSousTDS("elseblock");
         ifThenElse.thenBlock.accept(this, newTds);
         ifThenElse.elseBlock.accept(this, newTdsElse);
     }
 
     @Override public void visit(While while1, Tds tds){
-        Tds newTds = new Tds(tds);
-        SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
-        bloc.addDefinitionLine(while1.line);
-        try {
-            tds.addSymbole("While"+Tds.getCompteurSymbole(), bloc);
-        } catch (SymbolAlreadyExistsException e) {
-            errors.addError(e);
-        } 
-        
+        Tds newTds = tds.nouvelleSousTDS("whileblock");
         while1.doBlock.accept(this, newTds);
     }
 
@@ -307,13 +277,7 @@ public class TdsCreator implements TdsVisitor{
             if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct || ast instanceof IfThen || ast instanceof IfThenElse || ast instanceof While){
                 ast.accept(this, tds); 
             } else if(ast instanceof Bloc){
-                Tds newTds = new Tds(tds);
-                SymboleBlocAnonyme symbole = new SymboleBlocAnonyme(newTds);
-                try {
-                    tds.addSymbole("Bloc"+Tds.getCompteurSymbole(), symbole);
-                } catch (SymbolAlreadyExistsException e) {
-                    errors.addError(e);
-                }
+                Tds newTds = tds.nouvelleSousTDS("anonblock");
                 ast.accept(this, newTds);
             }
         }

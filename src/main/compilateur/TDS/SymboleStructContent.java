@@ -3,13 +3,11 @@ package compilateur.TDS;
 import java.util.ArrayList;
 
 public class SymboleStructContent extends Symbole{
-
-    private String name;
     private ArrayList<Symbole> declVars;
     private Tds tds;
 
     public SymboleStructContent(String name){
-        this.name = name;
+        super(name);
         this.declVars = new ArrayList<Symbole>();
     }
 
@@ -19,10 +17,6 @@ public class SymboleStructContent extends Symbole{
 
     public Tds getTds() {
         return this.tds;
-    }
-
-    public String getName(){
-        return this.name;
     }
     
     public void addDeclVars(Symbole symbole){

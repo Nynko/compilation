@@ -2,8 +2,14 @@ package compilateur.TDS;
 
 public abstract class Symbole {
     private int definitionLine;
+    private String name;
 
-    public Symbole(){
+    public Symbole(String name){
+        this.name = name;
+    }
+
+    public String getName(){
+        return this.name;
     }
 
     // public Symbole(int definitionLine){
