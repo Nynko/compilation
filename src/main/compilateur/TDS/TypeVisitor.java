@@ -206,10 +206,16 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Affectation affectation, Tds tds) {
         String leftType = affectation.left.accept(this, tds);
         String rightType = affectation.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
+        if (leftType == null) {
+            return null;
+        } else if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            errors.addError(new TypeException(affectation.line, rightType, leftType));
+            if (rightType == null) {
+                this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
+            } else {
+                errors.addError(new TypeException(affectation.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -218,10 +224,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Expr_ou expr_ou, Tds tds) {
         String leftType = expr_ou.left.accept(this, tds);
         String rightType = expr_ou.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(expr_ou.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(expr_ou.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -230,10 +238,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Expr_et expr_et, Tds tds) {
         String leftType = expr_et.left.accept(this, tds);
         String rightType = expr_et.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(expr_et.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(expr_et.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -242,10 +252,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Egal egal, Tds tds) {
         String leftType = egal.left.accept(this, tds);
         String rightType = egal.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(egal.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(egal.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -254,10 +266,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Different dif, Tds tds) {
         String leftType = dif.left.accept(this, tds);
         String rightType = dif.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return "int";
-        } else {
-            errors.addError(new TypeException(dif.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return "int";
+            } else {
+                errors.addError(new TypeException(dif.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -266,10 +280,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Inferieur inf, Tds tds) {
         String leftType = inf.left.accept(this, tds);
         String rightType = inf.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return "int";
-        } else {
-            errors.addError(new TypeException(inf.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return "int";
+            } else {
+                errors.addError(new TypeException(inf.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -278,10 +294,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(InferieurEgal infEgal, Tds tds) {
         String leftType = infEgal.left.accept(this, tds);
         String rightType = infEgal.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return "int";
-        } else {
-            errors.addError(new TypeException(infEgal.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return "int";
+            } else {
+                errors.addError(new TypeException(infEgal.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -290,10 +308,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Superieur sup, Tds tds) {
         String leftType = sup.left.accept(this, tds);
         String rightType = sup.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return "int";
-        } else {
-            errors.addError(new TypeException(sup.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return "int";
+            } else {
+                errors.addError(new TypeException(sup.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -302,10 +322,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(SuperieurEgal supEgal, Tds tds) {
         String leftType = supEgal.left.accept(this, tds);
         String rightType = supEgal.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return "int";
-        } else {
-            errors.addError(new TypeException(supEgal.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return "int";
+            } else {
+                errors.addError(new TypeException(supEgal.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -314,10 +336,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Plus plus, Tds tds) {
         String leftType = plus.left.accept(this, tds);
         String rightType = plus.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(plus.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(plus.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -326,10 +350,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Minus minus, Tds tds) {
         String leftType = minus.left.accept(this, tds);
         String rightType = minus.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(minus.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(minus.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -338,10 +364,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Division div, Tds tds) {
         String leftType = div.left.accept(this, tds);
         String rightType = div.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(div.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(div.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -350,10 +378,12 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Multiplication mult, Tds tds) {
         String leftType = mult.left.accept(this, tds);
         String rightType = mult.right.accept(this, tds);
-        if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            errors.addError(new TypeException(mult.line, rightType, leftType));
+        if (leftType != null && rightType != null) {
+            if (leftType.equals(rightType)) {
+                return leftType;
+            } else {
+                errors.addError(new TypeException(mult.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -361,8 +391,10 @@ public class TypeVisitor implements TdsVisitor<String> {
     @Override
     public String visit(Fleche fleche, Tds tds) {
         String leftType = fleche.left.accept(this, tds);
+        if (leftType == null) {
+            return null;
+        }
         Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
-
         String rightType = fleche.right.accept(this, tdsStruct);
         if (rightType != null) {
             return rightType;
@@ -374,12 +406,22 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(MoinsUnaire unaire, Tds tds) {
-        return unaire.noeud.accept(this, tds);
+        String type = unaire.noeud.accept(this, tds);
+        if (!type.equals("int")) {
+            this.errors.addError(new UnauthorizedOperationException(unaire.line));
+            return null;
+        }
+        return type;
     }
 
     @Override
     public String visit(Negation unaire, Tds tds) {
-        return unaire.noeud.accept(this, tds);
+        String type = unaire.noeud.accept(this, tds);
+        if (type == null) {
+            this.errors.addError(new UnauthorizedOperationException(unaire.line));
+            return null;
+        }
+        return "int";
     }
 
     @Override

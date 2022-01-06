@@ -345,237 +345,97 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Affectation affectation, Tds tds) {
-        String leftType = affectation.left.accept(visitor, tds);
-        String rightType = affectation.right.accept(visitor, tds);
-        if (leftType == null) {
-            return null;
-        }
-        if (!leftType.equals(rightType)) {
-            if (rightType == null) {
-                this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
-            } else {
-                errors.addError(new TypeException(affectation.line, rightType, leftType));
-            }
-        }
+       affectation.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Expr_ou expr_ou, Tds tds) {
-        Idf idfLeft = (Idf) expr_ou.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(expr_ou.left.toString(), expr_ou.line));
-            return null;
-        }
-        String leftType = expr_ou.left.accept(visitor, tds);
-        String rightType = expr_ou.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(expr_ou.line, rightType, leftType));
-        }
+        expr_ou.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Expr_et expr_et, Tds tds) {
-        Idf idfLeft = (Idf) expr_et.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(expr_et.left.toString(), expr_et.line));
-            return null;
-        }
-        String leftType = expr_et.left.accept(visitor, tds);
-        String rightType = expr_et.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(expr_et.line, rightType, leftType));
-        }
+        expr_et.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Egal egal, Tds tds) {
-        Idf idfLeft = (Idf) egal.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(egal.left.toString(), egal.line));
-            return null;
-        }
-        String leftType = egal.left.accept(visitor, tds);
-        String rightType = egal.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(egal.line, rightType, leftType));
-        }
+        egal.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Different dif, Tds tds) {
-        Idf idfLeft = (Idf) dif.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(dif.left.toString(), dif.line));
-            return null;
-        }
-        String leftType = dif.left.accept(visitor, tds);
-        String rightType = dif.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(dif.line, rightType, leftType));
-        }
+        dif.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Inferieur inf, Tds tds) {
-        Idf idfLeft = (Idf) inf.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(inf.left.toString(), inf.line));
-            return null;
-        }
-        String leftType = inf.left.accept(visitor, tds);
-        String rightType = inf.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(inf.line, rightType, leftType));
-        }
+        inf.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(InferieurEgal infEgal, Tds tds) {
-        Idf idfLeft = (Idf) infEgal.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(infEgal.left.toString(), infEgal.line));
-            return null;
-        }
-        String leftType = infEgal.left.accept(visitor, tds);
-        String rightType = infEgal.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(infEgal.line, rightType, leftType));
-        }
+        infEgal.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Superieur sup, Tds tds) {
-        Idf idfLeft = (Idf) sup.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(sup.left.toString(), sup.line));
-            return null;
-        }
-        String leftType = sup.left.accept(visitor, tds);
-        String rightType = sup.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(sup.line, rightType, leftType));
-        }
+        sup.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(SuperieurEgal supEgal, Tds tds) {
-        Idf idfLeft = (Idf) supEgal.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(supEgal.left.toString(), supEgal.line));
-            return null;
-        }
-        String leftType = supEgal.left.accept(visitor, tds);
-        String rightType = supEgal.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(supEgal.line, rightType, leftType));
-        }
+       supEgal.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Plus plus, Tds tds) {
-        Idf idfLeft = (Idf) plus.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(plus.left.toString(), plus.line));
-            return null;
-        }
-        String leftType = plus.left.accept(visitor, tds);
-        String rightType = plus.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(plus.line, rightType, leftType));
-        }
+        plus.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Minus minus, Tds tds) {
-        Idf idfLeft = (Idf) minus.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(minus.left.toString(), minus.line));
-            return null;
-        }
-        String leftType = minus.left.accept(visitor, tds);
-        String rightType = minus.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(minus.line, rightType, leftType));
-        }
+        minus.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Division div, Tds tds) {
-        Idf idfLeft = (Idf) div.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(div.left.toString(), div.line));
-            return null;
-        }
-        String leftType = div.left.accept(visitor, tds);
-        String rightType = div.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(div.line, rightType, leftType));
-        }
+        div.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Multiplication mult, Tds tds) {
-        Idf idfLeft = (Idf) mult.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(mult.left.toString(), mult.line));
-            return null;
-        }
-        String leftType = mult.left.accept(visitor, tds);
-        String rightType = mult.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(mult.line, rightType, leftType));
-        }
+        mult.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Fleche fleche, Tds tds) {
-        // Idf idfLeft = (Idf) fleche.left;
-        // if (tds.findSymbole(idfLeft.name) == null) {
-        //     errors.addError(new UndefinedSymboleException(fleche.left.toString(), fleche.line));
-        //     return null;
-        // }
-        String leftType = fleche.left.accept(visitor, tds);
-        if (leftType == null) {
-            return null;
-        }
-        Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
-
-        String rightType = fleche.right.accept(visitor, tdsStruct);
-        // if (rightType == null) {
-        //     errors.addError(new BadOperandTypeException("->",fleche.line));
-        // }
+        fleche.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(MoinsUnaire unaire, Tds tds) {
-        String type = unaire.accept(visitor, tds);
-        if (!type.equals("int")) {
-            return null;
-        }
-        errors.addError(new UnauthorizedOperationException(unaire.line));
+        unaire.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Negation unaire, Tds tds) {
-        String type = unaire.accept(visitor, tds);
-        if (type == null) {
-            errors.addError(new UnauthorizedOperationException(unaire.line));
-        }
+        unaire.accept(visitor, tds);
         return null;
     }
 
