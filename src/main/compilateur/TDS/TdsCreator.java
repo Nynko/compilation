@@ -328,59 +328,87 @@ public class TdsCreator implements TdsVisitor{
     }
 
     @Override public void visit(Affectation affectation, Tds tds){
-
+        if (tds.findSymbole(affectation.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(affectation.left.toString(), affectation.line));
+        }
     }
 
     @Override public void visit(Expr_ou expr_ou, Tds tds){
-
+        if (tds.findSymbole(expr_ou.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(expr_ou.left.toString(), expr_ou.line));
+        }
     }
 
     @Override public void visit(Expr_et expr_et, Tds tds){
-
+        if (tds.findSymbole(expr_et.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(expr_et.left.toString(), expr_et.line));
+        }
     }
 
     @Override public void visit(Egal egal, Tds tds){
-
+        if (tds.findSymbole(egal.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(egal.left.toString(), egal.line));
+        }
     }
 
     @Override public void visit(Different dif, Tds tds){
-
+        if (tds.findSymbole(dif.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(dif.left.toString(), dif.line));
+        }
     }
 
     @Override public void visit(Inferieur inf, Tds tds){
-
+        if (tds.findSymbole(inf.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(inf.left.toString(), inf.line));
+        }
     }
 
     @Override public void visit (InferieurEgal infEgal, Tds tds){
-
+        if (tds.findSymbole(infEgal.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(infEgal.left.toString(), infEgal.line));
+        }
     }
 
     @Override public void visit (Superieur sup, Tds tds){
-
+        if (tds.findSymbole(sup.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(sup.left.toString(), sup.line));
+        }
     }
 
     @Override public void visit (SuperieurEgal supEgal, Tds tds){
-
+        if (tds.findSymbole(supEgal.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(supEgal.left.toString(), supEgal.line));
+        }
     }
 
     @Override public void visit (Plus plus, Tds tds){
- 
+        if (tds.findSymbole(plus.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(plus.left.toString(), plus.line));
+        }
     }
 
     @Override public void visit (Minus minus, Tds tds){
-
+        if (tds.findSymbole(minus.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(minus.left.toString(), minus.line));
+        }
     }
 
     @Override public void visit (Division div, Tds tds){
-
+        if (tds.findSymbole(div.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(div.left.toString(), div.line));
+        }
     }
 
     @Override public void visit (Multiplication mult, Tds tds){
-
+        if (tds.findSymbole(mult.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(mult.left.toString(), mult.line));
+        }
     }
 
     @Override public void visit (Fleche fleche, Tds tds){
-
+        if (tds.findSymbole(fleche.left.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(fleche.left.toString(), fleche.line));
+        }
     }
 
     @Override public void visit (MoinsUnaire unaire, Tds tds){
