@@ -3,7 +3,6 @@ package compilateur.TDS;
 import java.util.ArrayList;
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
-import compilateur.ast.AstVisitor;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -49,6 +48,11 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     public ErrorAggregator getErrors() {
         return this.errors;
+    }
+
+    public void setErrorAggregator(ErrorAggregator agg) {
+        this.errors = agg;
+        this.visitor.setErrorAggregator(agg);
     }
 
     @Override public Void visit(Fichier fichier, Tds tds){

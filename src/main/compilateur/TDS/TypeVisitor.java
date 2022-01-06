@@ -37,13 +37,25 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
+import compilateur.utils.ErrorAggregator;
 
 public class TypeVisitor implements TdsVisitor<String> {
+
+    private ErrorAggregator errors = new ErrorAggregator();
+
+    public ErrorAggregator getErrors() {
+        return this.errors;
+    }
+
 
     @Override
     public String visit(Fichier fichier, Tds tds) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void setErrorAggregator(ErrorAggregator agg) {
+        this.errors = agg;
     }
 
     @Override
