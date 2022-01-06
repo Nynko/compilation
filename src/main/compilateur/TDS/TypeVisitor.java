@@ -1,6 +1,7 @@
 package compilateur.TDS;
 
 import compilateur.ast.Affectation;
+import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -129,12 +130,29 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
-
+        int nbParam = idfParenthesis.exprList.size();
+        String fctName = ((Idf)idfParenthesis.idf).name;
+        SymboleFonction sym = (SymboleFonction)tds.findSymbole(fctName);
+        // TODO nombre de parametre 
+        // sym.getTds().get
+        for (int i = 0; i < nbParam; i++) {
+             String paramTypeRef = "";
+            // =  sym.getParam(i)
+            String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
+            if (!paramType.equals(paramTypeRef)) {
+                //TODO erreur type parametre
+            }
+        }
         return idfParenthesis.idf.accept(this, tds);
     }
 
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
+        String fctName = ((Idf)idfParenthesisEmpty.idf).name;
+        SymboleFonction sym = (SymboleFonction)tds.findSymbole(fctName);
+        // if (sym.getParam() != 0) {
+        //     // TODO erreur nombre d'arguments
+        // }
         return idfParenthesisEmpty.idf.accept(this, tds);
     }
 
