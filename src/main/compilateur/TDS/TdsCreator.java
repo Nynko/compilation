@@ -2,7 +2,6 @@ package compilateur.TDS;
 
 
 import java.util.ArrayList;
-
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
