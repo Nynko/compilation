@@ -180,6 +180,12 @@ public class TdsCreator implements TdsVisitor<Void> {
         symboleFonction.setReturnType("struct_" + structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
+        try {
+            tds.addSymbole(functionName, symboleFonction);
+        } catch (SymbolAlreadyExistsException e) {
+            errors.addError(e);
+        }
+
         if (!(tds.findSymbole(structName) instanceof SymboleStructContent)) {
             // Si le type de struct n'existe pas
             errors.addError(new UndefinedStructureException(structName, declFctStruct.line));
