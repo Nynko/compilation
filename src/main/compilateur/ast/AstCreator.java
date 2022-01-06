@@ -302,9 +302,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitAffectation(circParser.AffectationContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(ctx.getChildCount()-1).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i=ctx.getChildCount()-3; i >= 0; i=i-2) {
 			Ast right = ctx.getChild(i).accept(this);
-			noeudTemporaire = new Affectation(right, noeudTemporaire);
+			noeudTemporaire = new Affectation(right, noeudTemporaire, line);
 		}
 		return noeudTemporaire;
 		
@@ -317,9 +318,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitExpr_ou(circParser.Expr_ouContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			noeudTemporaire = new Expr_ou(noeudTemporaire, right);
+			noeudTemporaire = new Expr_ou(noeudTemporaire, right, line);
 		}
 		return noeudTemporaire;
 	}
@@ -331,9 +333,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitExpr_et(circParser.Expr_etContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			noeudTemporaire = new Expr_et(noeudTemporaire, right);
+			noeudTemporaire = new Expr_et(noeudTemporaire, right, line);
 		}
 		return noeudTemporaire;
 	}
@@ -345,15 +348,16 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitComparaison(circParser.ComparaisonContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "==" :
-					noeudTemporaire = new Egal(noeudTemporaire, right);
+					noeudTemporaire = new Egal(noeudTemporaire, right, line);
 					break;
 				case "!=" :
-					noeudTemporaire = new Different(noeudTemporaire, right);
+					noeudTemporaire = new Different(noeudTemporaire, right, line);
 					break;
 				default :
 					break;
@@ -368,22 +372,23 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitOrdre(circParser.OrdreContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "<" :
-					noeudTemporaire = new Inferieur(noeudTemporaire, right);
+					noeudTemporaire = new Inferieur(noeudTemporaire, right, line);
 					break;
 				case "<=" :
-					noeudTemporaire = new InferieurEgal(noeudTemporaire, right);
+					noeudTemporaire = new InferieurEgal(noeudTemporaire, right, line);
 					break;
 				case ">" :
-					noeudTemporaire = new Superieur(noeudTemporaire, right);
+					noeudTemporaire = new Superieur(noeudTemporaire, right, line);
 					break;
 				case ">=" :
-					noeudTemporaire = new SuperieurEgal(noeudTemporaire, right);
+					noeudTemporaire = new SuperieurEgal(noeudTemporaire, right, line);
 				default :
 					break;
 			}
@@ -397,16 +402,17 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitAddition(circParser.AdditionContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "+" :
-					noeudTemporaire = new Plus(noeudTemporaire, right);
+					noeudTemporaire = new Plus(noeudTemporaire, right, line);
 					break;
 				case "-":
-					noeudTemporaire = new Minus(noeudTemporaire, right);
+					noeudTemporaire = new Minus(noeudTemporaire, right, line);
 					break;
 				default :
 					break;
@@ -422,15 +428,16 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitMultiplication(circParser.MultiplicationContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "*" :
-					noeudTemporaire = new Multiplication(noeudTemporaire, right);
+					noeudTemporaire = new Multiplication(noeudTemporaire, right, line);
 					break;
 				case "/":
-					noeudTemporaire = new Division(noeudTemporaire, right);
+					noeudTemporaire = new Division(noeudTemporaire, right, line);
 					break;
 				default :
 					break;
@@ -446,6 +453,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
 		Ast noeud; 
+		int line = ctx.getStart().getLine();
 		if (ctx.getChildCount() == 1) {
 			noeud = ctx.getChild(0).accept(this);
 			return noeud;
@@ -455,10 +463,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 			ctx.children.remove(0);
 			switch (signe) {
 				case "!" :
-					noeud = new Negation(ctx.accept(this));
+					noeud = new Negation(ctx.accept(this),line);
 					break;
 				case "-":
-					noeud = new MoinsUnaire(ctx.accept(this));
+					noeud = new MoinsUnaire(ctx.accept(this), line);
 					break;
 				default :
 					throw new Error();
@@ -477,9 +485,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitFleche(circParser.FlecheContext ctx) { 
 		
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 1; i * 2 < ctx.getChildCount(); i++) {
 			Ast right = new Idf(ctx.getChild(2*i).toString());
-			noeudTemporaire = new Fleche(noeudTemporaire, right);
+			noeudTemporaire = new Fleche(noeudTemporaire, right, line);
 		}
 		return noeudTemporaire;
 	}
