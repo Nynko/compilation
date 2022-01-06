@@ -253,24 +253,21 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Sizeof sizeof, Tds tds) {
+        sizeof.name.accept(visitor, tds);
         return null;
 
     }
 
     @Override
     public Void visit(IdfParenthesis idfParenthesis, Tds tds) {
-        // nb d'arguments
-        // if (idfParenthesis.exprList.size() != tds.findSymbole(((Idf)idfParenthesis.idf).name{
-
-        // }
+        idfParenthesis.accept(visitor, tds);
         return null;
-
     }
 
     @Override
     public Void visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
+        idfParenthesisEmpty.accept(visitor, tds);
         return null;
-
     }
 
 
@@ -310,11 +307,9 @@ public class TdsCreator implements TdsVisitor<Void> {
                 // System.out.println();
                 // System.out.println(symfct.getReturnType() +", " + return1.accept(visitor, tds)+ ", " + symfct.getName());
                 if (typeRetour == null) {
-                    System.out.println("symbole inconnu ligne : " + return1.line);
-                    // TODO erreur symbole inconnu 
+                    errors.addError(new UndefinedSymboleException(sym.getName(), return1.line));
                 } else if (!symfct.getReturnType().equals(typeRetour)) {
-                    System.out.println("erreur type retour incorrect ligne : " + return1.line);
-                    // TODO erreur type de retour incorrect
+                    errors.addError(new TypeException(return1.line, typeRetour, symfct.getReturnType()));
                 } 
                 return null;
             }
@@ -359,6 +354,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
         catch (ClassCastException e) {
             errors.addError(new UnauthorizedOperationException(affectation.line));
+            return null;
         }
         if (tds.findSymbole(idfLeft.name) == null) {
             errors.addError(new UndefinedSymboleException(affectation.left.toString(), affectation.line));
@@ -366,6 +362,8 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
         String leftType = affectation.left.accept(visitor, tds);
         String rightType = affectation.right.accept(visitor, tds);
+        System.out.println(leftType);
+        System.out.println(rightType);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
@@ -573,9 +571,10 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
-        if (type == null) {
-            // TODO erreur type
+        if (type != "int") {
+            return null;
         }
+        errors.addError(new UnauthorizedOperationException(unaire.line));
         return null;
     }
 
@@ -583,7 +582,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(Negation unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
         if (type == null) {
-            // TODO erreur type
+            errors.addError(new UnauthorizedOperationException(unaire.line));
         }
         return null;
     }

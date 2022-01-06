@@ -92,7 +92,7 @@ public class Tds {
 
     public void addSymbole(String name, Symbole symbole) throws SymbolAlreadyExistsException {
         if(this.listeSymboles.get(name) != null) {
-            throw new SymbolAlreadyExistsException(name,0, listeSymboles.get(name).getDefinitionLine());
+            throw new SymbolAlreadyExistsException(name,symbole.getDefinitionLine(), listeSymboles.get(name).getDefinitionLine());
         }
         if(symbole instanceof SymboleInt) {
             ((SymboleInt)symbole).setDeplacement(this.deplacement);
@@ -107,7 +107,7 @@ public class Tds {
 
     public void addSymboleParam(String name, Symbole symbole) throws SymbolAlreadyExistsException {
         if(this.listeSymboles.get(name) != null) {
-            throw new SymbolAlreadyExistsException(name,0, listeSymboles.get(name).getDefinitionLine());
+            throw new SymbolAlreadyExistsException(name,symbole.getDefinitionLine(), listeSymboles.get(name).getDefinitionLine());
         }
         if(symbole instanceof SymboleInt sym) {
             sym.setParam(this.compteurParams);

@@ -1,6 +1,7 @@
 package compilateur.TDS;
 
 import compilateur.ast.Affectation;
+import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -71,8 +72,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return "struct_" + symstructcontent.getName();
         } else {
-            System.out.println("symbole non reconnu " + idf.name);
-            // TODO erreur symbole pas reconnu
+            errors.addError(new UndefinedSymboleException(idf.name, idf.line));
         }
         return null;
     }
@@ -130,12 +130,29 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
-
+        int nbParam = idfParenthesis.exprList.size();
+        String fctName = ((Idf)idfParenthesis.idf).name;
+        SymboleFonction sym = (SymboleFonction)tds.findSymbole(fctName);
+        // TODO nombre de parametre 
+        // sym.getTds().get
+        for (int i = 0; i < nbParam; i++) {
+             String paramTypeRef = "";
+            // =  sym.getParam(i)
+            String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
+            if (!paramType.equals(paramTypeRef)) {
+                //TODO erreur type parametre
+            }
+        }
         return idfParenthesis.idf.accept(this, tds);
     }
 
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
+        String fctName = ((Idf)idfParenthesisEmpty.idf).name;
+        SymboleFonction sym = (SymboleFonction)tds.findSymbole(fctName);
+        // if (sym.getParam() != 0) {
+        //     // TODO erreur nombre d'arguments
+        // }
         return idfParenthesisEmpty.idf.accept(this, tds);
     }
 
@@ -186,7 +203,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             System.out.println(leftType + ", " + rightType);
             return leftType;
         } else {
-            // TODO erreur de type a l'affectation
+            errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
         return null;
     }
@@ -198,7 +215,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a ||
+            errors.addError(new TypeException(expr_ou.line, rightType, leftType));
         }
         return null;
     }
@@ -210,7 +227,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a &&
+            errors.addError(new TypeException(expr_et.line, rightType, leftType));
         }
         return null;
     }
@@ -222,7 +239,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a ==
+            errors.addError(new TypeException(egal.line, rightType, leftType));
         }
         return null;
     }
@@ -234,7 +251,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return "int";
         } else {
-            // TODO erreur de type a !=
+            errors.addError(new TypeException(dif.line, rightType, leftType));
         }
         return null;
     }
@@ -246,7 +263,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return "int";
         } else {
-            // TODO erreur de type a <
+            errors.addError(new TypeException(inf.line, rightType, leftType));
         }
         return null;
     }
@@ -258,7 +275,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return "int";
         } else {
-            // TODO erreur de type a <=
+            errors.addError(new TypeException(infEgal.line, rightType, leftType));
         }
         return null;
     }
@@ -270,7 +287,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return "int";
         } else {
-            // TODO erreur de type a >
+            errors.addError(new TypeException(sup.line, rightType, leftType));
         }
         return null;
     }
@@ -282,7 +299,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return "int";
         } else {
-            // TODO erreur de type a >=
+            errors.addError(new TypeException(supEgal.line, rightType, leftType));
         }
         return null;
     }
@@ -294,7 +311,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a +
+            errors.addError(new TypeException(plus.line, rightType, leftType));
         }
         return null;
     }
@@ -306,7 +323,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a -
+            errors.addError(new TypeException(minus.line, rightType, leftType));
         }
         return null;
     }
@@ -318,7 +335,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a /
+            errors.addError(new TypeException(div.line, rightType, leftType));
         }
         return null;
     }
@@ -330,7 +347,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // TODO erreur de type a *
+            errors.addError(new TypeException(mult.line, rightType, leftType));
         }
         return null;
     }
@@ -344,7 +361,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (!rightType.isEmpty()) {
             return rightType;
         } else {
-            // TODO erreur
+            errors.addError(new TypeException(fleche.line, rightType, leftType));
         }
         return null;
     }
