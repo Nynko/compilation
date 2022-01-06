@@ -310,11 +310,9 @@ public class TdsCreator implements TdsVisitor<Void> {
                 // System.out.println();
                 // System.out.println(symfct.getReturnType() +", " + return1.accept(visitor, tds)+ ", " + symfct.getName());
                 if (typeRetour == null) {
-                    System.out.println("symbole inconnu ligne : " + return1.line);
-                    // TODO erreur symbole inconnu 
+                    errors.addError(new UndefinedSymboleException(sym.getName(), return1.line));
                 } else if (!symfct.getReturnType().equals(typeRetour)) {
-                    System.out.println("erreur type retour incorrect ligne : " + return1.line);
-                    // TODO erreur type de retour incorrect
+                    errors.addError(new TypeException(return1.line, typeRetour, symfct.getReturnType()));
                 } 
                 return null;
             }
@@ -574,7 +572,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
         if (type == null) {
-            // TODO erreur type
+            errors.addError(new UnauthorizedOperationException(unaire.line));
         }
         return null;
     }
@@ -583,7 +581,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(Negation unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
         if (type == null) {
-            // TODO erreur type
+            errors.addError(new UnauthorizedOperationException(unaire.line));
         }
         return null;
     }
