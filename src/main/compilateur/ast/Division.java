@@ -4,7 +4,9 @@ import compilateur.TDS.*;
 
 public class Division implements Ast {
 
-    public <T> T accept(AstVisitor<T> visitor) {
+    public int line;
+    
+    public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
 
@@ -15,9 +17,10 @@ public class Division implements Ast {
     public Ast left;
     public Ast right;
 
-    public Division(Ast left, Ast right) {
+    public Division(Ast left, Ast right, int line){
         this.left = left;
         this.right = right;
+        this.line = line;
     }
 
 }

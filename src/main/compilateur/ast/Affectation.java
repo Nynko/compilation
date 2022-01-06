@@ -3,8 +3,10 @@ package compilateur.ast;
 import compilateur.TDS.*;
 
 public class Affectation implements Ast {
+    
+    public int line;
 
-    public <T> T accept(AstVisitor<T> visitor) {
+    public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
 
@@ -15,8 +17,9 @@ public class Affectation implements Ast {
     public Ast left;
     public Ast right;
 
-    public Affectation(Ast left, Ast right) {
+    public Affectation(Ast left, Ast right, int line) {
         this.left = left;
         this.right = right;
+        this.line = line;
     }
 }

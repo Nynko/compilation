@@ -4,7 +4,9 @@ import compilateur.TDS.*;
 
 public class MoinsUnaire implements Ast {
 
-    public <T> T accept(AstVisitor<T> visitor) {
+    public int line;
+    
+    public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
 
@@ -14,8 +16,9 @@ public class MoinsUnaire implements Ast {
 
     public Ast noeud;
 
-    public MoinsUnaire(Ast noeud) {
+    public MoinsUnaire(Ast noeud, int line){
         this.noeud = noeud;
+        this.line = line;
     }
 
 }

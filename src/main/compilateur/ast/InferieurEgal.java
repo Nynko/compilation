@@ -2,8 +2,11 @@ package compilateur.ast;
 
 import compilateur.TDS.*;
 
-public class InferieurEgal implements Ast {
-    public <T> T accept(AstVisitor<T> visitor) {
+public class InferieurEgal implements Ast{
+
+    public int line;
+
+    public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
 
@@ -14,8 +17,9 @@ public class InferieurEgal implements Ast {
     public Ast left;
     public Ast right;
 
-    public InferieurEgal(Ast left, Ast right) {
+    public InferieurEgal(Ast left, Ast right, int line) {
         this.left = left;
         this.right = right;
+        this.line = line;
     }
 }

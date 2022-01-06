@@ -3,7 +3,10 @@ package compilateur.ast;
 import compilateur.TDS.*;
 
 public class Different implements Ast {
-    public <T> T accept(AstVisitor<T> visitor) {
+
+    public int line;
+
+    public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
     }
 
@@ -14,8 +17,9 @@ public class Different implements Ast {
     public Ast left;
     public Ast right;
 
-    public Different(Ast left, Ast right) {
+    public Different(Ast left, Ast right, int line) {
         this.left = left;
         this.right = right;
+        this.line = line;
     }
 }

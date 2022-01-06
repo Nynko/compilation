@@ -1,20 +1,17 @@
 package compilateur.TDS;
 
 
-public class SymboleFonction extends SymboleBlocNomme {
-
+public class SymboleFonction extends Symbole {
     private String returnType;
+    private Tds tds;
 
     public SymboleFonction(String name, Tds tds){
-        super(name,tds);
+        super(name);
+        this.tds = tds;
     }
 
     public Tds getTds(){
         return this.tds;
-    }
-
-    public Boolean isNamed(String nom){
-        return nom.equals(this.name);
     }
 
     public String getReturnType(){
@@ -24,6 +21,4 @@ public class SymboleFonction extends SymboleBlocNomme {
     public void setReturnType(String str){
         this.returnType = str;
     }
-
-    
 }
