@@ -90,6 +90,9 @@ public class Main {
                 agg.printErrors();
                 System.out.println("==== Erreurs ====\n\n");
             }
+            System.out.println("==== Erreurs ====");
+            agg.printErrors();
+            System.out.println("==== Erreurs ====\n\n");
 
         } 
         catch (IOException e) {
