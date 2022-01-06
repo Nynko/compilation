@@ -351,7 +351,11 @@ public class TdsCreator implements TdsVisitor<Void> {
             return null;
         }
         if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(affectation.line, rightType, leftType));
+            if (rightType == null) {
+                this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
+            } else {
+                errors.addError(new TypeException(affectation.line, rightType, leftType));
+            }
         }
         return null;
     }
@@ -538,18 +542,21 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Fleche fleche, Tds tds) {
-        Idf idfLeft = (Idf) fleche.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(fleche.left.toString(), fleche.line));
+        // Idf idfLeft = (Idf) fleche.left;
+        // if (tds.findSymbole(idfLeft.name) == null) {
+        //     errors.addError(new UndefinedSymboleException(fleche.left.toString(), fleche.line));
+        //     return null;
+        // }
+        String leftType = fleche.left.accept(visitor, tds);
+        if (leftType == null) {
             return null;
         }
-        String leftType = fleche.left.accept(visitor, tds);
         Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
 
         String rightType = fleche.right.accept(visitor, tdsStruct);
-        if (rightType == null) {
-            errors.addError(new TypeException(fleche.line, rightType, leftType));
-        }
+        // if (rightType == null) {
+        //     errors.addError(new BadOperandTypeException("->",fleche.line));
+        // }
         return null;
     }
 

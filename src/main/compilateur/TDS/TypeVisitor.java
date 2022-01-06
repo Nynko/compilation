@@ -367,7 +367,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (rightType != null) {
             return rightType;
         } else {
-            errors.addError(new TypeException(fleche.line, rightType, leftType));
+            // errors.addError(new BadOperandTypeException("->",fleche.line));
         }
         return null;
     }
