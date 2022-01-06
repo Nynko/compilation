@@ -51,15 +51,11 @@ public class TdsCreator implements TdsVisitor<Void> {
         return this.errors;
     }
 
-    @Override
-    public Void visit(Fichier fichier, Tds tds) {
-
+    @Override public Void visit(Fichier fichier, Tds tds){
         tds.addnumRegion(0);
-
-        if (fichier.instructions != null) {
-            for (Ast ast : fichier.instructions) {
-                ast.accept(this, tds);
-            }
+        if (fichier.instructions == null) return null;
+        for (Ast ast:fichier.instructions){
+            ast.accept(this,tds);
         }
         return null;
     }
@@ -182,6 +178,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         Tds tdsFunction = new Tds(tds); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
+        symboleFonction.setReturnType("struct_"+structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
         if (!(tds.findSymbole(structName) instanceof SymboleStructContent)) {
@@ -190,14 +187,11 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
 
         if (declFctStruct.param != null) {
-            for (Ast ast : ((ParamListMulti) declFctStruct.param).paramList) {
-                if (ast instanceof ParamInt) {
-                    ast.accept(this, tdsFunction);
-                } else if (ast instanceof ParamStruct) {
-                    ast.accept(this, tdsFunction);
-                } else {
-                    throw new Error(
-                            "Erreur de remontée des symboles dans visit(declFctStruct...), symbole doit être SymboleInt ou SymboleStruct)");
+            for (Ast ast: ((ParamListMulti)declFctStruct.param).paramList){    
+                if(ast instanceof ParamInt || ast instanceof ParamStruct){
+                    ast.accept(this, tdsFunction); 
+                } else{
+                    throw new Error("Erreur de remontée des symboles dans visit(declFctStruct...), symbole doit être SymboleInt ou SymboleStruct)");
                 }
             }
         }
@@ -277,7 +271,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         SymboleBlocAnonyme bloc = new SymboleBlocAnonyme(newTds);
         bloc.addDefinitionLine(ifThen.line);
         try {
-            tds.addSymbole("ifThen", bloc); // il n'y aura qu'au plus un symbole nommé ifThen dans la tds
+            tds.addSymbole("ifThen"+Tds.getCompteurSymbole(), bloc);
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
@@ -304,12 +298,10 @@ public class TdsCreator implements TdsVisitor<Void> {
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
-        System.out.println("SALUT");
         ifThenElse.thenBlock.accept(this, newTds);
         ifThenElse.elseBlock.accept(this, newTdsElse);
-        System.out.println("AU REVOIR");
+        
         return null;
-
     }
 
     @Override
@@ -353,78 +345,24 @@ public class TdsCreator implements TdsVisitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visit(Bloc bloc, Tds tds) {
-        int i = 0;
-        ArrayList<Ast> listeAst = bloc.instList;
-        int longueurListe = listeAst.size();
-        Ast ast = null;
-        if (i < longueurListe)
-            ast = listeAst.get(i++);
+    @Override public Void visit(Bloc bloc, Tds tds){
+        if (bloc.instList == null) return null;
 
-        while (i <= longueurListe && ((ast instanceof DeclVarInt) || (ast instanceof DeclVarStruct))) { // Tant qu'objet de types decl_vars
-            ast.accept(this, tds);
-            if (i == longueurListe)
-                break;
-            ast = listeAst.get(i++);
-        }
-
-        // types instructions
-        while (i <= longueurListe) {
-            // On ne va modifier la TDS que pour les instructions générants un nouveau bloc
-            if (ast instanceof IfThen) {
-                ast.accept(this, tds);
-            } else if (ast instanceof IfThenElse) {
-                ast.accept(this, tds);
-            } else if (ast instanceof While) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Bloc) {
+        for (Ast ast: bloc.instList){    
+            if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct || ast instanceof IfThen || ast instanceof IfThenElse || ast instanceof While || ast instanceof Return || ast instanceof Affectation || ast instanceof Expr_ou
+                || ast instanceof Expr_et || ast instanceof Egal || ast instanceof Different || ast instanceof Inferieur || ast instanceof InferieurEgal || ast instanceof Superieur || ast instanceof SuperieurEgal
+                || ast instanceof Plus || ast instanceof Minus || ast instanceof Multiplication || ast instanceof Division || ast instanceof Fleche || ast instanceof MoinsUnaire || ast instanceof Negation){
+                ast.accept(this, tds); 
+            } else if(ast instanceof Bloc){
                 Tds newTds = new Tds(tds);
                 SymboleBlocAnonyme symbole = new SymboleBlocAnonyme(newTds);
                 try {
-                    tds.addSymbole("Bloc" + Tds.getCompteurSymbole(), symbole); // il n'y aura qu'au plus un symbole nommé bloc dans la tds
+                    tds.addSymbole("Bloc"+Tds.getCompteurSymbole(), symbole);
                 } catch (SymbolAlreadyExistsException e) {
                     errors.addError(e);
                 }
                 ast.accept(this, newTds);
-            } else if (ast instanceof Return) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Affectation) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Expr_ou) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Expr_et) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Egal) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Different) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Inferieur) {
-                ast.accept(this, tds);
-            } else if (ast instanceof InferieurEgal) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Superieur) {
-                ast.accept(this, tds);
-            } else if (ast instanceof SuperieurEgal) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Plus) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Minus) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Multiplication) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Division) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Fleche) {
-                ast.accept(this, tds);
-            } else if (ast instanceof MoinsUnaire) {
-                ast.accept(this, tds);
-            } else if (ast instanceof Negation) {
-                ast.accept(this, tds);
-            } 
-            if (i == longueurListe)
-                break;
-            ast = listeAst.get(i++);
+            }
         }
         return null;
     }
