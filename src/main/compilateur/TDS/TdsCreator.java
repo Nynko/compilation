@@ -55,11 +55,13 @@ public class TdsCreator implements TdsVisitor<Void> {
         this.visitor.setErrorAggregator(agg);
     }
 
-    @Override public Void visit(Fichier fichier, Tds tds){
+    @Override
+    public Void visit(Fichier fichier, Tds tds) {
         tds.addnumRegion(0);
-        if (fichier.instructions == null) return null;
-        for (Ast ast:fichier.instructions){
-            ast.accept(this,tds);
+        if (fichier.instructions == null)
+            return null;
+        for (Ast ast : fichier.instructions) {
+            ast.accept(this, tds);
         }
         return null;
     }
@@ -122,7 +124,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         SymboleStructContent symboleStruct = new SymboleStructContent(idf);
         symboleStruct.addDefinitionLine(decl_typ.line);
 
-        Tds structTds = tds.nouvelleSousTDS("struct_"+idf);
+        Tds structTds = tds.nouvelleSousTDS("struct_" + idf);
         symboleStruct.setTds(structTds);
 
         try {
@@ -134,8 +136,6 @@ public class TdsCreator implements TdsVisitor<Void> {
         for (Ast ast : decl_typ.decl) {
             if (ast instanceof DeclVarInt || ast instanceof DeclVarStruct) {
                 ast.accept(this, structTds);
-            } else {
-                // TODO : erreur sémantique, la struct contient une instruction incorrecte
             }
         }
         return null;
@@ -145,7 +145,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(DeclFctInt declFctInt, Tds tds) {
         String name = ((Idf) declFctInt.Idf).name;
 
-        Tds tdsFunction = tds.nouvelleSousTDS("fn_"+name); // Création d'une nouvelle Tds
+        Tds tdsFunction = tds.nouvelleSousTDS("fn_" + name); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(name, tdsFunction);
         symboleFonction.setReturnType("int");
         symboleFonction.addDefinitionLine(declFctInt.line);
@@ -158,13 +158,8 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         if (declFctInt.param != null) {
             for (Ast ast : ((ParamListMulti) declFctInt.param).paramList) {
-                if (ast instanceof ParamInt) {
+                if (ast instanceof ParamInt || ast instanceof ParamStruct) {
                     ast.accept(this, tdsFunction);
-                } else if (ast instanceof ParamStruct) {
-                    ast.accept(this, tdsFunction);
-                } else {
-                    throw new Error(
-                            "Erreur de remontée des symboles dans visit(DeclFctInt...), symbole doit être SymboleInt ou SymboleStruct)");
                 }
             }
         }
@@ -180,9 +175,9 @@ public class TdsCreator implements TdsVisitor<Void> {
         String structName = ((Idf) declFctStruct.Idf0).name;
         String functionName = ((Idf) declFctStruct.Idf1).name;
 
-        Tds tdsFunction = tds.nouvelleSousTDS("fn_"+functionName); // Création d'une nouvelle Tds
+        Tds tdsFunction = tds.nouvelleSousTDS("fn_" + functionName); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
-        symboleFonction.setReturnType("struct_"+structName);
+        symboleFonction.setReturnType("struct_" + structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
         if (!(tds.findSymbole(structName) instanceof SymboleStructContent)) {
@@ -191,11 +186,9 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
 
         if (declFctStruct.param != null) {
-            for (Ast ast: ((ParamListMulti)declFctStruct.param).paramList){    
-                if(ast instanceof ParamInt || ast instanceof ParamStruct){
-                    ast.accept(this, tdsFunction); 
-                } else{
-                    throw new Error("Erreur de remontée des symboles dans visit(declFctStruct...), symbole doit être SymboleInt ou SymboleStruct)");
+            for (Ast ast : ((ParamListMulti) declFctStruct.param).paramList) {
+                if (ast instanceof ParamInt || ast instanceof ParamStruct) {
+                    ast.accept(this, tdsFunction);
                 }
             }
         }
@@ -270,24 +263,25 @@ public class TdsCreator implements TdsVisitor<Void> {
         return null;
     }
 
-
-    @Override public Void visit(IfThen ifThen, Tds tds){
+    @Override
+    public Void visit(IfThen ifThen, Tds tds) {
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         ifThen.thenBlock.accept(this, newTds);
         return null;
     }
 
-
-    @Override public Void visit(IfThenElse ifThenElse, Tds tds){
+    @Override
+    public Void visit(IfThenElse ifThenElse, Tds tds) {
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         Tds newTdsElse = tds.nouvelleSousTDS("elseblock");
         ifThenElse.thenBlock.accept(this, newTds);
         ifThenElse.elseBlock.accept(this, newTdsElse);
-        
+
         return null;
     }
 
-    @Override public Void visit(While while1, Tds tds){
+    @Override
+    public Void visit(While while1, Tds tds) {
         Tds newTds = tds.nouvelleSousTDS("whileblock");
         while1.doBlock.accept(this, newTds);
         return null;
@@ -304,29 +298,24 @@ public class TdsCreator implements TdsVisitor<Void> {
         for (Symbole sym : temp.getPere().getListeSymboles().values()) {
             if (sym instanceof SymboleFonction symfct && symfct.getTds().equals(temp)) {
                 String typeRetour = return1.accept(visitor, tds);
-                // System.out.println();
-                // System.out.println(symfct.getReturnType() +", " + return1.accept(visitor, tds)+ ", " + symfct.getName());
                 if (typeRetour == null) {
                     errors.addError(new UndefinedSymboleException(sym.getName(), return1.line));
                 } else if (!symfct.getReturnType().equals(typeRetour)) {
                     errors.addError(new TypeException(return1.line, typeRetour, symfct.getReturnType()));
-                } 
+                }
                 return null;
             }
         }
         return null;
     }
 
-    @Override public Void visit(Bloc bloc, Tds tds){
-        if (bloc.instList == null) return null;
+    @Override
+    public Void visit(Bloc bloc, Tds tds) {
+        if (bloc.instList == null)
+            return null;
 
-        for (Ast ast: bloc.instList){    
-            // if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct || ast instanceof IfThen || ast instanceof IfThenElse || ast instanceof While || ast instanceof Return || ast instanceof Affectation || ast instanceof Expr_ou
-            //     || ast instanceof Expr_et || ast instanceof Egal || ast instanceof Different || ast instanceof Inferieur || ast instanceof InferieurEgal || ast instanceof Superieur || ast instanceof SuperieurEgal
-            //     || ast instanceof Plus || ast instanceof Minus || ast instanceof Multiplication || ast instanceof Division || ast instanceof Fleche || ast instanceof MoinsUnaire || ast instanceof Negation){
-            //     ast.accept(this, tds); 
-            // } else 
-            if(ast instanceof Bloc){
+        for (Ast ast : bloc.instList) {
+            if (ast instanceof Bloc) {
                 Tds newTds = tds.nouvelleSousTDS("anonblock");
                 ast.accept(this, newTds);
             } else {
@@ -417,7 +406,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = dif.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(dif.line, rightType, leftType));
-         }
+        }
         return null;
     }
 
@@ -432,7 +421,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = inf.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(inf.line, rightType, leftType));
-        }   
+        }
         return null;
     }
 
@@ -447,7 +436,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = infEgal.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(infEgal.line, rightType, leftType));
-        }   
+        }
         return null;
     }
 
@@ -462,7 +451,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = sup.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(sup.line, rightType, leftType));
-        }   
+        }
         return null;
     }
 
@@ -477,7 +466,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = supEgal.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(supEgal.line, rightType, leftType));
-        }    
+        }
         return null;
     }
 
@@ -492,7 +481,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = plus.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(plus.line, rightType, leftType));
-        }   
+        }
         return null;
     }
 
@@ -507,7 +496,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = minus.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(minus.line, rightType, leftType));
-        }    
+        }
         return null;
     }
 
@@ -522,7 +511,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = div.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(div.line, rightType, leftType));
-        }    
+        }
         return null;
     }
 
@@ -537,9 +526,8 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = mult.right.accept(visitor, tds);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(mult.line, rightType, leftType));
-        }    
+        }
         return null;
-
     }
 
     @Override
@@ -555,14 +543,14 @@ public class TdsCreator implements TdsVisitor<Void> {
         String rightType = fleche.right.accept(visitor, tdsStruct);
         if (rightType == null) {
             errors.addError(new TypeException(fleche.line, rightType, leftType));
-        }    
+        }
         return null;
     }
 
     @Override
     public Void visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
-        if (type != "int") {
+        if (!type.equals("int")) {
             return null;
         }
         errors.addError(new UnauthorizedOperationException(unaire.line));
