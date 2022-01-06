@@ -357,6 +357,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
         catch (ClassCastException e) {
             errors.addError(new UnauthorizedOperationException(affectation.line));
+            return null;
         }
         if (tds.findSymbole(idfLeft.name) == null) {
             errors.addError(new UndefinedSymboleException(affectation.left.toString(), affectation.line));
@@ -364,6 +365,8 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
         String leftType = affectation.left.accept(visitor, tds);
         String rightType = affectation.right.accept(visitor, tds);
+        System.out.println(leftType);
+        System.out.println(rightType);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
