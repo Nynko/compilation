@@ -79,8 +79,8 @@ public class Main {
                 GraphVizTdsVisitor graphVizTds = new GraphVizTdsVisitor();
                 Tds tds = new Tds("prog");
                 TdsCreator tdsCreator = new TdsCreator();
+                tdsCreator.setErrorAggregator(agg);
                 ast.accept(tdsCreator, tds);
-                tdsCreator.getErrors().printErrors();
 
                 graphVizTds.createGraph(tds);
                 graphVizTds.dumpGraph("./out/tds.dot");
