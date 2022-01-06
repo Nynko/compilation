@@ -322,13 +322,16 @@ public class TdsCreator implements TdsVisitor<Void> {
         if (bloc.instList == null) return null;
 
         for (Ast ast: bloc.instList){    
-            if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct || ast instanceof IfThen || ast instanceof IfThenElse || ast instanceof While || ast instanceof Return || ast instanceof Affectation || ast instanceof Expr_ou
-                || ast instanceof Expr_et || ast instanceof Egal || ast instanceof Different || ast instanceof Inferieur || ast instanceof InferieurEgal || ast instanceof Superieur || ast instanceof SuperieurEgal
-                || ast instanceof Plus || ast instanceof Minus || ast instanceof Multiplication || ast instanceof Division || ast instanceof Fleche || ast instanceof MoinsUnaire || ast instanceof Negation){
-                ast.accept(this, tds); 
-            } else if(ast instanceof Bloc){
+            // if(ast instanceof DeclVarInt || ast instanceof DeclVarStruct || ast instanceof IfThen || ast instanceof IfThenElse || ast instanceof While || ast instanceof Return || ast instanceof Affectation || ast instanceof Expr_ou
+            //     || ast instanceof Expr_et || ast instanceof Egal || ast instanceof Different || ast instanceof Inferieur || ast instanceof InferieurEgal || ast instanceof Superieur || ast instanceof SuperieurEgal
+            //     || ast instanceof Plus || ast instanceof Minus || ast instanceof Multiplication || ast instanceof Division || ast instanceof Fleche || ast instanceof MoinsUnaire || ast instanceof Negation){
+            //     ast.accept(this, tds); 
+            // } else 
+            if(ast instanceof Bloc){
                 Tds newTds = tds.nouvelleSousTDS("anonblock");
                 ast.accept(this, newTds);
+            } else {
+                ast.accept(this, tds);
             }
         }
         return null;

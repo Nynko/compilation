@@ -1,7 +1,6 @@
 package compilateur.TDS;
 
 import compilateur.ast.Affectation;
-import compilateur.ast.AstVisitor;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -119,6 +118,7 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
+
         return idfParenthesis.idf.accept(this, tds);
     }
 
