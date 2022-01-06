@@ -340,8 +340,6 @@ public class TdsCreator implements TdsVisitor<Void> {
         String leftType = affectation.left.accept(visitor, tds);
         String rightType = affectation.right.accept(visitor, tds);
         if (leftType == null) {
-            errors.addError(new UndefinedSymboleException(affectation.left.toString(), affectation.line)); 
-            //TODO corriger les erreurs moches
             return null;
         }
         if (!leftType.equals(rightType)) {
