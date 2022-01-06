@@ -4,6 +4,8 @@ import compilateur.TDS.*;
 
 public class Idf implements Ast {
 
+    public int line;
+
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
     }
@@ -14,7 +16,8 @@ public class Idf implements Ast {
 
     public String name;
 
-    public Idf(String name) {
+    public Idf(String name, int line) {
         this.name = name;
+        this.line = line;
     }
 }
