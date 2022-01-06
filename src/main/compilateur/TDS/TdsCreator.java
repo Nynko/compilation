@@ -52,13 +52,10 @@ public class TdsCreator implements TdsVisitor{
     }
 
     @Override public void visit(Fichier fichier, Tds tds){
-
         tds.addnumRegion(0);
-
-        if (fichier.instructions != null) {
-            for (Ast ast:fichier.instructions){
-                ast.accept(this,tds);
-            }
+        if (fichier.instructions == null) return;
+        for (Ast ast:fichier.instructions){
+            ast.accept(this,tds);
         }
     }
 
@@ -181,10 +178,8 @@ public class TdsCreator implements TdsVisitor{
 
         if (declFctStruct.param != null) {
             for (Ast ast: ((ParamListMulti)declFctStruct.param).paramList){    
-                if(ast instanceof ParamInt){
+                if(ast instanceof ParamInt || ast instanceof ParamStruct){
                     ast.accept(this, tdsFunction); 
-                } else if(ast instanceof ParamStruct){
-                    ast.accept(this, tdsFunction);
                 } else{
                     throw new Error("Erreur de remontée des symboles dans visit(declFctStruct...), symbole doit être SymboleInt ou SymboleStruct)");
                 }
