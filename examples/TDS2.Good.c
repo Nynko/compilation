@@ -30,10 +30,14 @@ int une_fonction(){
     return 1;
 }
 
+int z(int aa, int bb){
+    return 3;
+}
+
 int function2(){
     int b, a;
     b = a = 3;
-    return z();
+    return z(b, a);
 }
 
 int afuc(){

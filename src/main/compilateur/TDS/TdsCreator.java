@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
+import compilateur.ast.AstVisitor;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -255,6 +256,10 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IdfParenthesis idfParenthesis, Tds tds) {
+        // nb d'arguments
+        // if (idfParenthesis.exprList.size() != tds.findSymbole(((Idf)idfParenthesis.idf).name{
+
+        // }
         return null;
 
     }
