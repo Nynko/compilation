@@ -376,11 +376,15 @@ public class TdsCreator implements TdsVisitor{
     }
 
     @Override public void visit (MoinsUnaire unaire, Tds tds){
-
+        if (tds.findSymbole(unaire.noeud.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(unaire.noeud.toString(), unaire.line));
+        }
     }
     
     @Override public void visit (Negation unaire, Tds tds){
-
+        if (tds.findSymbole(unaire.noeud.toString()) == null) {
+            errors.addError(new UndefinedSymboleException(unaire.noeud.toString(), unaire.line));
+        }
     }
 
     @Override

@@ -453,6 +453,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
 		Ast noeud; 
+		int line = ctx.getStart().getLine();
 		if (ctx.getChildCount() == 1) {
 			noeud = ctx.getChild(0).accept(this);
 			return noeud;
@@ -462,10 +463,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 			ctx.children.remove(0);
 			switch (signe) {
 				case "!" :
-					noeud = new Negation(ctx.accept(this));
+					noeud = new Negation(ctx.accept(this),line);
 					break;
 				case "-":
-					noeud = new MoinsUnaire(ctx.accept(this));
+					noeud = new MoinsUnaire(ctx.accept(this), line);
 					break;
 				default :
 					throw new Error();
