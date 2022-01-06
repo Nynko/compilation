@@ -2,8 +2,6 @@ package compilateur.ast;
 
 import java.util.ArrayList;
 
-import org.antlr.v4.runtime.misc.Interval;
-
 import compilateur.grammar.circBaseVisitor;
 import compilateur.grammar.circParser;
 
