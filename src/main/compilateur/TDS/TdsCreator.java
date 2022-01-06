@@ -283,11 +283,8 @@ public class TdsCreator implements TdsVisitor{
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
-        System.out.println("SALUT");
         ifThenElse.thenBlock.accept(this, newTds);
         ifThenElse.elseBlock.accept(this, newTdsElse);
-        System.out.println("AU REVOIR");
-
     }
 
     @Override public void visit(While while1, Tds tds){
