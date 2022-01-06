@@ -571,9 +571,10 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.accept(visitor, tds);
-        if (type == null) {
-            errors.addError(new UnauthorizedOperationException(unaire.line));
+        if (type != "int") {
+            return null;
         }
+        errors.addError(new UnauthorizedOperationException(unaire.line));
         return null;
     }
 
