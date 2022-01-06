@@ -2,6 +2,8 @@ package compilateur.TDS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 import compilateur.Offset;
 
 public class Tds {
@@ -15,6 +17,7 @@ public class Tds {
     private int numRegion = compteur++;
     private Tds pointeurPere;
     private int deplacement = 0;
+    private int compteurParams = 0;
     private int deplacementParam = -Offset.OFFSET;
     private HashMap<String,Symbole> listeSymboles;
     private ArrayList<Tds> sousTDS = new ArrayList<>();
@@ -106,15 +109,34 @@ public class Tds {
         if(this.listeSymboles.get(name) != null) {
             throw new SymbolAlreadyExistsException(name,0, listeSymboles.get(name).getDefinitionLine());
         }
-        if(symbole instanceof SymboleInt) {
-            ((SymboleInt)symbole).setDeplacement(this.deplacementParam);
+        if(symbole instanceof SymboleInt sym) {
+            sym.setParam(this.compteurParams);
+            sym.setDeplacement(this.deplacementParam);
             this.deplacementParam -= Offset.OFFSET;
-        } else if(symbole instanceof SymboleStruct) {
-            ((SymboleStruct)symbole).setDeplacement(this.deplacementParam);
+            this.compteurParams += 1;
+        } else if(symbole instanceof SymboleStruct sym) {
+            sym.setParam(this.compteurParams);
+            sym.setDeplacement(this.deplacementParam);
             this.deplacementParam -= Offset.OFFSET;
+            this.compteurParams += 1;
         }
         this.listeSymboles.put(name, symbole);
         compteurSymbole++;
+    }
+
+    public ArrayList<SymboleVar> getParams() {
+        ArrayList<SymboleVar> params = new ArrayList<>();
+        for (Map.Entry<String, Symbole> set : this.listeSymboles.entrySet()) {
+            Symbole sym = set.getValue();
+
+            if(sym instanceof SymboleVar symvar) {
+                if(symvar.isParam()) {
+                    params.add(symvar);
+                }
+            }
+        }
+        params.sort((o1, o2) -> Integer.compare(o1.getParamIndex(),o2.getParamIndex()));
+        return params;
     }
 
     public Tds nouvelleSousTDS(String name) {

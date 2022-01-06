@@ -2,11 +2,13 @@ package compilateur.graphviz;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
 import compilateur.TDS.Symbole;
 import compilateur.TDS.SymboleStructContent;
+import compilateur.TDS.SymboleVar;
 import compilateur.TDS.SymboleFonction;
 import compilateur.TDS.SymboleInt;
 import compilateur.TDS.SymboleStruct;
@@ -61,16 +63,16 @@ public class GraphVizTdsVisitor {
 
             if(symbole instanceof SymboleInt){
                 SymboleInt sym = (SymboleInt) symbole;
-                tableContent += String.format("<tr><td> %s </td> <td> int </td> <td> %d </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDeplacement(), sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> %s </td> <td> int </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleStruct){
                 SymboleStruct sym = (SymboleStruct) symbole;
-                tableContent += String.format("<tr><td> %s </td> <td> struct %s </td> <td> %d </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getStruct().getName(), sym.getDeplacement(), sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> %s </td> <td> struct %s </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getStruct().getName(), sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleStructContent){
                 SymboleStructContent sym = (SymboleStructContent) symbole;
-                tableContent += String.format("<tr><td> struct_%s </td> <td> struct_type </td> <td> </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> struct_%s </td> <td> struct_type </td> <td> </td> <td> </td>  <td> line . %d  </td> </tr>", sym.getName(), sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleFonction) {
                 SymboleFonction sym = (SymboleFonction) symbole;
-                tableContent += String.format("<tr><td> %s </td> <td> function (returns %s) </td> <td>  </td> <td> line . %d  </td> </tr>" , sym.getName(), sym.getReturnType(), sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> %s </td> <td> function (returns %s) </td> <td></td> <td> %s </td> <td> line . %d  </td> </tr>" , sym.getName(), sym.getReturnType(), sym.getName()+paramlistToString(sym.getTds().getParams()), sym.getDefinitionLine() );
             }
         }
 
@@ -84,7 +86,7 @@ public class GraphVizTdsVisitor {
             \t%s [shape=\"plaintext\",label=<
             <table border='1' cellborder='1' cellspacing='1'>
                 <tr>
-                    <td colspan="4"><b>%s, Région %s, Imbrication %s</b></td>
+                    <td colspan="5"><b>%s, Région %s, Imbrication %s</b></td>
                 </tr>
                 <tr>
                     <td>
@@ -97,6 +99,9 @@ public class GraphVizTdsVisitor {
                         <b> Déplacement </b>
                     </td>
                     <td>
+                        <b> Param </b>
+                    </td>
+                    <td>
                         <b> Ligne de définition </b>
                     </td>
                 </tr>
@@ -106,6 +111,15 @@ public class GraphVizTdsVisitor {
             node, name, region, imbrication, tableContent);
     } 
 
+    public String paramlistToString(ArrayList<SymboleVar> params) {
+        String res = "(";
+        if(params.size() > 0) {
+            for(SymboleVar sym: params) res += sym.getName() + ", ";
+            res = res.substring(0, res.length()-2);
+        }
+        res += ")";
+        return res;
+    }
 
     public void createGraph(Tds tds){
         addTds(tds.getName(),this.nextState(), tds);
