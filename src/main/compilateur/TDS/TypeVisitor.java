@@ -207,7 +207,6 @@ public class TypeVisitor implements TdsVisitor<String> {
         String leftType = affectation.left.accept(this, tds);
         String rightType = affectation.right.accept(this, tds);
         if (leftType.equals(rightType)) {
-            System.out.println(leftType + ", " + rightType);
             return leftType;
         } else {
             errors.addError(new TypeException(affectation.line, rightType, leftType));

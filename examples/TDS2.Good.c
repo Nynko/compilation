@@ -1,46 +1,59 @@
 
-// struct vide{
+struct vide
+{
+};
 
-// };
-
-struct a{
-    // struct vide * b;
+struct a
+{
+    struct vide *b;
     int a;
 };
 
-int une_fonction(){
-    int a,b;
-    // int y;
+int une_fonction()
+{
+    int a, b;
+    int y;
 
-    // while(1){
-    //     int c;
-    //     if(condition){
-    //         int d;
-    //     }
-    //     else{
-    //         int e;
-    //     }
-    // }
+    while (1)
+    {
+        int c;
+        int c;
+        if (condition)
+        {
+            int d;
+        }
+        else
+        {
+            int e;
+        }
+    }
 
-    // {
-    //     if(test){
-    //         ;
-    //     }
-    // }
+    {
+        if (test)
+        {
+            ;
+        }
+    }
     return 1;
 }
 
-int z(int aa, int bb){
+int z(int aa, int bb)
+{
     return 3;
 }
 
-int function2(){
+int function2()
+{
     int b, a;
     b = a = 3;
-    return z(b, a);
+    return 0;
 }
 
-int afuc(){
-    struct a*a;
-    return a;
+struct a* afuc()
+{
+    int aaa;
+    struct a *a;
+    aaa = a + 1;
+    aaa = z(a);
+    return aaa;
 }

@@ -265,6 +265,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IfThen ifThen, Tds tds) {
+        ifThen.condition.accept(visitor, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         ifThen.thenBlock.accept(this, newTds);
         return null;
@@ -272,6 +273,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IfThenElse ifThenElse, Tds tds) {
+        ifThenElse.condition.accept(visitor, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         Tds newTdsElse = tds.nouvelleSousTDS("elseblock");
         ifThenElse.thenBlock.accept(this, newTds);
@@ -350,8 +352,6 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
         String leftType = affectation.left.accept(visitor, tds);
         String rightType = affectation.right.accept(visitor, tds);
-        System.out.println(leftType);
-        System.out.println(rightType);
         if (!leftType.equals(rightType)) {
             errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
