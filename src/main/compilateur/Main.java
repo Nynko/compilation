@@ -85,10 +85,6 @@ public class Main {
                 graphVizTds.createGraph(tds);
                 graphVizTds.dumpGraph("./out/tds.dot");
 
-            } else {
-                System.out.println("==== Erreurs ====");
-                agg.printErrors();
-                System.out.println("==== Erreurs ====\n\n");
             }
             System.out.println("==== Erreurs ====");
             agg.printErrors();
