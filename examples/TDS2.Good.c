@@ -8,6 +8,7 @@ struct a
     struct vide *b;
     int a;
     struct a * d;
+    int azerty;
 };
 
 int une_fonction()
@@ -83,9 +84,21 @@ struct a* afuc()
 }
 
 int functionWithoutReturn() {
-    int a, c;
+    int a, c, d;
+    struct a* u, *uu;
+    uu = u;
+    a = u->a;
+    c = a;
+    u->a = 1; 
+    d = u->a;
+    c = d;
+    c = u->azerty;
+
+    uu = u;
+
     a = b;
     c = a;
     a = 1;
     c = a;
+    1 / 0;
 }

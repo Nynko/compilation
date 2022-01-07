@@ -223,7 +223,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (leftType.equals(rightType)) {
             return leftType;
         } else {
-            // echec de l'affectation 
+            // echec de l'affectation
             if (affectation.left instanceof Idf idf) {
                 Symbole s = tds.findSymbole(idf.name);
                 if (s instanceof SymboleVar sv) {
@@ -383,6 +383,9 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Division div, Tds tds) {
         String leftType = div.left.accept(this, tds);
         String rightType = div.right.accept(this, tds);
+        if (div.right instanceof IntNode intr && intr.parseInt == 0) {
+            this.errors.addError(new DivisionByZeroException(div.line));
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
