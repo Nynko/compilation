@@ -197,8 +197,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
-
-        if (!(tds.findSymbole(structName) instanceof SymboleStructContent)) {
+        if (tds.findSymboleStruct("struct_" + structName) == null) {
             // Si le type de struct n'existe pas
             errors.addError(new UndefinedStructureException(structName, declFctStruct.line));
         }

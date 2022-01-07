@@ -3,6 +3,7 @@ package compilateur.TDS;
 import java.util.ArrayList;
 
 import compilateur.ast.Affectation;
+import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -65,14 +66,18 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (sym instanceof SymboleFonction symfct) {
             return symfct.getReturnType();
         } else if (sym instanceof SymboleInt symint) {
-            if (!symint.isInitalized()) {
-                this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symint.getDefinitionLine()));
-            }
+            // System.out.println("===== " + symint.getName()+ " " + idf.line);
+            // if (!symint.isInitalized()) {
+            //     this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symint.getDefinitionLine()));
+            // }
             return "int";
         } else if (sym instanceof SymboleStruct symstruct) {
-            if (!symstruct.isInitalized()) {
-                this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symstruct.getDefinitionLine()));
-            }
+            
+            // System.out.println("------- " + symstruct.getName()+ " " + idf.line);
+            
+            // if (!symstruct.isInitalized()) {
+            //     this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symstruct.getDefinitionLine()));
+            // }
             return "struct_" + symstruct.getStruct().getName();
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return "struct_" + symstructcontent.getName();
@@ -210,31 +215,45 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Affectation affectation, Tds tds) {
-        if (affectation.left instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv) {
-                sv.setInitalized(true);
-            }
-        }
         String leftType = affectation.left.accept(this, tds);
         String rightType = affectation.right.accept(this, tds);
+        // erreur a gauche
         if (leftType == null) {
             return null;
-        } else if (leftType.equals(rightType)) {
-            return leftType;
-        } else {
-            // echec de l'affectation
+        }
+        // erreur a droite
+        if (rightType == null){
+            this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
+            return null;
+        }
+        // membre droit est initialisé ?
+        if (affectation.right instanceof Idf idf) { // si c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            System.out.println(s.getName() + " " + affectation.line);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(affectation.line, sv.getName(), sv.getDefinitionLine()));
+                return leftType;
+            }
+        }
+        
+        if (leftType.equals(rightType)) {
+            
+            // affectation reussie
             if (affectation.left instanceof Idf idf) {
                 Symbole s = tds.findSymbole(idf.name);
                 if (s instanceof SymboleVar sv) {
-                    sv.setInitalized(false);
+                    sv.setInitalized(true);
+                }
+            } else if (affectation.left instanceof Fleche fleche) {
+                Idf idf = (Idf)fleche.right;
+                Symbole s = tds.findSymbole(idf.name);
+                if (s instanceof SymboleVar sv) {
+                    sv.setInitalized(true);
                 }
             }
-            if (rightType == null) {
-                this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
-            } else {
-                errors.addError(new TypeException(affectation.line, rightType, leftType));
-            }
+            return leftType;
+        } else {
+            errors.addError(new TypeException(affectation.line, rightType, leftType));
         }
         return null;
     }
@@ -243,6 +262,21 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Expr_ou expr_ou, Tds tds) {
         String leftType = expr_ou.left.accept(this, tds);
         String rightType = expr_ou.right.accept(this, tds);
+        if (rightType != null && expr_ou.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(expr_ou.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && expr_ou.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(expr_ou.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
@@ -257,6 +291,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Expr_et expr_et, Tds tds) {
         String leftType = expr_et.left.accept(this, tds);
         String rightType = expr_et.right.accept(this, tds);
+        if (rightType != null && expr_et.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(expr_et.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && expr_et.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(expr_et.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
@@ -271,6 +319,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Egal egal, Tds tds) {
         String leftType = egal.left.accept(this, tds);
         String rightType = egal.right.accept(this, tds);
+        if (rightType != null && egal.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(egal.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && egal.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(egal.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
@@ -285,6 +347,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Different dif, Tds tds) {
         String leftType = dif.left.accept(this, tds);
         String rightType = dif.right.accept(this, tds);
+        if (rightType != null && dif.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(dif.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && dif.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(dif.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return "int";
@@ -299,6 +375,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Inferieur inf, Tds tds) {
         String leftType = inf.left.accept(this, tds);
         String rightType = inf.right.accept(this, tds);
+        if (rightType != null && inf.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(inf.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && inf.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(inf.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return "int";
@@ -313,6 +403,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(InferieurEgal infEgal, Tds tds) {
         String leftType = infEgal.left.accept(this, tds);
         String rightType = infEgal.right.accept(this, tds);
+        if (rightType != null && infEgal.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(infEgal.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && infEgal.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(infEgal.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return "int";
@@ -327,6 +431,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Superieur sup, Tds tds) {
         String leftType = sup.left.accept(this, tds);
         String rightType = sup.right.accept(this, tds);
+        if (rightType != null && sup.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(sup.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && sup.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(sup.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return "int";
@@ -341,6 +459,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(SuperieurEgal supEgal, Tds tds) {
         String leftType = supEgal.left.accept(this, tds);
         String rightType = supEgal.right.accept(this, tds);
+        if (rightType != null && supEgal.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(supEgal.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && supEgal.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(supEgal.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return "int";
@@ -355,6 +487,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Plus plus, Tds tds) {
         String leftType = plus.left.accept(this, tds);
         String rightType = plus.right.accept(this, tds);
+        if (rightType != null && plus.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(plus.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && plus.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(plus.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
@@ -369,6 +515,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Minus minus, Tds tds) {
         String leftType = minus.left.accept(this, tds);
         String rightType = minus.right.accept(this, tds);
+        if (rightType != null && minus.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(minus.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && minus.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(minus.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
@@ -383,6 +543,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Division div, Tds tds) {
         String leftType = div.left.accept(this, tds);
         String rightType = div.right.accept(this, tds);
+        if (rightType != null && div.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(div.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && div.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(div.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (div.right instanceof IntNode intr && intr.parseInt == 0) {
             this.errors.addError(new DivisionByZeroException(div.line));
         }
@@ -400,6 +574,20 @@ public class TypeVisitor implements TdsVisitor<String> {
     public String visit(Multiplication mult, Tds tds) {
         String leftType = mult.left.accept(this, tds);
         String rightType = mult.right.accept(this, tds);
+        if (rightType != null && mult.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(mult.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && mult.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(mult.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (leftType != null && rightType != null) {
             if (leftType.equals(rightType)) {
                 return leftType;
@@ -418,10 +606,22 @@ public class TypeVisitor implements TdsVisitor<String> {
         }
         Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
         String rightType = fleche.right.accept(this, tdsStruct);
+        if (rightType != null && fleche.right instanceof Idf idf) { // si a droite c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(fleche.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
+        if (leftType != null && fleche.left instanceof Idf idf) { // si a gauche c'est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(fleche.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (rightType != null) {
             return rightType;
-        } else {
-            // errors.addError(new BadOperandTypeException("->",fleche.line));
         }
         return null;
     }
@@ -429,6 +629,13 @@ public class TypeVisitor implements TdsVisitor<String> {
     @Override
     public String visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.noeud.accept(this, tds);
+        if (type != null && unaire.noeud instanceof Idf idf) { // si noeud est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(unaire.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (!type.equals("int")) {
             this.errors.addError(new UnauthorizedOperationException(unaire.line));
             return null;
@@ -439,6 +646,13 @@ public class TypeVisitor implements TdsVisitor<String> {
     @Override
     public String visit(Negation unaire, Tds tds) {
         String type = unaire.noeud.accept(this, tds);
+        if (type != null && unaire.noeud instanceof Idf idf) { // si noeud est un idf
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(unaire.line, sv.getName(), sv.getDefinitionLine()));
+                return null;
+            }
+        }
         if (type == null) {
             this.errors.addError(new UnauthorizedOperationException(unaire.line));
             return null;
