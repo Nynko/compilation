@@ -3,8 +3,9 @@ package compilateur.TDS;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import compilateur.Offset;
+
+
 
 public class Tds {
     // Variables de classe
@@ -22,7 +23,10 @@ public class Tds {
     private HashMap<String,Symbole> listeSymboles;
     private ArrayList<Tds> sousTDS = new ArrayList<>();
     
-
+    /** Créer une nouvelle TDS
+     * 
+     * @param name le nom de la TDS
+     */
     public Tds(String name) {
         this.name = name;
         this.imbrication = 0;
@@ -30,6 +34,11 @@ public class Tds {
         this.listeSymboles = new HashMap<String,Symbole>();
     }
 
+    /** Créer une nouvelle TDS
+     * 
+     * @param name le nom de la TDS
+     * @param pointeurPere la TDS du bloc englobant
+     */
     public Tds(String name, Tds pointeurPere){
         this.name = name;
         this.imbrication = pointeurPere.getImbrication()+1;
@@ -37,38 +46,75 @@ public class Tds {
         this.listeSymboles = new HashMap<String,Symbole>();
     }
 
+    /** Récuperer la liste des symboles contenus dans la table
+     * 
+     * @return la liste des symboles contenus dans la TDS
+     */
     public HashMap<String,Symbole> getListeSymboles(){
         return this.listeSymboles;
     }
 
+    /** Retourne le nombre de symboles du programme
+     * 
+     * @return le nombre de symboles
+     */
     public static int getCompteurSymbole() {
         return compteurSymbole;
     }
 
+    /** Ajouter un pointeur vers la TDS du bloc englobant
+     * 
+     * @param tds la TDS du bloc englobant
+     */
     public void addPere(Tds tds){
         this.pointeurPere = tds;
     }
 
+    /** Ajouter un numéro de région
+     * 
+     * @param numRegion le numéro de région
+     */
     public void addnumRegion(int numRegion){
         this.numRegion = numRegion;
     }
 
+    /** Récupérer le nom de la TDS
+     * 
+     * @return le nom de la table
+     */
     public String getName() {
         return this.name;
     }
 
+    /** Récupère la TDS du bloc englobant
+     * 
+     * @return un pointeur vers la TDS du bloc englobant
+     */
     public Tds getPere(){
         return this.pointeurPere;
     }
 
+    /** Récupère le numémo d'imbrication
+     * 
+     * @return le numéro d'imbrication
+     */
     public int getImbrication() {
         return this.imbrication;
     }
 
+    /** Récupère le numémo de région
+     * 
+     * @return le numéro de région
+     */
     public int getNumRegion() {
         return this.numRegion;
     }
 
+    /** Trouve un symbole dans la TDS ou les TDS des blocs englobants
+     * 
+     * @param name le nom du symbole
+     * @return le symbole si il existe ou `null`
+     */
     public Symbole findSymbole(String name) {
         Symbole s = this.listeSymboles.get(name);
         if(s!=null) return s;
@@ -81,6 +127,11 @@ public class Tds {
         return null;
     }
 
+    /** Trouver un symbole de déclaration de type struct
+     * 
+     * @param name le nom du symbole de struct
+     * @return le symbole de struct ou `null`
+     */
     public SymboleStructContent findSymboleStruct(String name) {
         Tds table = this;
         while(table.getImbrication() != 0 && table.pointeurPere != null) {
@@ -90,6 +141,12 @@ public class Tds {
         return s;
     }
 
+    /** Ajouter un symbole à la TDS
+     * 
+     * @param name le nom du symbole
+     * @param symbole le symbole
+     * @throws SymbolAlreadyExistsException si un symbole de même nom est déjà délaré dans le bloc
+     */
     public void addSymbole(String name, Symbole symbole) throws SymbolAlreadyExistsException {
         if(this.listeSymboles.get(name) != null) {
             throw new SymbolAlreadyExistsException(name,symbole.getDefinitionLine(), listeSymboles.get(name).getDefinitionLine());
@@ -105,6 +162,12 @@ public class Tds {
         compteurSymbole++;
     }
 
+    /** Ajouter un symbole de paramètre à la TDS
+     * 
+     * @param name le nom du symbole
+     * @param symbole le symbole
+     * @throws SymbolAlreadyExistsException si un symbole de même nom est déjà délaré dans le bloc
+     */
     public void addSymboleParam(String name, Symbole symbole) throws SymbolAlreadyExistsException {
         if(this.listeSymboles.get(name) != null) {
             throw new SymbolAlreadyExistsException(name,symbole.getDefinitionLine(), listeSymboles.get(name).getDefinitionLine());
@@ -124,6 +187,10 @@ public class Tds {
         compteurSymbole++;
     }
 
+    /** Récupère les paramètres d'une fonction
+     * 
+     * @return la liste de symboles paramètres de la fonction
+     */
     public ArrayList<SymboleVar> getParams() {
         ArrayList<SymboleVar> params = new ArrayList<>();
         for (Map.Entry<String, Symbole> set : this.listeSymboles.entrySet()) {
@@ -139,12 +206,21 @@ public class Tds {
         return params;
     }
 
+    /** Créer une nouvelle sous-TDS
+     * 
+     * @param name le nom de la nouvelle TDS
+     * @return la nouvelle sous-TDS
+     */
     public Tds nouvelleSousTDS(String name) {
         Tds nouvelleTds = new Tds(name, this);
         this.sousTDS.add(nouvelleTds);
         return nouvelleTds;
     }
 
+    /** Récupèrer la liste des sous-TDS d'une TDS
+     * 
+     * @return la liste des sous-TDS
+     */
     public ArrayList<Tds> getSousTDS() {
         return this.sousTDS;
     }
