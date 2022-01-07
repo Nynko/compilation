@@ -13,8 +13,8 @@ public abstract class SymboleVar extends Symbole {
         return this.initialise;
     }
 
-    public void setInitalized() {
-        this.initialise = true;
+    public void setInitalized(boolean b) {
+        this.initialise = b;
     }
     
     public void setParam(int index) {

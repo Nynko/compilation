@@ -64,9 +64,15 @@ public class TypeVisitor implements TdsVisitor<String> {
         Symbole sym = tds.findSymbole(idf.name);
         if (sym instanceof SymboleFonction symfct) {
             return symfct.getReturnType();
-        } else if (sym instanceof SymboleInt) {
+        } else if (sym instanceof SymboleInt symint) {
+            if (!symint.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symint.getDefinitionLine()));
+            }
             return "int";
         } else if (sym instanceof SymboleStruct symstruct) {
+            if (!symstruct.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symstruct.getDefinitionLine()));
+            }
             return "struct_" + symstruct.getStruct().getName();
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return "struct_" + symstructcontent.getName();
@@ -204,6 +210,12 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Affectation affectation, Tds tds) {
+        if (affectation.left instanceof Idf idf) {
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv) {
+                sv.setInitalized(true);
+            }
+        }
         String leftType = affectation.left.accept(this, tds);
         String rightType = affectation.right.accept(this, tds);
         if (leftType == null) {
@@ -211,6 +223,13 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (leftType.equals(rightType)) {
             return leftType;
         } else {
+            // echec de l'affectation 
+            if (affectation.left instanceof Idf idf) {
+                Symbole s = tds.findSymbole(idf.name);
+                if (s instanceof SymboleVar sv) {
+                    sv.setInitalized(false);
+                }
+            }
             if (rightType == null) {
                 this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
             } else {

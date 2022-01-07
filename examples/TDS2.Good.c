@@ -83,5 +83,9 @@ struct a* afuc()
 }
 
 int functionWithoutReturn() {
-    int a;
+    int a, c;
+    a = b;
+    c = a;
+    a = 1;
+    c = a;
 }
