@@ -130,7 +130,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             ArrayList<SymboleVar> param = sym.getTds().getParams();
             int min = param.size();
             if (min != nbParam) {
-                this.errors.addError(new NumberParameterExecption(sym.getName(), idfParenthesis.line, min, nbParam));
+                this.errors.addError(new NumberParameterException(sym.getName(), idfParenthesis.line, min, nbParam));
                 if (nbParam < min) {
                     min = nbParam;
                 }
@@ -159,7 +159,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             String fctName = ((Idf) idfParenthesisEmpty.idf).name;
             SymboleFonction sym = (SymboleFonction) tds.findSymbole(fctName);
             if (!sym.getTds().getParams().isEmpty()) {
-                this.errors.addError(new NumberParameterExecption(sym.getName(), idfParenthesisEmpty.line,
+                this.errors.addError(new NumberParameterException(sym.getName(), idfParenthesisEmpty.line,
                         sym.getTds().getParams().size(), 0));
             }
         } catch (Exception e) {

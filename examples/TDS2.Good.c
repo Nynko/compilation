@@ -81,3 +81,7 @@ struct a* afuc()
     !aaa;
     return aaa;
 }
+
+int functionWithoutReturn() {
+    int a;
+}

@@ -164,8 +164,20 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
         }
 
+        boolean asReturn = false;
         if (declFctInt.bloc != null) {
+            for (Ast ast : ((Bloc)declFctInt.bloc).instList) {
+                if (ast instanceof Return) {
+                    asReturn = true;
+                    break;
+                }
+            }
+            if (!asReturn) {
+                this.errors.addError(new ReturnFunctionException(declFctInt.line));
+            }
             declFctInt.bloc.accept(this, tdsFunction);
+        } else {
+            this.errors.addError(new ReturnFunctionException(declFctInt.line));
         }
         return null;
     }
@@ -198,9 +210,21 @@ public class TdsCreator implements TdsVisitor<Void> {
                 }
             }
         }
-
+        
+        boolean asReturn = false; 
         if (declFctStruct.bloc != null) {
+            for (Ast ast : ((Bloc)declFctStruct.bloc).instList) {
+                if (ast instanceof Return) {
+                    asReturn = true;
+                    break;
+                }
+            }
+            if (!asReturn) {
+                this.errors.addError(new ReturnFunctionException(declFctStruct.line));
+            }
             declFctStruct.bloc.accept(this, tdsFunction);
+        } else {
+            this.errors.addError(new ReturnFunctionException(declFctStruct.line));
         }
         return null;
     }
