@@ -66,7 +66,7 @@ public class GraphVizTdsVisitor {
                 tableContent += String.format("<tr><td> %s </td> <td> int </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleStruct){
                 SymboleStruct sym = (SymboleStruct) symbole;
-                tableContent += String.format("<tr><td> %s </td> <td> struct %s </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getStruct().getName(), sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> %s </td> <td> struct %s </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getStruct()!=null ? sym.getStruct().getName():"undefined struct", sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleStructContent){
                 SymboleStructContent sym = (SymboleStructContent) symbole;
                 tableContent += String.format("<tr><td> struct_%s </td> <td> struct_type </td> <td> </td> <td> </td>  <td> line . %d  </td> </tr>", sym.getName(), sym.getDefinitionLine() );
