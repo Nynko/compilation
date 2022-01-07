@@ -14,7 +14,7 @@ public class SymboleStruct extends SymboleVar {
 
     @Override
     public boolean isInitalized() {
-        for (Symbole s : this.struct.getListDeclVars()) {
+        for (Symbole s : this.struct.getTds().getListeSymboles().values()) {
             if (s instanceof SymboleVar sv && !sv.isInitalized()) {
                 return false;
             }
