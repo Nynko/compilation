@@ -87,9 +87,21 @@ public class TdsCreator implements TdsVisitor<Void> {
             ast.accept(this, tds);
         }
 
+        // test que la fonction main est présente
         Symbole main = tds.findSymbole("main");
         if (main == null) {
             this.errors.addError(new MainNotFoundException());
+            return null;
+        }
+        SymboleFonction f = ((SymboleFonction)main);
+        // test si le type de retour est bien int
+        if (f.getReturnType().equals("int")) {
+            this.errors.addError(new TypeException(main.getDefinitionLine(), f.getReturnType() , "int"));
+        }
+        // test si le nombre de parametre est bien nul
+        int nb;
+        if ((nb = f.getTds().getParams().size()) != 0) {
+            this.errors.addError(new NumberParameterException(f.getName(), f.getDefinitionLine(), 0, nb));
         }
 
         return null;
