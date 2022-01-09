@@ -96,6 +96,7 @@ int functionWithoutReturn() {
     int a, c, d;
     struct a* u, *uu;
     uu = u;
+    u = malloc(sizeof(struct a));
     a = u->z;
     c = a;
     u->z = 1;

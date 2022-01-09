@@ -12,13 +12,13 @@ public class SymboleStruct extends SymboleVar {
         return this.struct;
     }
 
-    @Override
-    public boolean isInitalized() {
-        for (Symbole s : this.struct.getTds().getListeSymboles().values()) {
-            if (s instanceof SymboleInt sv && !sv.isInitalized()) {
-                return false;
-            }
-        }
-        return true;
-    }
+    // @Override
+    // public boolean isInitalized() {
+    //     for (Symbole s : this.struct.getTds().getListeSymboles().values()) {
+    //         if (s instanceof SymboleInt sv && !sv.isInitalized()) {
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+    // }
 }
