@@ -60,6 +60,29 @@ public class TdsCreator implements TdsVisitor<Void> {
         tds.addnumRegion(0);
         if (fichier.instructions == null)
             return null;
+
+        try {
+            SymboleInt n = new SymboleInt("n");
+            n.addDefinitionLine(-1);
+            // ajout print
+            Tds tds_print = tds.nouvelleSousTDS("print"); // Création d'une nouvelle Tds
+            tds_print.addSymboleParam("n", n);
+            SymboleFonction symbole_print = new SymboleFonction("print", tds_print);
+            symbole_print.setReturnType("void");
+            symbole_print.addDefinitionLine(-1);
+            tds.addSymbole("print", symbole_print);
+
+            // ajout malloc
+            Tds tds_malloc = tds.nouvelleSousTDS("malloc"); // Création d'une nouvelle Tds
+            tds_malloc.addSymboleParam("n", n);
+            SymboleFonction symbole_malloc = new SymboleFonction("malloc", tds_print);
+            symbole_malloc.setReturnType("void_*");
+            symbole_malloc.addDefinitionLine(-1);
+            tds.addSymbole("malloc", symbole_malloc);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
         for (Ast ast : fichier.instructions) {
             ast.accept(this, tds);
         }
@@ -166,7 +189,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         boolean asReturn = false;
         if (declFctInt.bloc != null) {
-            for (Ast ast : ((Bloc)declFctInt.bloc).instList) {
+            for (Ast ast : ((Bloc) declFctInt.bloc).instList) {
                 if (ast instanceof Return) {
                     asReturn = true;
                     break;
@@ -209,10 +232,10 @@ public class TdsCreator implements TdsVisitor<Void> {
                 }
             }
         }
-        
-        boolean asReturn = false; 
+
+        boolean asReturn = false;
         if (declFctStruct.bloc != null) {
-            for (Ast ast : ((Bloc)declFctStruct.bloc).instList) {
+            for (Ast ast : ((Bloc) declFctStruct.bloc).instList) {
                 if (ast instanceof Return) {
                     asReturn = true;
                     break;
@@ -368,7 +391,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Affectation affectation, Tds tds) {
-       affectation.accept(visitor, tds);
+        affectation.accept(visitor, tds);
         return null;
     }
 
@@ -416,7 +439,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(SuperieurEgal supEgal, Tds tds) {
-       supEgal.accept(visitor, tds);
+        supEgal.accept(visitor, tds);
         return null;
     }
 

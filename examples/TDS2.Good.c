@@ -1,4 +1,5 @@
-
+// int;
+// int = {};
 struct vide
 {
 };
