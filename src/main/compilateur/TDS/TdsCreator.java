@@ -86,6 +86,12 @@ public class TdsCreator implements TdsVisitor<Void> {
         for (Ast ast : fichier.instructions) {
             ast.accept(this, tds);
         }
+
+        Symbole main = tds.findSymbole("main");
+        if (main == null) {
+            this.errors.addError(new MainNotFoundException());
+        }
+
         return null;
     }
 
