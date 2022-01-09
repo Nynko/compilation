@@ -1,16 +1,24 @@
 package compilateur.ast;
 
-public class IdfParenthesisEmpty implements Ast{
+import compilateur.TDS.*;
 
-    public <T> T accept(AstVisitor<T> visitor){
+public class IdfParenthesisEmpty implements Ast {
+
+    public int line;
+
+    public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    public Ast idf; 
+    public <T> T accept(TdsVisitor<T> visitor, Tds tds) {
+        return visitor.visit(this, tds);
+    }
 
-    public IdfParenthesisEmpty(Ast idf) {
+    public Ast idf;
+
+    public IdfParenthesisEmpty(Ast idf, int line) {
         this.idf = idf;
+        this.line = line;
     }
 
 }
-

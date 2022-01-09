@@ -23,7 +23,7 @@ make test
 Afficher un arbre syntaxique
 
 ```bash
-make run -- ARGS="examples/good.exp"
+make run -- ARGS="examples/good.c"
 ```
 
 Compiler l'intégralité du projet :

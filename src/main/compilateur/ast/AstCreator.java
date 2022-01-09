@@ -37,10 +37,11 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitDeclVarInt(circParser.DeclVarIntContext ctx) { 
 		ArrayList<Ast> idf = new ArrayList<>();
+		int line = ctx.getStart().getLine();
 		for (int i = 1; i < ctx.getChildCount() - 1; i += 2) {
-			idf.add(new Idf(ctx.getChild(i).toString()));
+			idf.add(new Idf(ctx.getChild(i).toString(),line));
 		}
-		return new DeclVarInt(idf);
+		return new DeclVarInt(idf,line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -50,11 +51,12 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitDeclVarStruct(circParser.DeclVarStructContext ctx) { 
 		ArrayList<Ast> idf = new ArrayList<>();
-		idf.add(new Idf(ctx.getChild(1).toString()));
+		int line = ctx.getStart().getLine();
+		idf.add(new Idf(ctx.getChild(1).toString(),line));
 		for (int i = 3; i < ctx.getChildCount() - 1; i += 3) {
-			idf.add(new Idf(ctx.getChild(i).toString()));
+			idf.add(new Idf(ctx.getChild(i).toString(),line));
 		}
-		return new DeclVarStruct(idf);
+		return new DeclVarStruct(idf,line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -64,7 +66,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitDecl_typ(circParser.Decl_typContext ctx) { 
 		String StrIdf = ctx.getChild(1).toString();
-		Ast idf = new Idf(StrIdf);
+		int line = ctx.getStart().getLine();
+		Ast idf = new Idf(StrIdf,line);
 
 		ArrayList<Ast> decl = new ArrayList<>();
 		// int i = 3;
@@ -75,7 +78,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		// 	decl.add(ctx.getChild(i).accept(this));
 		// 	i++;
 		// }
-		return new Decl_typ(idf,decl);
+		return new Decl_typ(idf,decl,line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -84,10 +87,11 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitDeclFctInt(circParser.DeclFctIntContext ctx) {
-		Ast idf = new Idf(ctx.getChild(1).toString());
+		int line = ctx.getStart().getLine();
+		Ast idf = new Idf(ctx.getChild(1).toString(),line);
 		Ast param = ctx.getChild(3).accept(this);
 		Ast bloc = ctx.getChild(5).accept(this);
-		return new DeclFctInt(idf, param, bloc);
+		return new DeclFctInt(idf, param, bloc,line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -96,11 +100,12 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitDeclFctStruct(circParser.DeclFctStructContext ctx) {
-		Ast idf0 = new Idf(ctx.getChild(1).toString());
-		Ast idf1 = new Idf(ctx.getChild(3).toString());
+		int line = ctx.getStart().getLine();
+		Ast idf0 = new Idf(ctx.getChild(1).toString(),line);
+		Ast idf1 = new Idf(ctx.getChild(3).toString(),line);
 		Ast param = ctx.getChild(5).accept(this);
 		Ast bloc = ctx.getChild(7).accept(this);
-		return new DeclFctStruct(idf0, idf1, param, bloc);
+		return new DeclFctStruct(idf0, idf1, param, bloc,line);
 	 }
 	/**
 	 * {@inheritDoc}
@@ -131,8 +136,9 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitParamInt(circParser.ParamIntContext ctx) { 
-		Ast idf = new Idf(ctx.getChild(1).toString());
-		return new ParamInt(idf);
+		int line = ctx.getStart().getLine();
+		Ast idf = new Idf(ctx.getChild(1).toString(),line);
+		return new ParamInt(idf,line);
 	 }
 	/**
 	 * {@inheritDoc}
@@ -141,9 +147,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Ast visitParamStruct(circParser.ParamStructContext ctx) {
-		Ast idf0 = new Idf(ctx.getChild(1).toString());
-		Ast idf1 = new Idf(ctx.getChild(3).toString());
-		return new ParamStruct(idf0, idf1);
+		int line = ctx.getStart().getLine();
+		Ast idf0 = new Idf(ctx.getChild(1).toString(),line);
+		Ast idf1 = new Idf(ctx.getChild(3).toString(),line);
+		return new ParamStruct(idf0, idf1, line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -158,27 +165,9 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitIdf(circParser.IdfContext ctx) { return new Idf(ctx.getChild(0).toString());}
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public Ast visitIdfParenthesisEmpty(circParser.IdfParenthesisEmptyContext ctx) { return new IdfParenthesisEmpty(new Idf(ctx.getChild(0).toString())); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public Ast visitIdfParenthesis(circParser.IdfParenthesisContext ctx) {
-		Ast idf = new Idf(ctx.getChild(0).toString());
-		ArrayList<Ast> exprList = new ArrayList<Ast>();
-		for (int i = 2; i < ctx.getChildCount(); i= i+2) {
-			exprList.add(ctx.getChild(i).accept(this));
-		}
-		return new IdfParenthesis(idf, exprList);
+	@Override public Ast visitIdf(circParser.IdfContext ctx) { 
+		int line = ctx.getStart().getLine();
+		return new Idf(ctx.getChild(0).toString(),line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -186,7 +175,35 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitSizeof(circParser.SizeofContext ctx) { return new Sizeof(new Idf(ctx.getChild(3).toString())); }
+	@Override public Ast visitIdfParenthesisEmpty(circParser.IdfParenthesisEmptyContext ctx) { 
+		int line = ctx.getStart().getLine();
+		return new IdfParenthesisEmpty(new Idf(ctx.getChild(0).toString(),line),ctx.getStart().getLine());
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitIdfParenthesis(circParser.IdfParenthesisContext ctx) {
+		int line = ctx.getStart().getLine();
+		Ast idf = new Idf(ctx.getChild(0).toString(),line);
+		ArrayList<Ast> exprList = new ArrayList<Ast>();
+		for (int i = 2; i < ctx.getChildCount(); i= i+2) {
+			exprList.add(ctx.getChild(i).accept(this));
+		}
+		return new IdfParenthesis(idf, exprList, line);
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public Ast visitSizeof(circParser.SizeofContext ctx) { 
+		int line = ctx.getStart().getLine();
+		return new Sizeof(new Idf(ctx.getChild(3).toString(),line),ctx.getStart().getLine());
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -200,7 +217,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return new Semicolon();}
+	@Override public Ast visitSemicolon(circParser.SemicolonContext ctx) { return new Semicolon(ctx.getStart().getLine());}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -217,7 +234,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitIfThen(circParser.IfThenContext ctx) {
 		Ast condition = ctx.getChild(2).accept(this);
 		Ast thenBlock = ctx.getChild(4).accept(this);
-		return new IfThen(condition, thenBlock);
+		int line = ctx.getStart().getLine();
+		return new IfThen(condition, thenBlock, line);
 
 	 }
 	/**
@@ -230,7 +248,9 @@ public class AstCreator extends circBaseVisitor<Ast>{
 		Ast condition = ctx.getChild(2).accept(this);
 		Ast thenBlock = ctx.getChild(4).accept(this);
 		Ast elseBlock = ctx.getChild(6).accept(this);
-		return new IfThenElse(condition, thenBlock, elseBlock);
+		int line = ctx.getStart().getLine();
+		int lineElse = ctx.getStop().getLine();
+		return new IfThenElse(condition, thenBlock, elseBlock, line, lineElse);
 	}
 	/**
 	 * {@inheritDoc}
@@ -241,7 +261,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitWhile(circParser.WhileContext ctx) {
 		Ast condition = ctx.getChild(2).accept(this);
 		Ast doBlock = ctx.getChild(4).accept(this);
-		return new While(condition, doBlock);
+		int line = ctx.getStart().getLine();
+		return new While(condition, doBlock, line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -258,7 +279,8 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitReturn(circParser.ReturnContext ctx) {
 		Ast expr = ctx.getChild(1).accept(this);
-		return new Return(expr);
+		int line = ctx.getStart().getLine();
+		return new Return(expr,line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -268,10 +290,11 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitBloc(circParser.BlocContext ctx) {
 		ArrayList<Ast> instList = new ArrayList<Ast>();
+		int line = ctx.getStart().getLine();
 		for (int i = 1; i < ctx.getChildCount()-1; i++) {
 			instList.add(ctx.getChild(i).accept(this));
 		}
-		return new Bloc(instList);
+		return new Bloc(instList, line);
 	}
 	/**
 	 * {@inheritDoc}
@@ -288,9 +311,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitAffectation(circParser.AffectationContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(ctx.getChildCount()-1).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i=ctx.getChildCount()-3; i >= 0; i=i-2) {
 			Ast right = ctx.getChild(i).accept(this);
-			noeudTemporaire = new Affectation(right, noeudTemporaire);
+			noeudTemporaire = new Affectation(right, noeudTemporaire, line);
 		}
 		return noeudTemporaire;
 		
@@ -303,9 +327,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitExpr_ou(circParser.Expr_ouContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			noeudTemporaire = new Expr_ou(noeudTemporaire, right);
+			noeudTemporaire = new Expr_ou(noeudTemporaire, right, line);
 		}
 		return noeudTemporaire;
 	}
@@ -317,9 +342,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitExpr_et(circParser.Expr_etContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
-			noeudTemporaire = new Expr_et(noeudTemporaire, right);
+			noeudTemporaire = new Expr_et(noeudTemporaire, right, line);
 		}
 		return noeudTemporaire;
 	}
@@ -331,16 +357,16 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitComparaison(circParser.ComparaisonContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
-
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "==" :
-					noeudTemporaire = new Egal(noeudTemporaire, right);
+					noeudTemporaire = new Egal(noeudTemporaire, right, line);
 					break;
 				case "!=" :
-					noeudTemporaire = new Different(noeudTemporaire, right);
+					noeudTemporaire = new Different(noeudTemporaire, right, line);
 					break;
 				default :
 					break;
@@ -355,22 +381,23 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitOrdre(circParser.OrdreContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "<" :
-					noeudTemporaire = new Inferieur(noeudTemporaire, right);
+					noeudTemporaire = new Inferieur(noeudTemporaire, right, line);
 					break;
 				case "<=" :
-					noeudTemporaire = new InferieurEgal(noeudTemporaire, right);
+					noeudTemporaire = new InferieurEgal(noeudTemporaire, right, line);
 					break;
 				case ">" :
-					noeudTemporaire = new Superieur(noeudTemporaire, right);
+					noeudTemporaire = new Superieur(noeudTemporaire, right, line);
 					break;
 				case ">=" :
-					noeudTemporaire = new SuperieurEgal(noeudTemporaire, right);
+					noeudTemporaire = new SuperieurEgal(noeudTemporaire, right, line);
 				default :
 					break;
 			}
@@ -384,16 +411,17 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitAddition(circParser.AdditionContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
 
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "+" :
-					noeudTemporaire = new Plus(noeudTemporaire, right);
+					noeudTemporaire = new Plus(noeudTemporaire, right, line);
 					break;
 				case "-":
-					noeudTemporaire = new Minus(noeudTemporaire, right);
+					noeudTemporaire = new Minus(noeudTemporaire, right, line);
 					break;
 				default :
 					break;
@@ -409,16 +437,16 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitMultiplication(circParser.MultiplicationContext ctx) { 
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 0; i * 2 < ctx.getChildCount() - 1; i++) {
-
 			String signe = ctx.getChild(2 * i + 1).toString();
 			Ast right = ctx.getChild(2*(i+1)).accept(this);
 			switch (signe) {
 				case "*" :
-					noeudTemporaire = new Multiplication(noeudTemporaire, right);
+					noeudTemporaire = new Multiplication(noeudTemporaire, right, line);
 					break;
 				case "/":
-					noeudTemporaire = new Division(noeudTemporaire, right);
+					noeudTemporaire = new Division(noeudTemporaire, right, line);
 					break;
 				default :
 					break;
@@ -434,6 +462,7 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 */
 	@Override public Ast visitUnaire(circParser.UnaireContext ctx) { 
 		Ast noeud; 
+		int line = ctx.getStart().getLine();
 		if (ctx.getChildCount() == 1) {
 			noeud = ctx.getChild(0).accept(this);
 			return noeud;
@@ -443,10 +472,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 			ctx.children.remove(0);
 			switch (signe) {
 				case "!" :
-					noeud = new Negation(ctx.accept(this));
+					noeud = new Negation(ctx.accept(this),line);
 					break;
 				case "-":
-					noeud = new MoinsUnaire(ctx.accept(this));
+					noeud = new MoinsUnaire(ctx.accept(this), line);
 					break;
 				default :
 					throw new Error();
@@ -465,9 +494,10 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	@Override public Ast visitFleche(circParser.FlecheContext ctx) { 
 		
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+		int line = ctx.getStart().getLine();
 		for (int i = 1; i * 2 < ctx.getChildCount(); i++) {
-			Ast right = new Idf(ctx.getChild(2*i).toString());
-			noeudTemporaire = new Fleche(noeudTemporaire, right);
+			Ast right = new Idf(ctx.getChild(2*i).toString(),line);
+			noeudTemporaire = new Fleche(noeudTemporaire, right, line);
 		}
 		return noeudTemporaire;
 	}
@@ -477,14 +507,14 @@ public class AstCreator extends circBaseVisitor<Ast>{
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitInteger(circParser.IntegerContext ctx) { return new IntNode(Integer.parseInt(ctx.getChild(0).toString())); }
+	@Override public Ast visitInteger(circParser.IntegerContext ctx) { return new IntNode(Integer.parseInt(ctx.getChild(0).toString()),ctx.getStart().getLine()); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public Ast visitChar(circParser.CharContext ctx) { return new CharNode(ctx.getChild(0).toString()); }
+	@Override public Ast visitChar(circParser.CharContext ctx) { return new CharNode(ctx.getChild(0).toString(), ctx.getStart().getLine()); }
 	
 	/**
 	 * {@inheritDoc}

@@ -1,19 +1,27 @@
 package compilateur.ast;
 
+import compilateur.TDS.*;
 import java.util.ArrayList;
 
-public class IdfParenthesis implements Ast{
+public class IdfParenthesis implements Ast {
 
-    public <T> T accept(AstVisitor<T> visitor){
+    public int line;
+
+    public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    public Ast idf;
-    public ArrayList<Ast> exprList;   
+    public <T> T accept(TdsVisitor<T> visitor, Tds tds) {
+        return visitor.visit(this, tds);
+    }
 
-    public IdfParenthesis(Ast idf, ArrayList<Ast> exprList) {
+    public Ast idf;
+    public ArrayList<Ast> exprList;
+
+    public IdfParenthesis(Ast idf, ArrayList<Ast> exprList, int line) {
         this.idf = idf;
         this.exprList = exprList;
+        this.line = line;
     }
 
 }
