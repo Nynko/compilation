@@ -62,6 +62,8 @@ struct a* afuc()
 {
     int aaa , bbb, ccc;
     struct a *a, *x;
+    a = malloc(sizeof(struct a));
+    x = malloc(sizeof(struct a));
     a->z = 1;
     a->b = 1;
     a->c = 1;
