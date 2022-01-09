@@ -236,7 +236,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
         }
         
-        if (leftType.equals(rightType)) {
+        if (leftType.equals(rightType) || (rightType.equals("void_*") && leftType.startsWith("struct_"))) {
             
             // affectation reussie
             if (affectation.left instanceof Idf idf) {

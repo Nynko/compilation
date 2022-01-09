@@ -110,4 +110,8 @@ int functionWithoutReturn() {
     a = 1;
     c = a;
     1 / 0;
+    u = malloc(10);
+    a = malloc(1);
+    print(10);
+    print(u);
 }
