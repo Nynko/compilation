@@ -95,7 +95,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
         SymboleFonction f = ((SymboleFonction)main);
         // test si le type de retour est bien int
-        if (f.getReturnType().equals("int")) {
+        if (!f.getReturnType().equals("int")) {
             this.errors.addError(new TypeException(main.getDefinitionLine(), f.getReturnType() , "int"));
         }
         // test si le nombre de parametre est bien nul
