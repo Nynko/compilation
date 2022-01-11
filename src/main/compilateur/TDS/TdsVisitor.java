@@ -36,6 +36,7 @@ import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.MoinsUnaire;
 import compilateur.ast.Negation;
+import compilateur.ast.Operateur;
 import compilateur.ast.While;
 
 
@@ -62,21 +63,22 @@ public interface TdsVisitor<T>{
     public T visit(CharNode charNode, Tds tds);
     public T visit(IntNode intNode, Tds tds);
     public T visit(Affectation affectation, Tds tds);
-    public T visit(Expr_ou expr_ou, Tds tds);
-    public T visit(Expr_et expr_et, Tds tds);
-    public T visit(Egal egal, Tds tds);
-    public T visit(Different dif, Tds tds);
-    public T visit(Inferieur inf, Tds tds);
-    public T visit(InferieurEgal infEgal, Tds tds);
-    public T visit(Superieur sup, Tds tds);
-    public T visit(SuperieurEgal supEgal, Tds tds);
-    public T visit(Plus plus, Tds tds);
-    public T visit(Minus minus, Tds tds);
-    public T visit(Division div, Tds tds);
-    public T visit(Multiplication mult, Tds tds);
+    // public T visit(Expr_ou expr_ou, Tds tds);
+    // public T visit(Expr_et expr_et, Tds tds);
+    // public T visit(Egal egal, Tds tds);
+    // public T visit(Different dif, Tds tds);
+    // public T visit(Inferieur inf, Tds tds);
+    // public T visit(InferieurEgal infEgal, Tds tds);
+    // public T visit(Superieur sup, Tds tds);
+    // public T visit(SuperieurEgal supEgal, Tds tds);
+    // public T visit(Plus plus, Tds tds);
+    // public T visit(Minus minus, Tds tds);
+    // public T visit(Division div, Tds tds);
+    // public T visit(Multiplication mult, Tds tds);
     public T visit(Fleche fleche, Tds tds);
     public T visit(MoinsUnaire unaire, Tds tds);
     public T visit(Negation unaire, Tds tds);
     public T visit(Semicolon semicolon, Tds tds);
+    public T visit(Operateur operateur, Tds tds);
     
 }
