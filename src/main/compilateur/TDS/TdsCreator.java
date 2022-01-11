@@ -38,6 +38,7 @@ import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.MoinsUnaire;
 import compilateur.ast.Negation;
+import compilateur.ast.Operateur;
 import compilateur.ast.While;
 import compilateur.utils.ErrorAggregator;
 
@@ -413,77 +414,77 @@ public class TdsCreator implements TdsVisitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visit(Expr_ou expr_ou, Tds tds) {
-        expr_ou.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Expr_ou expr_ou, Tds tds) {
+    //     expr_ou.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Expr_et expr_et, Tds tds) {
-        expr_et.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Expr_et expr_et, Tds tds) {
+    //     expr_et.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Egal egal, Tds tds) {
-        egal.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Egal egal, Tds tds) {
+    //     egal.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Different dif, Tds tds) {
-        dif.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Different dif, Tds tds) {
+    //     dif.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Inferieur inf, Tds tds) {
-        inf.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Inferieur inf, Tds tds) {
+    //     inf.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(InferieurEgal infEgal, Tds tds) {
-        infEgal.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(InferieurEgal infEgal, Tds tds) {
+    //     infEgal.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Superieur sup, Tds tds) {
-        sup.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Superieur sup, Tds tds) {
+    //     sup.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(SuperieurEgal supEgal, Tds tds) {
-        supEgal.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(SuperieurEgal supEgal, Tds tds) {
+    //     supEgal.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Plus plus, Tds tds) {
-        plus.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Plus plus, Tds tds) {
+    //     plus.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Minus minus, Tds tds) {
-        minus.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Minus minus, Tds tds) {
+    //     minus.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Division div, Tds tds) {
-        div.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Division div, Tds tds) {
+    //     div.accept(visitor, tds);
+    //     return null;
+    // }
 
-    @Override
-    public Void visit(Multiplication mult, Tds tds) {
-        mult.accept(visitor, tds);
-        return null;
-    }
+    // @Override
+    // public Void visit(Multiplication mult, Tds tds) {
+    //     mult.accept(visitor, tds);
+    //     return null;
+    // }
 
     @Override
     public Void visit(Fleche fleche, Tds tds) {
@@ -505,6 +506,12 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Semicolon semicolon, Tds tds) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Operateur operateur, Tds tds) {
+        operateur.accept(visitor, tds);
         return null;
     }
 
