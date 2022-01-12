@@ -240,25 +240,28 @@ public class TypeVisitor implements TdsVisitor<String> {
         }
 
         // affectation reussie
-        if (affectation.left instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv) {
-                sv.setInitalized(true);
+        if (this.isCompatible(leftType, rightType) || leftType.equals("int") && this.isPointer(rightType) || this.isPointer(leftType) && rightType.equals("int")) {
+            if (leftType.equals("int") && this.isPointer(rightType) || this.isPointer(leftType) && rightType.equals("int")) {
+                // TODO warnning type
+                // errors.addError(new TypeException(affectation.line, rightType, leftType));
             }
-        } else if (affectation.left instanceof Fleche fleche) {
-            Idf idf = (Idf) fleche.right;
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv) {
-                sv.setInitalized(true);
+            if (affectation.left instanceof Idf idf) {
+                Symbole s = tds.findSymbole(idf.name);
+                if (s instanceof SymboleVar sv) {
+                    sv.setInitalized(true);
+                }
+            } else if (affectation.left instanceof Fleche fleche) {
+                Idf idf = (Idf) fleche.right;
+                Symbole s = tds.findSymbole(idf.name);
+                if (s instanceof SymboleVar sv) {
+                    sv.setInitalized(true);
+                }
             }
+            return leftType;
         }
-        
-
-        if (!leftType.equals(rightType) && !rightType.equals("void_*") || leftType.equals("int") && rightType.equals("void_*")) {
-            // TODO warnning type
-            // errors.addError(new TypeException(affectation.line, rightType, leftType));
-        }
-        return leftType;
+            
+        this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
+        return null;
     }
 
     // @Override
@@ -692,7 +695,7 @@ public class TypeVisitor implements TdsVisitor<String> {
                 return null;
             }
         }
-        if (type != null && !type.equals("int")) {
+        if (type != null && this.isPointer(type)) {
             this.errors.addError(new UnauthorizedOperationException(unaire.line));
             return null;
         }
@@ -747,18 +750,19 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
         }
 
-        if (leftType.equals(rightType)) {
+        // si les types des operandes sont compatibles sans warnning
+        if (this.isCompatible(leftType, rightType)) {
             // addition, multiplication, division entre pointeur
-            if (!leftType.equals("int") && (operateur instanceof Plus || operateur instanceof Multiplication
+            if (this.isPointer(leftType) && (operateur instanceof Plus || operateur instanceof Multiplication
                     || operateur instanceof Division)) {
                 this.errors.addError(new UnauthorizedOperationException(operateur.line));
                 return null;
             }
-            // comparaison
+            // comparaison + soustraction entre pointeur 
             if (operateur instanceof Egal || operateur instanceof Different || operateur instanceof Inferieur
                     || operateur instanceof InferieurEgal || operateur instanceof Superieur
                     || operateur instanceof SuperieurEgal || operateur instanceof Expr_et
-                    || operateur instanceof Expr_ou) {
+                    || operateur instanceof Expr_ou || (this.isPointer(leftType) && operateur instanceof Minus)) {
                 return "int";
             }
             return leftType;
@@ -768,12 +772,12 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
             // arithmétique de pointeur
             if (operateur instanceof Plus) {
-                if (leftType.equals("int")) {
+                if (leftType.equals("int") && this.isPointer(rightType)) {
                     return rightType;
-                } else {
+                } else if(rightType.equals("int") && this.isPointer(leftType)) {
                     return leftType;
                 }
-            } else if (leftType.equals("int") && operateur instanceof Minus) {
+            } else if (rightType.equals("int") && this.isPointer(leftType) && operateur instanceof Minus) {
                 return leftType;
             }
             // comparaison entre 2 types différents
@@ -785,13 +789,21 @@ public class TypeVisitor implements TdsVisitor<String> {
                 return "int";
             }
             // soustraction par un pointeur, multiplication ou division avec un pointeur
-            if (leftType.equals("int") && operateur instanceof Minus || operateur instanceof Multiplication
-                    || operateur instanceof Division) {
+            if ((this.isPointer(rightType) && operateur instanceof Minus) || ((operateur instanceof Multiplication
+                    || operateur instanceof Division) && (this.isPointer(rightType) || this.isPointer(leftType)))) {
                 this.errors.addError(new UnauthorizedOperationException(operateur.line));
                 return null;
             }
         }
         return null;
+    }
+
+    private boolean isCompatible(String leftType, String rightType) {
+        return leftType.equals(rightType) || this.isPointer(rightType) && this.isPointer(leftType);
+    }
+
+    private boolean isPointer(String type) {
+        return type.startsWith("struct_") || type.endsWith("*");
     }
 
 }
