@@ -223,6 +223,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             if (leftType.equals("int") && this.isPointer(rightType)
                     || this.isPointer(leftType) && rightType.equals("int")) {
                 // TODO warnning type
+                System.out.println("Warning affectation entre 2 types " + leftType + " et " + rightType + " a la ligne " + affectation.line );
                 // errors.addError(new TypeException(affectation.line, rightType, leftType));
             }
             if (affectation.left instanceof Idf idf) {
@@ -334,16 +335,20 @@ public class TypeVisitor implements TdsVisitor<String> {
             // arithmétique de pointeur
             if (operateur instanceof Plus) {
                 if (leftType.equals("int") && this.isPointer(rightType)) {
+                    System.out.println("Arithmétique de pointeur ligne " + operateur.line);
                     return rightType;
                 } else if (rightType.equals("int") && this.isPointer(leftType)) {
+                    System.out.println("Arithmétique de pointeur ligne " + operateur.line);
                     return leftType;
                 }
             } else if (rightType.equals("int") && this.isPointer(leftType) && operateur instanceof Minus) {
+                System.out.println("Arithmétique de pointeur ligne " + operateur.line);
                 return leftType;
             }
             // comparaison entre 2 types différents
             if (operateur instanceof Comparaison) {
                 // TODO warnning
+                System.out.println("Comparaison entre 2 types " + leftType + " et " + rightType + " a la ligne " + operateur.line );
                 // this.errors.addError();
                 return "int";
             }
