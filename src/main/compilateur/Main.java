@@ -12,8 +12,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
-import compilateur.TDS.Tds;
-import compilateur.TDS.TdsCreator;
 import compilateur.ast.Ast;
 import compilateur.ast.AstCreator;
 import compilateur.grammar.circLexer;
@@ -21,6 +19,8 @@ import compilateur.grammar.circParser;
 import compilateur.grammar.circParser.FichierContext;
 import compilateur.graphviz.GraphVizTdsVisitor;
 import compilateur.graphviz.GraphVizVisitor;
+import compilateur.tds.Tds;
+import compilateur.tds.TdsCreator;
 import compilateur.utils.ErrorAggregator;
 
 public class Main {
@@ -57,7 +57,7 @@ public class Main {
             // JFrame frame = new JFrame("Antlr AST");
             // JPanel panel = new JPanel();
             // TreeViewer viewer = new TreeViewer(Arrays.asList(
-            //         parser.getRuleNames()), program);
+            // parser.getRuleNames()), program);
             // viewer.setScale(1.5); // Scale a little
             // panel.add(viewer);
             // frame.add(panel);
@@ -97,9 +97,7 @@ public class Main {
             agg.printErrors();
             System.out.println("==== Erreurs ====\n\n");
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (RecognitionException e) {
+        } catch (IOException | RecognitionException e) {
             e.printStackTrace();
         }
 

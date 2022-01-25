@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 public class SymboleStructContent extends Symbole{
     private Tds tds;

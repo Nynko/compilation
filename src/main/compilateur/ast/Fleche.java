@@ -1,7 +1,7 @@
 package compilateur.ast;
 
-import compilateur.TDS.Tds;
-import compilateur.TDS.TdsVisitor;
+import compilateur.tds.Tds;
+import compilateur.tds.TdsVisitor;
 
 public class Fleche extends Operateur {
 

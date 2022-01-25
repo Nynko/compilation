@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Bloc;
@@ -56,5 +56,7 @@ public interface TdsVisitor<T>{
     public T visit(Negation unaire, Tds tds);
     public T visit(Semicolon semicolon, Tds tds);
     public T visit(Operateur operateur, Tds tds);
+
+    public static final String TYPESTRUCT = "struct_";
     
 }

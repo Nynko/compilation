@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import java.util.ArrayList;
 
@@ -64,9 +64,9 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (sym instanceof SymboleInt) {
             return "int";
         } else if (sym instanceof SymboleStruct symstruct) {
-            return "struct_" + symstruct.getStruct().getName();
+            return TYPESTRUCT + symstruct.getStruct().getName();
         } else if (sym instanceof SymboleStructContent symstructcontent) {
-            return "struct_" + symstructcontent.getName();
+            return TYPESTRUCT + symstructcontent.getName();
         } else {
             errors.addError(new UndefinedSymboleException(idf.name, idf.line));
         }
@@ -120,11 +120,12 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
-        try {
-            int nbParam = idfParenthesis.exprList.size();
-            String fctName = ((Idf) idfParenthesis.idf).name;
-            SymboleFonction sym = (SymboleFonction) tds.findSymbole(fctName);
-            ArrayList<SymboleVar> param = sym.getTds().getParams();
+        int nbParam = idfParenthesis.exprList.size();
+        String fctName = ((Idf) idfParenthesis.idf).name;
+        Symbole sym = tds.findSymbole(fctName);
+        if (sym != null) {
+            SymboleFonction symf = (SymboleFonction) sym;
+            ArrayList<SymboleVar> param = symf.getTds().getParams();
             int min = param.size();
             if (min != nbParam) {
                 this.errors.addError(new NumberParameterException(sym.getName(), idfParenthesis.line, min, nbParam));
@@ -138,28 +139,28 @@ public class TypeVisitor implements TdsVisitor<String> {
                 if (s instanceof SymboleInt) {
                     paramTypeRef = "int";
                 } else if (s instanceof SymboleStruct symstruct) {
-                    paramTypeRef = "struct_" + symstruct.getStruct().getName();
+                    paramTypeRef = TYPESTRUCT + symstruct.getStruct().getName();
                 }
                 String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
                 if (!paramType.equals(paramTypeRef)) {
                     this.errors.addError(new TypeException(idfParenthesis.line, paramType, paramTypeRef));
                 }
             }
-        } catch (Exception e) {
         }
         return idfParenthesis.idf.accept(this, tds);
     }
 
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
-        try {
-            String fctName = ((Idf) idfParenthesisEmpty.idf).name;
-            SymboleFonction sym = (SymboleFonction) tds.findSymbole(fctName);
-            if (!sym.getTds().getParams().isEmpty()) {
-                this.errors.addError(new NumberParameterException(sym.getName(), idfParenthesisEmpty.line,
-                        sym.getTds().getParams().size(), 0));
+
+        String fctName = ((Idf) idfParenthesisEmpty.idf).name;
+        Symbole sym = tds.findSymbole(fctName);
+        if (sym != null) {
+            SymboleFonction symf = (SymboleFonction) sym;
+            if (!symf.getTds().getParams().isEmpty()) {
+                this.errors.addError(new NumberParameterException(symf.getName(), idfParenthesisEmpty.line,
+                        symf.getTds().getParams().size(), 0));
             }
-        } catch (Exception e) {
         }
         return idfParenthesisEmpty.idf.accept(this, tds);
     }
@@ -360,7 +361,7 @@ public class TypeVisitor implements TdsVisitor<String> {
     }
 
     private boolean isPointer(String type) {
-        return type.startsWith("struct_") || type.endsWith("*");
+        return type.startsWith(TYPESTRUCT) || type.endsWith("*");
     }
 
     private boolean testIfIsIdfAndInitialized(Ast ast, Tds tds, int line) {

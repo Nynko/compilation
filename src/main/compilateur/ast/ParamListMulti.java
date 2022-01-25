@@ -1,8 +1,8 @@
 package compilateur.ast;
 
-import compilateur.TDS.*;
-
 import java.util.ArrayList;
+
+import compilateur.tds.*;
 
 public class ParamListMulti implements Ast {
 
