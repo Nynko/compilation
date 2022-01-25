@@ -1,6 +1,7 @@
 package compilateur.TDS;
 
 import java.util.ArrayList;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
@@ -10,11 +11,6 @@ import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
 import compilateur.ast.DeclVarStruct;
 import compilateur.ast.Decl_typ;
-import compilateur.ast.Different;
-import compilateur.ast.Division;
-import compilateur.ast.Egal;
-import compilateur.ast.Expr_et;
-import compilateur.ast.Expr_ou;
 import compilateur.ast.Fichier;
 import compilateur.ast.Fleche;
 import compilateur.ast.Idf;
@@ -22,23 +18,16 @@ import compilateur.ast.IdfParenthesis;
 import compilateur.ast.IdfParenthesisEmpty;
 import compilateur.ast.IfThen;
 import compilateur.ast.IfThenElse;
-import compilateur.ast.Inferieur;
-import compilateur.ast.InferieurEgal;
 import compilateur.ast.IntNode;
-import compilateur.ast.Minus;
-import compilateur.ast.Multiplication;
-import compilateur.ast.ParamInt;
-import compilateur.ast.ParamListMulti;
-import compilateur.ast.ParamStruct;
-import compilateur.ast.Plus;
-import compilateur.ast.Return;
-import compilateur.ast.Semicolon;
-import compilateur.ast.Sizeof;
-import compilateur.ast.Superieur;
-import compilateur.ast.SuperieurEgal;
 import compilateur.ast.MoinsUnaire;
 import compilateur.ast.Negation;
 import compilateur.ast.Operateur;
+import compilateur.ast.ParamInt;
+import compilateur.ast.ParamListMulti;
+import compilateur.ast.ParamStruct;
+import compilateur.ast.Return;
+import compilateur.ast.Semicolon;
+import compilateur.ast.Sizeof;
 import compilateur.ast.While;
 import compilateur.utils.ErrorAggregator;
 
@@ -413,78 +402,6 @@ public class TdsCreator implements TdsVisitor<Void> {
         affectation.accept(visitor, tds);
         return null;
     }
-
-    // @Override
-    // public Void visit(Expr_ou expr_ou, Tds tds) {
-    //     expr_ou.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Expr_et expr_et, Tds tds) {
-    //     expr_et.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Egal egal, Tds tds) {
-    //     egal.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Different dif, Tds tds) {
-    //     dif.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Inferieur inf, Tds tds) {
-    //     inf.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(InferieurEgal infEgal, Tds tds) {
-    //     infEgal.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Superieur sup, Tds tds) {
-    //     sup.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(SuperieurEgal supEgal, Tds tds) {
-    //     supEgal.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Plus plus, Tds tds) {
-    //     plus.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Minus minus, Tds tds) {
-    //     minus.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Division div, Tds tds) {
-    //     div.accept(visitor, tds);
-    //     return null;
-    // }
-
-    // @Override
-    // public Void visit(Multiplication mult, Tds tds) {
-    //     mult.accept(visitor, tds);
-    //     return null;
-    // }
 
     @Override
     public Void visit(Fleche fleche, Tds tds) {
