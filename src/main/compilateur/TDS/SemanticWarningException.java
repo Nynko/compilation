@@ -7,7 +7,7 @@ import compilateur.utils.CompilerErrorException;
  */
 public abstract class SemanticWarningException extends CompilerErrorException {
 
-    public SemanticWarningException(int line, String message) {
+    protected SemanticWarningException(int line, String message) {
         super(line, "WARNING: " + message);
     }
 

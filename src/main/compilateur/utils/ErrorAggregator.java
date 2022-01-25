@@ -16,6 +16,6 @@ public class ErrorAggregator {
     }
 
     public boolean noError() {
-        return this.errors.size() == 0;
+        return this.errors.isEmpty();
     }
 }

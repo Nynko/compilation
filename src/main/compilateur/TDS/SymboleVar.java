@@ -5,7 +5,7 @@ public abstract class SymboleVar extends Symbole {
     private int deplacement;
     private boolean initialise = false;
 
-    public SymboleVar(String name) {
+    protected SymboleVar(String name) {
         super(name);
     }
 

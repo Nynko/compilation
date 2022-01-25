@@ -57,7 +57,7 @@ public class Main {
             // JFrame frame = new JFrame("Antlr AST");
             // JPanel panel = new JPanel();
             // TreeViewer viewer = new TreeViewer(Arrays.asList(
-            //         parser.getRuleNames()), program);
+            // parser.getRuleNames()), program);
             // viewer.setScale(1.5); // Scale a little
             // panel.add(viewer);
             // frame.add(panel);
@@ -97,9 +97,7 @@ public class Main {
             agg.printErrors();
             System.out.println("==== Erreurs ====\n\n");
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (RecognitionException e) {
+        } catch (IOException | RecognitionException e) {
             e.printStackTrace();
         }
 

@@ -11,14 +11,4 @@ public class SymboleStruct extends SymboleVar {
     public SymboleStructContent getStruct() {
         return this.struct;
     }
-
-    // @Override
-    // public boolean isInitalized() {
-    //     for (Symbole s : this.struct.getTds().getListeSymboles().values()) {
-    //         if (s instanceof SymboleInt sv && !sv.isInitalized()) {
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
 }

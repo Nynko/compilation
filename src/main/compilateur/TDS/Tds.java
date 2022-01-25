@@ -137,8 +137,7 @@ public class Tds {
         while(table.getImbrication() != 0 && table.pointeurPere != null) {
             table = table.getPere();
         }
-        SymboleStructContent s = (SymboleStructContent) table.listeSymboles.get(name);
-        return s;
+        return (SymboleStructContent) table.listeSymboles.get(name);
     }
 
     /** Ajouter un symbole à la TDS
@@ -151,14 +150,15 @@ public class Tds {
         if(this.listeSymboles.get(name) != null) {
             throw new SymbolAlreadyExistsException(name,symbole.getDefinitionLine(), listeSymboles.get(name).getDefinitionLine());
         }
-        if(symbole instanceof SymboleInt) {
-            ((SymboleInt)symbole).setDeplacement(this.deplacement);
-            this.deplacement += Offset.OFFSET;
-        } else if(symbole instanceof SymboleStruct) {
-            ((SymboleStruct)symbole).setDeplacement(this.deplacement);
+        if(symbole instanceof SymboleVar sym) {
+            sym.setDeplacement(this.deplacement);
             this.deplacement += Offset.OFFSET;
         }
         this.listeSymboles.put(name, symbole);
+        Tds.incrementNumberSymbole();
+    }
+
+    public static void incrementNumberSymbole() {
         compteurSymbole++;
     }
 
@@ -172,19 +172,14 @@ public class Tds {
         if(this.listeSymboles.get(name) != null) {
             throw new SymbolAlreadyExistsException(name,symbole.getDefinitionLine(), listeSymboles.get(name).getDefinitionLine());
         }
-        if(symbole instanceof SymboleInt sym) {
-            sym.setParam(this.compteurParams);
-            sym.setDeplacement(this.deplacementParam);
-            this.deplacementParam -= Offset.OFFSET;
-            this.compteurParams += 1;
-        } else if(symbole instanceof SymboleStruct sym) {
+        if(symbole instanceof SymboleVar sym) {
             sym.setParam(this.compteurParams);
             sym.setDeplacement(this.deplacementParam);
             this.deplacementParam -= Offset.OFFSET;
             this.compteurParams += 1;
         }
         this.listeSymboles.put(name, symbole);
-        compteurSymbole++;
+        Tds.incrementNumberSymbole();
     }
 
     /** Récupère les paramètres d'une fonction
@@ -196,10 +191,8 @@ public class Tds {
         for (Map.Entry<String, Symbole> set : this.listeSymboles.entrySet()) {
             Symbole sym = set.getValue();
 
-            if(sym instanceof SymboleVar symvar) {
-                if(symvar.isParam()) {
+            if(sym instanceof SymboleVar symvar && symvar.isParam()) {
                     params.add(symvar);
-                }
             }
         }
         params.sort((o1, o2) -> Integer.compare(o1.getParamIndex(),o2.getParamIndex()));
