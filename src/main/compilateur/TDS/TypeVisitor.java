@@ -65,19 +65,9 @@ public class TypeVisitor implements TdsVisitor<String> {
         Symbole sym = tds.findSymbole(idf.name);
         if (sym instanceof SymboleFonction symfct) {
             return symfct.getReturnType();
-        } else if (sym instanceof SymboleInt symint) {
-            // System.out.println("===== " + symint.getName()+ " " + idf.line);
-            // if (!symint.isInitalized()) {
-            //     this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symint.getDefinitionLine()));
-            // }
+        } else if (sym instanceof SymboleInt) {
             return "int";
         } else if (sym instanceof SymboleStruct symstruct) {
-            
-            // System.out.println("------- " + symstruct.getName()+ " " + idf.line);
-            
-            // if (!symstruct.isInitalized()) {
-            //     this.errors.addError(new VarNotInitializedException(idf.line, idf.name, symstruct.getDefinitionLine()));
-            // }
             return "struct_" + symstruct.getStruct().getName();
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return "struct_" + symstructcontent.getName();
@@ -229,7 +219,6 @@ public class TypeVisitor implements TdsVisitor<String> {
         // membre droit est initialisé ?
         if (affectation.right instanceof Idf idf) { // si c'est un idf
             Symbole s = tds.findSymbole(idf.name);
-            System.out.println(s.getName() + " " + affectation.line);
             if (s instanceof SymboleVar sv && !sv.isInitalized()) {
                 this.errors.addError(new VarNotInitializedException(affectation.line, sv.getName(), sv.getDefinitionLine()));
                 return leftType;
