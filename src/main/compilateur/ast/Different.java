@@ -1,6 +1,6 @@
 package compilateur.ast;
 
-public class Different extends Operateur {
+public class Different extends Comparaison {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);

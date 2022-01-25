@@ -6,6 +6,7 @@ import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
+import compilateur.ast.Comparaison;
 import compilateur.ast.DeclFctInt;
 import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
@@ -230,18 +231,15 @@ public class TypeVisitor implements TdsVisitor<String> {
             return null;
         }
         // membre droit est initialisé si c'est un idf ?
-        if (affectation.right instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors.addError(
-                        new VarNotInitializedException(affectation.line, sv.getName(), sv.getDefinitionLine()));
-                return leftType;
-            }
+        if (!this.testIfIsIdfAndInitialized(affectation.right, tds, affectation.line)) {
+            return leftType;
         }
 
         // affectation reussie
-        if (this.isCompatible(leftType, rightType) || leftType.equals("int") && this.isPointer(rightType) || this.isPointer(leftType) && rightType.equals("int")) {
-            if (leftType.equals("int") && this.isPointer(rightType) || this.isPointer(leftType) && rightType.equals("int")) {
+        if (this.isCompatible(leftType, rightType) || leftType.equals("int") && this.isPointer(rightType)
+                || this.isPointer(leftType) && rightType.equals("int")) {
+            if (leftType.equals("int") && this.isPointer(rightType)
+                    || this.isPointer(leftType) && rightType.equals("int")) {
                 // TODO warnning type
                 // errors.addError(new TypeException(affectation.line, rightType, leftType));
             }
@@ -259,7 +257,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
             return leftType;
         }
-            
+
         this.errors.addError(new BadOperandTypeException("affectation", affectation.line));
         return null;
     }
@@ -661,41 +659,26 @@ public class TypeVisitor implements TdsVisitor<String> {
         }
         Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
         String rightType = fleche.right.accept(this, tdsStruct);
+        
         // si a droite c'est un idf
-        if (rightType != null && fleche.right instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors.addError(new VarNotInitializedException(fleche.line,
-                        sv.getName(), sv.getDefinitionLine()));
-                return null;
-            }
+        if(rightType == null || !this.testIfIsIdfAndInitialized(fleche.right, tds, fleche.line)){
+            return null;
         }
         // si a gauche c'est un idf
-        if (fleche.left instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors.addError(new VarNotInitializedException(fleche.line,
-                        sv.getName(), sv.getDefinitionLine()));
-                return null;
-            }
+        if(!this.testIfIsIdfAndInitialized(fleche.left, tds, fleche.line)){
+            return null;
         }
-        if (rightType != null) {
-            return rightType;
-        }
-        return null;
+       
+        return rightType;
     }
 
     @Override
     public String visit(MoinsUnaire unaire, Tds tds) {
         String type = unaire.noeud.accept(this, tds);
-        if (type != null && unaire.noeud instanceof Idf idf) { // si noeud est un idf
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors.addError(new VarNotInitializedException(unaire.line, sv.getName(), sv.getDefinitionLine()));
-                return null;
-            }
+        if (type == null || !this.testIfIsIdfAndInitialized(unaire.noeud, tds, unaire.line)) {
+            return null;
         }
-        if (type != null && this.isPointer(type)) {
+        if (this.isPointer(type)) {
             this.errors.addError(new UnauthorizedOperationException(unaire.line));
             return null;
         }
@@ -705,15 +688,11 @@ public class TypeVisitor implements TdsVisitor<String> {
     @Override
     public String visit(Negation unaire, Tds tds) {
         String type = unaire.noeud.accept(this, tds);
-        if (type != null && unaire.noeud instanceof Idf idf) { // si noeud est un idf
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors.addError(new VarNotInitializedException(unaire.line, sv.getName(), sv.getDefinitionLine()));
-                return null;
-            }
-        }
         if (type == null) {
             this.errors.addError(new UnauthorizedOperationException(unaire.line));
+            return null;
+        }
+        if (!this.testIfIsIdfAndInitialized(unaire.noeud, tds, unaire.line)) {
             return null;
         }
         return "int";
@@ -731,23 +710,14 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType == null || rightType == null) {
             return null;
         }
-        // si a gauche c'est un idf
-        if (operateur.left instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors
-                        .addError(new VarNotInitializedException(operateur.line, sv.getName(), sv.getDefinitionLine()));
-                return null;
-            }
+        // test si a gauche c'est un idf, si oui, on regarde s'il est initialisé
+        if(!this.testIfIsIdfAndInitialized(operateur.left, tds, operateur.line)){
+            return null;
         }
-        // si a droite c'est un idf
-        if (operateur.right instanceof Idf idf) {
-            Symbole s = tds.findSymbole(idf.name);
-            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
-                this.errors
-                        .addError(new VarNotInitializedException(operateur.line, sv.getName(), sv.getDefinitionLine()));
-                return null;
-            }
+        
+        // test si a droite c'est un idf, si oui, on regarde s'il est initialisé
+        if(!this.testIfIsIdfAndInitialized(operateur.right, tds, operateur.line)){
+            return null;
         }
 
         // si les types des operandes sont compatibles sans warnning
@@ -758,11 +728,9 @@ public class TypeVisitor implements TdsVisitor<String> {
                 this.errors.addError(new UnauthorizedOperationException(operateur.line));
                 return null;
             }
-            // comparaison + soustraction entre pointeur 
-            if (operateur instanceof Egal || operateur instanceof Different || operateur instanceof Inferieur
-                    || operateur instanceof InferieurEgal || operateur instanceof Superieur
-                    || operateur instanceof SuperieurEgal || operateur instanceof Expr_et
-                    || operateur instanceof Expr_ou || (this.isPointer(leftType) && operateur instanceof Minus)) {
+            // comparaison + soustraction entre pointeur
+            if (operateur instanceof Comparaison || operateur instanceof Expr_et || operateur instanceof Expr_ou
+                    || (this.isPointer(leftType) && operateur instanceof Minus)) {
                 return "int";
             }
             return leftType;
@@ -774,16 +742,14 @@ public class TypeVisitor implements TdsVisitor<String> {
             if (operateur instanceof Plus) {
                 if (leftType.equals("int") && this.isPointer(rightType)) {
                     return rightType;
-                } else if(rightType.equals("int") && this.isPointer(leftType)) {
+                } else if (rightType.equals("int") && this.isPointer(leftType)) {
                     return leftType;
                 }
             } else if (rightType.equals("int") && this.isPointer(leftType) && operateur instanceof Minus) {
                 return leftType;
             }
             // comparaison entre 2 types différents
-            if (operateur instanceof Egal || operateur instanceof Different || operateur instanceof Inferieur
-                    || operateur instanceof InferieurEgal || operateur instanceof Superieur
-                    || operateur instanceof SuperieurEgal) {
+            if (operateur instanceof Comparaison) {
                 // TODO warnning
                 // this.errors.addError();
                 return "int";
@@ -806,4 +772,14 @@ public class TypeVisitor implements TdsVisitor<String> {
         return type.startsWith("struct_") || type.endsWith("*");
     }
 
+    private boolean testIfIsIdfAndInitialized(Ast ast, Tds tds, int line) {
+        if (ast instanceof Idf idf) {
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv && !sv.isInitalized()) {
+                this.errors.addError(new VarNotInitializedException(line, sv.getName(), sv.getDefinitionLine()));
+                return false;
+            }
+        }
+        return true;
+    }
 }
