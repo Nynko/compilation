@@ -222,9 +222,7 @@ public class TypeVisitor implements TdsVisitor<String> {
                 || this.isPointer(leftType) && rightType.equals("int")) {
             if (leftType.equals("int") && this.isPointer(rightType)
                     || this.isPointer(leftType) && rightType.equals("int")) {
-                // TODO warnning type
-                System.out.println("Warning affectation entre 2 types " + leftType + " et " + rightType + " a la ligne " + affectation.line );
-                // errors.addError(new TypeException(affectation.line, rightType, leftType));
+                errors.addError(new TypeWarningException(affectation.line, rightType, leftType));
             }
             if (affectation.left instanceof Idf idf) {
                 Symbole s = tds.findSymbole(idf.name);
@@ -253,16 +251,16 @@ public class TypeVisitor implements TdsVisitor<String> {
         }
         Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
         String rightType = fleche.right.accept(this, tdsStruct);
-        
+
         // si a droite c'est un idf
-        if(rightType == null || !this.testIfIsIdfAndInitialized(fleche.right, tds, fleche.line)){
+        if (rightType == null || !this.testIfIsIdfAndInitialized(fleche.right, tds, fleche.line)) {
             return null;
         }
         // si a gauche c'est un idf
-        if(!this.testIfIsIdfAndInitialized(fleche.left, tds, fleche.line)){
+        if (!this.testIfIsIdfAndInitialized(fleche.left, tds, fleche.line)) {
             return null;
         }
-       
+
         return rightType;
     }
 
@@ -305,12 +303,12 @@ public class TypeVisitor implements TdsVisitor<String> {
             return null;
         }
         // test si a gauche c'est un idf, si oui, on regarde s'il est initialisé
-        if(!this.testIfIsIdfAndInitialized(operateur.left, tds, operateur.line)){
+        if (!this.testIfIsIdfAndInitialized(operateur.left, tds, operateur.line)) {
             return null;
         }
-        
+
         // test si a droite c'est un idf, si oui, on regarde s'il est initialisé
-        if(!this.testIfIsIdfAndInitialized(operateur.right, tds, operateur.line)){
+        if (!this.testIfIsIdfAndInitialized(operateur.right, tds, operateur.line)) {
             return null;
         }
 
@@ -335,21 +333,16 @@ public class TypeVisitor implements TdsVisitor<String> {
             // arithmétique de pointeur
             if (operateur instanceof Plus) {
                 if (leftType.equals("int") && this.isPointer(rightType)) {
-                    System.out.println("Arithmétique de pointeur ligne " + operateur.line);
                     return rightType;
                 } else if (rightType.equals("int") && this.isPointer(leftType)) {
-                    System.out.println("Arithmétique de pointeur ligne " + operateur.line);
                     return leftType;
                 }
             } else if (rightType.equals("int") && this.isPointer(leftType) && operateur instanceof Minus) {
-                System.out.println("Arithmétique de pointeur ligne " + operateur.line);
                 return leftType;
             }
             // comparaison entre 2 types différents
             if (operateur instanceof Comparaison) {
-                // TODO warnning
-                System.out.println("Comparaison entre 2 types " + leftType + " et " + rightType + " a la ligne " + operateur.line );
-                // this.errors.addError();
+                this.errors.addError(new ComparisonWarningException(operateur.line, leftType, rightType));
                 return "int";
             }
             // soustraction par un pointeur, multiplication ou division avec un pointeur
