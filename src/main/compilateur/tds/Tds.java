@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import java.util.ArrayList;
 import java.util.HashMap;

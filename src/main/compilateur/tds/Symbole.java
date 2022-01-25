@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 public abstract class Symbole {
     private int definitionLine;

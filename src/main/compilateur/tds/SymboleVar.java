@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 public abstract class SymboleVar extends Symbole {
     private int paramIndex = -1;

@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 public class SymbolAlreadyExistsException extends SemanticErrorException {
     public SymbolAlreadyExistsException(String symName, int line, int oldDefininitionLine) {

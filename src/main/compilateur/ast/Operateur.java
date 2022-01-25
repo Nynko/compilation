@@ -1,7 +1,7 @@
 package compilateur.ast;
 
-import compilateur.TDS.Tds;
-import compilateur.TDS.TdsVisitor;
+import compilateur.tds.Tds;
+import compilateur.tds.TdsVisitor;
 
 public abstract class Operateur implements Ast {
     public Ast left;

@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import compilateur.utils.CompilerErrorException;
 

@@ -2,7 +2,7 @@ package compilateur.ast;
 
 import java.util.ArrayList;
 
-import compilateur.TDS.*;
+import compilateur.tds.*;
 
 public class Bloc implements Ast{
 

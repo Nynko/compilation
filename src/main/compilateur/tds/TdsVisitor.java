@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Bloc;
