@@ -92,5 +92,26 @@ struct a *functionIfElseS()
 
 int main()
 {
-    return 0;
+    int a;
+    if (0)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+    
+    if (1)
+    {
+        int a;
+        a = 0;
+        a = a + 1;
+        /* code */
+    }
+    if (0){
+        int a;
+    }
+    a = 0;
+    
 }

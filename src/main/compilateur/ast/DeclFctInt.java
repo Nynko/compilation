@@ -2,9 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.*;
 
-public class DeclFctInt implements Ast {
-
-    public int line;
+public class DeclFctInt extends Line implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -19,9 +17,9 @@ public class DeclFctInt implements Ast {
     public Ast bloc;
 
     public DeclFctInt(Ast idf, Ast param, Ast bloc, int line) {
+        super(line);
         this.Idf = idf;
         this.param = param;
         this.bloc = bloc;
-        this.line = line;
     }
 }

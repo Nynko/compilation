@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import compilateur.tds.*;
 
-public class IdfParenthesis implements Ast {
-
-    public int line;
+public class IdfParenthesis extends Line implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -20,9 +18,9 @@ public class IdfParenthesis implements Ast {
     public ArrayList<Ast> exprList;
 
     public IdfParenthesis(Ast idf, ArrayList<Ast> exprList, int line) {
+        super(line);
         this.idf = idf;
         this.exprList = exprList;
-        this.line = line;
     }
 
 }

@@ -2,9 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.*;
 
-public class CharNode implements Ast {
-
-    public int line;
+public class CharNode extends Line implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -17,8 +15,8 @@ public class CharNode implements Ast {
     public String string;
 
     public CharNode(String string, int line) {
+        super(line);
         this.string = string;
-        this.line = line;
     }
 
 }

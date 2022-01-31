@@ -2,9 +2,8 @@ package compilateur.ast;
 
 import compilateur.tds.*;
 
-public class IfThenElse implements Ast {
+public class IfThenElse extends Line implements Ast {
 
-    public int lineIf;
     public int lineElse;
 
     public <T> T accept(AstVisitor<T> visitor) {
@@ -20,10 +19,10 @@ public class IfThenElse implements Ast {
     public Ast elseBlock;
 
     public IfThenElse(Ast condition, Ast thenBlock, Ast elseBlock, int lineIf, int lineElse) {
+        super(lineIf);
         this.condition = condition;
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
-        this.lineIf = lineIf;
         this.lineElse = lineElse;
     }
 

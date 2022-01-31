@@ -18,6 +18,7 @@ import compilateur.ast.IdfParenthesis;
 import compilateur.ast.IdfParenthesisEmpty;
 import compilateur.ast.IfThen;
 import compilateur.ast.IfThenElse;
+import compilateur.ast.Line;
 import compilateur.ast.IntNode;
 import compilateur.ast.MoinsUnaire;
 import compilateur.ast.Negation;
@@ -199,16 +200,8 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
         }
 
-        boolean asReturn = false;
         if (declFctInt.bloc != null) {
-            // for (Ast ast : ((Bloc) declFctInt.bloc).instList) {
-            // if (ast instanceof Return) {
-            // asReturn = true;
-            // break;
-            // }
-            // }
-            asReturn = this.as_return(declFctInt.bloc);
-            if (!asReturn) {
+            if (!this.as_return(declFctInt.bloc)) {
                 this.errors.addError(new ReturnFunctionException(declFctInt.line));
             }
             declFctInt.bloc.accept(this, tdsFunction);
@@ -246,16 +239,8 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
         }
 
-        boolean asReturn = false;
         if (declFctStruct.bloc != null) {
-            // for (Ast ast : ((Bloc) declFctStruct.bloc).instList) {
-            // if (ast instanceof Return) {
-            // asReturn = true;
-            // break;
-            // }
-            // }
-            asReturn = this.as_return(declFctStruct.bloc);
-            if (!asReturn) {
+            if (!this.as_return(declFctStruct.bloc)) {
                 this.errors.addError(new ReturnFunctionException(declFctStruct.line));
             }
             declFctStruct.bloc.accept(this, tdsFunction);
@@ -278,7 +263,7 @@ public class TdsCreator implements TdsVisitor<Void> {
             // verifie si il y a un return dans le bloc
             for (int index = 0; index < bloc.instList.size(); index++) {
                 if (asReturn) {
-                    System.out.println("useless code " + bloc.line);
+                    this.errors.addError(new CodeNeverUseWarningException(((Line) bloc.instList.get(index)).line));
                 } else {
                     Ast a = bloc.instList.get(index);
                     if (a instanceof Return) {
@@ -305,7 +290,7 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
             if (asReturn) {
                 for (int i = indexReturn + 1; i < bloc.instList.size(); i++) {
-                    System.out.println("useless code " + bloc.instList.get(i));
+                    this.errors.addError(new CodeNeverUseWarningException(((Line) bloc.instList.get(i)).line));
                 }
             }
         }
