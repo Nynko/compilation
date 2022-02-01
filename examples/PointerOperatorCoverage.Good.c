@@ -12,16 +12,18 @@ struct b
 
 int main(){
     
-    struct a * pa;
+    struct a * pa, *paa;
     struct b * pb;
     int i;
     
     pa = malloc(sizeof(struct a));
-    pb = i;
+    paa = pa;
+    pb = pa;
     i = pa;
     pb = malloc(sizeof(struct b));
 
     i = 100;
+    pb = i;
 
     !pa;
     -pa;

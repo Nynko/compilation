@@ -220,9 +220,12 @@ public class TypeVisitor implements TdsVisitor<String> {
 
         // affectation reussie
         if (this.isCompatible(leftType, rightType) || leftType.equals("int") && this.isPointer(rightType)
-                || this.isPointer(leftType) && rightType.equals("int") || this.isPointer(leftType) && this.isPointer(rightType)) {
+                || this.isPointer(leftType) && rightType.equals("int")
+                || this.isPointer(leftType) && this.isPointer(rightType)) {
             if (leftType.equals("int") && this.isPointer(rightType)
-                    || this.isPointer(leftType) && rightType.equals("int") || this.isPointer(leftType) && this.isPointer(rightType) && !this.isCompatible(leftType, rightType)) {
+                    || this.isPointer(leftType) && rightType.equals("int")
+                    || !rightType.equals("void_*") && this.isPointer(leftType) && this.isPointer(rightType)
+                            && !this.isCompatible(leftType, rightType)) {
                 errors.addError(new TypeWarningException(affectation.line, rightType, leftType));
             }
             if (affectation.left instanceof Idf idf) {
@@ -364,7 +367,7 @@ public class TypeVisitor implements TdsVisitor<String> {
     }
 
     private boolean isCompatible(String leftType, String rightType) {
-        return leftType.equals(rightType) || this.isPointer(leftType) && rightType.equals("void_*");
+        return leftType.equals(rightType);
     }
 
     private boolean isPointer(String type) {
