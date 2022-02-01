@@ -313,8 +313,13 @@ public class TypeVisitor implements TdsVisitor<String> {
             return null;
         }
 
+        // division par 0
+        if (operateur instanceof Division && operateur.right instanceof IntNode intr && intr.parseInt == 0) {
+            this.errors.addError(new DivisionByZeroException(operateur.line));
+        }
+
         // si les types des operandes sont compatibles sans warnning
-        if (this.isCompatible(leftType, rightType) && !leftType.equals("void_*") && rightType.equals("void_*")) {
+        if (this.isCompatible(leftType, rightType) && !leftType.equals("void_*") && !rightType.equals("void_*")) {
             // addition, multiplication, division entre pointeur
             if (this.isPointer(leftType) && (operateur instanceof Plus || operateur instanceof Multiplication
                     || operateur instanceof Division)) {
