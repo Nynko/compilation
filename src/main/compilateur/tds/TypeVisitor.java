@@ -220,9 +220,9 @@ public class TypeVisitor implements TdsVisitor<String> {
 
         // affectation reussie
         if (this.isCompatible(leftType, rightType) || leftType.equals("int") && this.isPointer(rightType)
-                || this.isPointer(leftType) && rightType.equals("int")) {
+                || this.isPointer(leftType) && rightType.equals("int") || this.isPointer(leftType) && this.isPointer(rightType)) {
             if (leftType.equals("int") && this.isPointer(rightType)
-                    || this.isPointer(leftType) && rightType.equals("int")) {
+                    || this.isPointer(leftType) && rightType.equals("int") || this.isPointer(leftType) && this.isPointer(rightType) && !leftType.equals(rightType)) {
                 errors.addError(new TypeWarningException(affectation.line, rightType, leftType));
             }
             if (affectation.left instanceof Idf idf) {
@@ -314,7 +314,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         }
 
         // si les types des operandes sont compatibles sans warnning
-        if (this.isCompatible(leftType, rightType)) {
+        if (this.isCompatible(leftType, rightType) && !leftType.equals("void_*") && rightType.equals("void_*")) {
             // addition, multiplication, division entre pointeur
             if (this.isPointer(leftType) && (operateur instanceof Plus || operateur instanceof Multiplication
                     || operateur instanceof Division)) {
@@ -357,7 +357,7 @@ public class TypeVisitor implements TdsVisitor<String> {
     }
 
     private boolean isCompatible(String leftType, String rightType) {
-        return leftType.equals(rightType) || this.isPointer(rightType) && this.isPointer(leftType);
+        return leftType.equals(rightType) || this.isPointer(leftType) && rightType.equals("void_*");
     }
 
     private boolean isPointer(String type) {
