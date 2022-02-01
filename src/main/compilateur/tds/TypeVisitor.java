@@ -319,7 +319,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         }
 
         // si les types des operandes sont compatibles sans warnning
-        if (this.isCompatible(leftType, rightType) && !leftType.equals("void_*") && !rightType.equals("void_*")) {
+        if (this.isCompatible(leftType, rightType)) {
             // addition, multiplication, division entre pointeur
             if (this.isPointer(leftType) && (operateur instanceof Plus || operateur instanceof Multiplication
                     || operateur instanceof Division)) {
@@ -342,6 +342,8 @@ public class TypeVisitor implements TdsVisitor<String> {
                     return rightType;
                 } else if (rightType.equals("int") && this.isPointer(leftType)) {
                     return leftType;
+                } else {
+                    this.errors.addError(new UnauthorizedOperationException(operateur.line));
                 }
             } else if (rightType.equals("int") && this.isPointer(leftType) && operateur instanceof Minus) {
                 return leftType;
