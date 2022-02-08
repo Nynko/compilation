@@ -1,4 +1,4 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 public class DivisionByZeroException extends SemanticErrorException{
     

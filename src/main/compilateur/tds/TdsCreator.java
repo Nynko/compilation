@@ -1,6 +1,7 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import java.util.ArrayList;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
@@ -10,11 +11,6 @@ import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
 import compilateur.ast.DeclVarStruct;
 import compilateur.ast.Decl_typ;
-import compilateur.ast.Different;
-import compilateur.ast.Division;
-import compilateur.ast.Egal;
-import compilateur.ast.Expr_et;
-import compilateur.ast.Expr_ou;
 import compilateur.ast.Fichier;
 import compilateur.ast.Fleche;
 import compilateur.ast.Idf;
@@ -22,26 +18,25 @@ import compilateur.ast.IdfParenthesis;
 import compilateur.ast.IdfParenthesisEmpty;
 import compilateur.ast.IfThen;
 import compilateur.ast.IfThenElse;
-import compilateur.ast.Inferieur;
-import compilateur.ast.InferieurEgal;
 import compilateur.ast.IntNode;
-import compilateur.ast.Minus;
-import compilateur.ast.Multiplication;
+import compilateur.ast.MoinsUnaire;
+import compilateur.ast.Negation;
+import compilateur.ast.Operateur;
 import compilateur.ast.ParamInt;
 import compilateur.ast.ParamListMulti;
 import compilateur.ast.ParamStruct;
-import compilateur.ast.Plus;
 import compilateur.ast.Return;
 import compilateur.ast.Semicolon;
 import compilateur.ast.Sizeof;
-import compilateur.ast.Superieur;
-import compilateur.ast.SuperieurEgal;
-import compilateur.ast.MoinsUnaire;
-import compilateur.ast.Negation;
 import compilateur.ast.While;
 import compilateur.utils.ErrorAggregator;
 
 public class TdsCreator implements TdsVisitor<Void> {
+
+    public static final String PRINT = "print";
+    public static final String MALLOC = "malloc";
+    public static final String MAIN = "main";
+
 
     private ErrorAggregator errors = new ErrorAggregator();
     private TypeVisitor visitor = new TypeVisitor();
@@ -65,22 +60,22 @@ public class TdsCreator implements TdsVisitor<Void> {
             SymboleInt n = new SymboleInt("n");
             n.addDefinitionLine(-1);
             // ajout print
-            Tds tds_print = tds.nouvelleSousTDS("print"); // Création d'une nouvelle Tds
+            Tds tds_print = tds.nouvelleSousTDS(PRINT); // Création d'une nouvelle Tds
             tds_print.addSymboleParam("n", n);
-            SymboleFonction symbole_print = new SymboleFonction("print", tds_print);
+            SymboleFonction symbole_print = new SymboleFonction(PRINT, tds_print);
             symbole_print.setReturnType("void");
             symbole_print.addDefinitionLine(-1);
-            tds.addSymbole("print", symbole_print);
+            tds.addSymbole(PRINT, symbole_print);
 
             // ajout malloc
-            Tds tds_malloc = tds.nouvelleSousTDS("malloc"); // Création d'une nouvelle Tds
+            Tds tds_malloc = tds.nouvelleSousTDS(MALLOC); // Création d'une nouvelle Tds
             tds_malloc.addSymboleParam("n", n);
-            SymboleFonction symbole_malloc = new SymboleFonction("malloc", tds_print);
+            SymboleFonction symbole_malloc = new SymboleFonction(MALLOC, tds_print);
             symbole_malloc.setReturnType("void_*");
             symbole_malloc.addDefinitionLine(-1);
-            tds.addSymbole("malloc", symbole_malloc);
-        } catch (Exception e) {
-            // TODO: handle exception
+            tds.addSymbole(MALLOC, symbole_malloc);
+        } catch (SymbolAlreadyExistsException e) {
+            this.errors.addError(e);
         }
 
         for (Ast ast : fichier.instructions) {
@@ -88,7 +83,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         }
 
         // test que la fonction main est présente
-        Symbole main = tds.findSymbole("main");
+        Symbole main = tds.findSymbole(MAIN);
         if (main == null) {
             this.errors.addError(new MainNotFoundException());
             return null;
@@ -137,7 +132,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         // Récupération de la structure
         SymboleStructContent struct;
-        struct = tds.findSymboleStruct("struct_" + structName);
+        struct = tds.findSymboleStruct(TYPESTRUCT + structName);
 
         if (struct == null) {
             errors.addError(new UndefinedStructureException(structName, declVarStruct.line));
@@ -165,11 +160,11 @@ public class TdsCreator implements TdsVisitor<Void> {
         SymboleStructContent symboleStruct = new SymboleStructContent(idf);
         symboleStruct.addDefinitionLine(decl_typ.line);
 
-        Tds structTds = tds.nouvelleSousTDS("struct_" + idf);
+        Tds structTds = tds.nouvelleSousTDS(TYPESTRUCT + idf);
         symboleStruct.setTds(structTds);
 
         try {
-            tds.addSymbole("struct_" + idf, symboleStruct);
+            tds.addSymbole(TYPESTRUCT + idf, symboleStruct);
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
@@ -230,7 +225,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         Tds tdsFunction = tds.nouvelleSousTDS("fn_" + functionName); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
-        symboleFonction.setReturnType("struct_" + structName);
+        symboleFonction.setReturnType(TYPESTRUCT + structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
         try {
@@ -238,7 +233,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
-        if (tds.findSymboleStruct("struct_" + structName) == null) {
+        if (tds.findSymboleStruct(TYPESTRUCT + structName) == null) {
             // Si le type de struct n'existe pas
             errors.addError(new UndefinedStructureException(structName, declFctStruct.line));
         }
@@ -295,7 +290,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         // Récupération de la structure
         SymboleStructContent struct;
-        struct = tds.findSymboleStruct("struct_" + structName);
+        struct = tds.findSymboleStruct(TYPESTRUCT + structName);
 
         if (struct == null) {
             errors.addError(new UndefinedStructureException(structName, paramStruct.line));
@@ -414,78 +409,6 @@ public class TdsCreator implements TdsVisitor<Void> {
     }
 
     @Override
-    public Void visit(Expr_ou expr_ou, Tds tds) {
-        expr_ou.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Expr_et expr_et, Tds tds) {
-        expr_et.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Egal egal, Tds tds) {
-        egal.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Different dif, Tds tds) {
-        dif.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Inferieur inf, Tds tds) {
-        inf.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(InferieurEgal infEgal, Tds tds) {
-        infEgal.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Superieur sup, Tds tds) {
-        sup.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(SuperieurEgal supEgal, Tds tds) {
-        supEgal.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Plus plus, Tds tds) {
-        plus.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Minus minus, Tds tds) {
-        minus.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Division div, Tds tds) {
-        div.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
-    public Void visit(Multiplication mult, Tds tds) {
-        mult.accept(visitor, tds);
-        return null;
-    }
-
-    @Override
     public Void visit(Fleche fleche, Tds tds) {
         fleche.accept(visitor, tds);
         return null;
@@ -505,6 +428,12 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Semicolon semicolon, Tds tds) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Operateur operateur, Tds tds) {
+        operateur.accept(visitor, tds);
         return null;
     }
 

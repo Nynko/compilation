@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
-import compilateur.TDS.Symbole;
-import compilateur.TDS.SymboleStructContent;
-import compilateur.TDS.SymboleVar;
-import compilateur.TDS.SymboleFonction;
-import compilateur.TDS.SymboleInt;
-import compilateur.TDS.SymboleStruct;
-import compilateur.TDS.Tds;
+import compilateur.tds.Symbole;
+import compilateur.tds.SymboleFonction;
+import compilateur.tds.SymboleInt;
+import compilateur.tds.SymboleStruct;
+import compilateur.tds.SymboleStructContent;
+import compilateur.tds.SymboleVar;
+import compilateur.tds.Tds;
 
 
 public class GraphVizTdsVisitor {
