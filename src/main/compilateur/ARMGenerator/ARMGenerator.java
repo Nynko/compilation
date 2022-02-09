@@ -8,6 +8,11 @@ import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
 import compilateur.ast.DeclVarStruct;
 import compilateur.ast.Decl_typ;
+import compilateur.ast.Different;
+import compilateur.ast.Division;
+import compilateur.ast.Egal;
+import compilateur.ast.Expr_et;
+import compilateur.ast.Expr_ou;
 import compilateur.ast.Fichier;
 import compilateur.ast.Fleche;
 import compilateur.ast.Idf;
@@ -15,21 +20,26 @@ import compilateur.ast.IdfParenthesis;
 import compilateur.ast.IdfParenthesisEmpty;
 import compilateur.ast.IfThen;
 import compilateur.ast.IfThenElse;
+import compilateur.ast.Inferieur;
+import compilateur.ast.InferieurEgal;
 import compilateur.ast.IntNode;
+import compilateur.ast.Minus;
 import compilateur.ast.MoinsUnaire;
+import compilateur.ast.Multiplication;
 import compilateur.ast.Negation;
-import compilateur.ast.Operateur;
 import compilateur.ast.ParamInt;
 import compilateur.ast.ParamListMulti;
 import compilateur.ast.ParamStruct;
+import compilateur.ast.Plus;
 import compilateur.ast.Return;
 import compilateur.ast.Semicolon;
 import compilateur.ast.Sizeof;
+import compilateur.ast.Superieur;
+import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
 import compilateur.tds.Tds;
-import compilateur.tds.TdsVisitor;
 
-public class ARMGenerator implements TdsVisitor<String> {
+public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Fichier fichier, Tds tds) {
@@ -182,7 +192,73 @@ public class ARMGenerator implements TdsVisitor<String> {
     }
 
     @Override
-    public String visit(Operateur operateur, Tds tds) {
+    public String visit(Expr_ou expr_ou, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Expr_et expr_et, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Egal egal, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Different dif, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Inferieur inf, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(InferieurEgal infEgal, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Superieur sup, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(SuperieurEgal supEgal, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Plus plus, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Minus minus, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Division div, Tds tds) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(Multiplication mult, Tds tds) {
         // TODO Auto-generated method stub
         return null;
     }
