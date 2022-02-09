@@ -2,9 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.*;
 
-public class Sizeof implements Ast {
-
-    public int line;
+public class Sizeof extends Line implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -17,7 +15,7 @@ public class Sizeof implements Ast {
     public Ast name;
 
     public Sizeof(Ast name, int line) {
+        super(line);
         this.name = name;
-        this.line = line;
     }
 }
