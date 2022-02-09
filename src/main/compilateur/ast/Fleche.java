@@ -1,25 +1,20 @@
 package compilateur.ast;
 
-import compilateur.TDS.*;
+import compilateur.tds.Tds;
+import compilateur.tds.TdsVisitor;
 
-public class Fleche implements Ast {
+public class Fleche extends Operateur {
 
-    public int line;
-
-    public <T> T accept(AstVisitor<T> visitor){
+    public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
+    @Override
     public <T> T accept(TdsVisitor<T> visitor, Tds tds) {
         return visitor.visit(this, tds);
     }
 
-    public Ast left;
-    public Ast right;
-
     public Fleche(Ast left, Ast right, int line) {
-        this.left = left;
-        this.right = right;
-        this.line = line;
+        super(left, right, line);
     }
 }

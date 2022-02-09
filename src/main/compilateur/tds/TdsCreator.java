@@ -1,6 +1,7 @@
-package compilateur.TDS;
+package compilateur.tds;
 
 import java.util.ArrayList;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
@@ -10,11 +11,6 @@ import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
 import compilateur.ast.DeclVarStruct;
 import compilateur.ast.Decl_typ;
-import compilateur.ast.Different;
-import compilateur.ast.Division;
-import compilateur.ast.Egal;
-import compilateur.ast.Expr_et;
-import compilateur.ast.Expr_ou;
 import compilateur.ast.Fichier;
 import compilateur.ast.Fleche;
 import compilateur.ast.Idf;
@@ -22,26 +18,25 @@ import compilateur.ast.IdfParenthesis;
 import compilateur.ast.IdfParenthesisEmpty;
 import compilateur.ast.IfThen;
 import compilateur.ast.IfThenElse;
-import compilateur.ast.Inferieur;
-import compilateur.ast.InferieurEgal;
 import compilateur.ast.IntNode;
-import compilateur.ast.Minus;
-import compilateur.ast.Multiplication;
+import compilateur.ast.MoinsUnaire;
+import compilateur.ast.Negation;
+import compilateur.ast.Operateur;
 import compilateur.ast.ParamInt;
 import compilateur.ast.ParamListMulti;
 import compilateur.ast.ParamStruct;
-import compilateur.ast.Plus;
 import compilateur.ast.Return;
 import compilateur.ast.Semicolon;
 import compilateur.ast.Sizeof;
-import compilateur.ast.Superieur;
-import compilateur.ast.SuperieurEgal;
-import compilateur.ast.MoinsUnaire;
-import compilateur.ast.Negation;
 import compilateur.ast.While;
 import compilateur.utils.ErrorAggregator;
 
 public class TdsCreator implements TdsVisitor<Void> {
+
+    public static final String PRINT = "print";
+    public static final String MALLOC = "malloc";
+    public static final String MAIN = "main";
+
 
     private ErrorAggregator errors = new ErrorAggregator();
     private TypeVisitor visitor = new TypeVisitor();
@@ -60,9 +55,50 @@ public class TdsCreator implements TdsVisitor<Void> {
         tds.addnumRegion(0);
         if (fichier.instructions == null)
             return null;
+
+        try {
+            SymboleInt n = new SymboleInt("n");
+            n.addDefinitionLine(-1);
+            // ajout print
+            Tds tds_print = tds.nouvelleSousTDS(PRINT); // Création d'une nouvelle Tds
+            tds_print.addSymboleParam("n", n);
+            SymboleFonction symbole_print = new SymboleFonction(PRINT, tds_print);
+            symbole_print.setReturnType("void");
+            symbole_print.addDefinitionLine(-1);
+            tds.addSymbole(PRINT, symbole_print);
+
+            // ajout malloc
+            Tds tds_malloc = tds.nouvelleSousTDS(MALLOC); // Création d'une nouvelle Tds
+            tds_malloc.addSymboleParam("n", n);
+            SymboleFonction symbole_malloc = new SymboleFonction(MALLOC, tds_print);
+            symbole_malloc.setReturnType("void_*");
+            symbole_malloc.addDefinitionLine(-1);
+            tds.addSymbole(MALLOC, symbole_malloc);
+        } catch (SymbolAlreadyExistsException e) {
+            this.errors.addError(e);
+        }
+
         for (Ast ast : fichier.instructions) {
             ast.accept(this, tds);
         }
+
+        // test que la fonction main est présente
+        Symbole main = tds.findSymbole(MAIN);
+        if (main == null) {
+            this.errors.addError(new MainNotFoundException());
+            return null;
+        }
+        SymboleFonction f = ((SymboleFonction)main);
+        // test si le type de retour est bien int
+        if (!f.getReturnType().equals("int")) {
+            this.errors.addError(new TypeException(main.getDefinitionLine(), f.getReturnType() , "int"));
+        }
+        // test si le nombre de parametre est bien nul
+        int nb;
+        if ((nb = f.getTds().getParams().size()) != 0) {
+            this.errors.addError(new NumberParameterException(f.getName(), f.getDefinitionLine(), 0, nb));
+        }
+
         return null;
     }
 
@@ -96,7 +132,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         // Récupération de la structure
         SymboleStructContent struct;
-        struct = tds.findSymboleStruct("struct_" + structName);
+        struct = tds.findSymboleStruct(TYPESTRUCT + structName);
 
         if (struct == null) {
             errors.addError(new UndefinedStructureException(structName, declVarStruct.line));
@@ -124,11 +160,11 @@ public class TdsCreator implements TdsVisitor<Void> {
         SymboleStructContent symboleStruct = new SymboleStructContent(idf);
         symboleStruct.addDefinitionLine(decl_typ.line);
 
-        Tds structTds = tds.nouvelleSousTDS("struct_" + idf);
+        Tds structTds = tds.nouvelleSousTDS(TYPESTRUCT + idf);
         symboleStruct.setTds(structTds);
 
         try {
-            tds.addSymbole("struct_" + idf, symboleStruct);
+            tds.addSymbole(TYPESTRUCT + idf, symboleStruct);
         } catch (SymbolAlreadyExistsException e) {
             errors.addError(e);
         }
@@ -164,8 +200,20 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
         }
 
+        boolean asReturn = false;
         if (declFctInt.bloc != null) {
+            for (Ast ast : ((Bloc) declFctInt.bloc).instList) {
+                if (ast instanceof Return) {
+                    asReturn = true;
+                    break;
+                }
+            }
+            if (!asReturn) {
+                this.errors.addError(new ReturnFunctionException(declFctInt.line));
+            }
             declFctInt.bloc.accept(this, tdsFunction);
+        } else {
+            this.errors.addError(new ReturnFunctionException(declFctInt.line));
         }
         return null;
     }
@@ -177,10 +225,15 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         Tds tdsFunction = tds.nouvelleSousTDS("fn_" + functionName); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
-        symboleFonction.setReturnType("struct_" + structName);
+        symboleFonction.setReturnType(TYPESTRUCT + structName);
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
-        if (!(tds.findSymbole(structName) instanceof SymboleStructContent)) {
+        try {
+            tds.addSymbole(functionName, symboleFonction);
+        } catch (SymbolAlreadyExistsException e) {
+            errors.addError(e);
+        }
+        if (tds.findSymboleStruct(TYPESTRUCT + structName) == null) {
             // Si le type de struct n'existe pas
             errors.addError(new UndefinedStructureException(structName, declFctStruct.line));
         }
@@ -193,8 +246,20 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
         }
 
+        boolean asReturn = false;
         if (declFctStruct.bloc != null) {
+            for (Ast ast : ((Bloc) declFctStruct.bloc).instList) {
+                if (ast instanceof Return) {
+                    asReturn = true;
+                    break;
+                }
+            }
+            if (!asReturn) {
+                this.errors.addError(new ReturnFunctionException(declFctStruct.line));
+            }
             declFctStruct.bloc.accept(this, tdsFunction);
+        } else {
+            this.errors.addError(new ReturnFunctionException(declFctStruct.line));
         }
         return null;
     }
@@ -225,7 +290,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         // Récupération de la structure
         SymboleStructContent struct;
-        struct = tds.findSymboleStruct("struct_" + structName);
+        struct = tds.findSymboleStruct(TYPESTRUCT + structName);
 
         if (struct == null) {
             errors.addError(new UndefinedStructureException(structName, paramStruct.line));
@@ -265,6 +330,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IfThen ifThen, Tds tds) {
+        ifThen.condition.accept(visitor, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         ifThen.thenBlock.accept(this, newTds);
         return null;
@@ -272,6 +338,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(IfThenElse ifThenElse, Tds tds) {
+        ifThenElse.condition.accept(visitor, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         Tds newTdsElse = tds.nouvelleSousTDS("elseblock");
         ifThenElse.thenBlock.accept(this, newTds);
@@ -337,235 +404,36 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Affectation affectation, Tds tds) {
-        String leftType = affectation.left.accept(visitor, tds);
-        String rightType = affectation.right.accept(visitor, tds);
-        if (leftType == null) {
-            return null;
-        }
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(affectation.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Expr_ou expr_ou, Tds tds) {
-        Idf idfLeft = (Idf) expr_ou.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(expr_ou.left.toString(), expr_ou.line));
-            return null;
-        }
-        String leftType = expr_ou.left.accept(visitor, tds);
-        String rightType = expr_ou.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(expr_ou.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Expr_et expr_et, Tds tds) {
-        Idf idfLeft = (Idf) expr_et.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(expr_et.left.toString(), expr_et.line));
-            return null;
-        }
-        String leftType = expr_et.left.accept(visitor, tds);
-        String rightType = expr_et.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(expr_et.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Egal egal, Tds tds) {
-        Idf idfLeft = (Idf) egal.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(egal.left.toString(), egal.line));
-            return null;
-        }
-        String leftType = egal.left.accept(visitor, tds);
-        String rightType = egal.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(egal.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Different dif, Tds tds) {
-        Idf idfLeft = (Idf) dif.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(dif.left.toString(), dif.line));
-            return null;
-        }
-        String leftType = dif.left.accept(visitor, tds);
-        String rightType = dif.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(dif.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Inferieur inf, Tds tds) {
-        Idf idfLeft = (Idf) inf.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(inf.left.toString(), inf.line));
-            return null;
-        }
-        String leftType = inf.left.accept(visitor, tds);
-        String rightType = inf.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(inf.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(InferieurEgal infEgal, Tds tds) {
-        Idf idfLeft = (Idf) infEgal.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(infEgal.left.toString(), infEgal.line));
-            return null;
-        }
-        String leftType = infEgal.left.accept(visitor, tds);
-        String rightType = infEgal.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(infEgal.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Superieur sup, Tds tds) {
-        Idf idfLeft = (Idf) sup.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(sup.left.toString(), sup.line));
-            return null;
-        }
-        String leftType = sup.left.accept(visitor, tds);
-        String rightType = sup.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(sup.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(SuperieurEgal supEgal, Tds tds) {
-        Idf idfLeft = (Idf) supEgal.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(supEgal.left.toString(), supEgal.line));
-            return null;
-        }
-        String leftType = supEgal.left.accept(visitor, tds);
-        String rightType = supEgal.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(supEgal.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Plus plus, Tds tds) {
-        Idf idfLeft = (Idf) plus.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(plus.left.toString(), plus.line));
-            return null;
-        }
-        String leftType = plus.left.accept(visitor, tds);
-        String rightType = plus.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(plus.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Minus minus, Tds tds) {
-        Idf idfLeft = (Idf) minus.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(minus.left.toString(), minus.line));
-            return null;
-        }
-        String leftType = minus.left.accept(visitor, tds);
-        String rightType = minus.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(minus.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Division div, Tds tds) {
-        Idf idfLeft = (Idf) div.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(div.left.toString(), div.line));
-            return null;
-        }
-        String leftType = div.left.accept(visitor, tds);
-        String rightType = div.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(div.line, rightType, leftType));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visit(Multiplication mult, Tds tds) {
-        Idf idfLeft = (Idf) mult.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(mult.left.toString(), mult.line));
-            return null;
-        }
-        String leftType = mult.left.accept(visitor, tds);
-        String rightType = mult.right.accept(visitor, tds);
-        if (!leftType.equals(rightType)) {
-            errors.addError(new TypeException(mult.line, rightType, leftType));
-        }
+        affectation.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Fleche fleche, Tds tds) {
-        Idf idfLeft = (Idf) fleche.left;
-        if (tds.findSymbole(idfLeft.name) == null) {
-            errors.addError(new UndefinedSymboleException(fleche.left.toString(), fleche.line));
-            return null;
-        }
-        String leftType = fleche.left.accept(visitor, tds);
-        Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
-
-        String rightType = fleche.right.accept(visitor, tdsStruct);
-        if (rightType == null) {
-            errors.addError(new TypeException(fleche.line, rightType, leftType));
-        }
+        fleche.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(MoinsUnaire unaire, Tds tds) {
-        String type = unaire.accept(visitor, tds);
-        if (!type.equals("int")) {
-            return null;
-        }
-        errors.addError(new UnauthorizedOperationException(unaire.line));
+        unaire.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Negation unaire, Tds tds) {
-        String type = unaire.accept(visitor, tds);
-        if (type == null) {
-            errors.addError(new UnauthorizedOperationException(unaire.line));
-        }
+        unaire.accept(visitor, tds);
         return null;
     }
 
     @Override
     public Void visit(Semicolon semicolon, Tds tds) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Operateur operateur, Tds tds) {
+        operateur.accept(visitor, tds);
         return null;
     }
 

@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
-import compilateur.TDS.Symbole;
-import compilateur.TDS.SymboleStructContent;
-import compilateur.TDS.SymboleVar;
-import compilateur.TDS.SymboleFonction;
-import compilateur.TDS.SymboleInt;
-import compilateur.TDS.SymboleStruct;
-import compilateur.TDS.Tds;
+import compilateur.tds.Symbole;
+import compilateur.tds.SymboleFonction;
+import compilateur.tds.SymboleInt;
+import compilateur.tds.SymboleStruct;
+import compilateur.tds.SymboleStructContent;
+import compilateur.tds.SymboleVar;
+import compilateur.tds.Tds;
 
 
 public class GraphVizTdsVisitor {
@@ -66,7 +65,7 @@ public class GraphVizTdsVisitor {
                 tableContent += String.format("<tr><td> %s </td> <td> int </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleStruct){
                 SymboleStruct sym = (SymboleStruct) symbole;
-                tableContent += String.format("<tr><td> %s </td> <td> struct %s </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getStruct().getName(), sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
+                tableContent += String.format("<tr><td> %s </td> <td> struct %s </td> <td> %d </td> <td> %s </td> <td> line . %d  </td> </tr>", sym.getName(), sym.getStruct()!=null ? sym.getStruct().getName():"undefined struct", sym.getDeplacement(), sym.isParam()? "oui (index: " + sym.getParamIndex()+ ")":"non", sym.getDefinitionLine() );
             } else if(symbole instanceof SymboleStructContent){
                 SymboleStructContent sym = (SymboleStructContent) symbole;
                 tableContent += String.format("<tr><td> struct_%s </td> <td> struct_type </td> <td> </td> <td> </td>  <td> line . %d  </td> </tr>", sym.getName(), sym.getDefinitionLine() );
