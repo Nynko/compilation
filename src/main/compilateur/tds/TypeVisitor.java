@@ -64,7 +64,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (sym instanceof SymboleInt) {
             return "int";
         } else if (sym instanceof SymboleStruct symstruct) {
-            return TYPESTRUCT + symstruct.getStruct().getName();
+            return symstruct.getType();
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return TYPESTRUCT + symstructcontent.getName();
         } else {
@@ -224,7 +224,7 @@ public class TypeVisitor implements TdsVisitor<String> {
                 || this.isPointer(leftType) && this.isPointer(rightType)) {
             if (leftType.equals("int") && this.isPointer(rightType)
                     || this.isPointer(leftType) && rightType.equals("int")
-                    || !rightType.equals("void_*") && this.isPointer(leftType) && this.isPointer(rightType)
+                    || this.isPointer(leftType) && this.isPointer(rightType)
                             && !this.isCompatible(leftType, rightType)) {
                 errors.addError(new TypeWarningException(affectation.line, rightType, leftType));
             }
@@ -253,6 +253,7 @@ public class TypeVisitor implements TdsVisitor<String> {
         if (leftType == null) {
             return null;
         }
+        leftType = leftType.replace("_*", "");
         Tds tdsStruct = tds.findSymboleStruct(leftType).getTds();
         String rightType = fleche.right.accept(this, tdsStruct);
 
@@ -371,7 +372,7 @@ public class TypeVisitor implements TdsVisitor<String> {
     }
 
     private boolean isPointer(String type) {
-        return type.startsWith(TYPESTRUCT) || type.endsWith("*");
+        return type.endsWith("*");
     }
 
     private boolean testIfIsIdfAndInitialized(Ast ast, Tds tds, int line) {

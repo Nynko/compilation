@@ -14,4 +14,8 @@ public class SymboleStructContent extends Symbole{
     public Tds getTds() {
         return this.tds;
     }
+
+    public String getType() {
+        return TdsVisitor.TYPESTRUCT + this.getName();
+    }
 }

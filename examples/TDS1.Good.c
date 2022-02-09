@@ -13,6 +13,12 @@ struct b{
     int f;
 };
 
+struct a * f(){
+    struct a* pa;
+    pa = malloc(sizeof(struct a));
+    return pa;
+}
+
 
 int main(){
     int condition;

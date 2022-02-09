@@ -11,4 +11,8 @@ public class SymboleStruct extends SymboleVar {
     public SymboleStructContent getStruct() {
         return this.struct;
     }
+
+    public String getType() {
+        return this.struct.getType() + "_*";
+    }
 }

@@ -225,7 +225,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
         Tds tdsFunction = tds.nouvelleSousTDS("fn_" + functionName); // Création d'une nouvelle Tds
         SymboleFonction symboleFonction = new SymboleFonction(functionName, tdsFunction);
-        symboleFonction.setReturnType(TYPESTRUCT + structName);
+        symboleFonction.setReturnType(TYPESTRUCT + structName + "_*");
         symboleFonction.addDefinitionLine(declFctStruct.line);
 
         try {
