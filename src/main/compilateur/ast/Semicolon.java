@@ -2,9 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.*;
 
-public class Semicolon implements Ast {
-
-    public int line;
+public class Semicolon extends Line implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -15,6 +13,6 @@ public class Semicolon implements Ast {
     }
 
     public Semicolon(int line) {
-        this.line = line;
+        super(line);
     }
 }

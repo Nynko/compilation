@@ -337,6 +337,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
             return leftType;
         } else {
+            // et / ou logique
             if (operateur instanceof Expr_et || operateur instanceof Expr_ou) {
                 return "int";
             }

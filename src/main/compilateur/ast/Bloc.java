@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import compilateur.tds.*;
 
-public class Bloc implements Ast{
-
-    public int line;
+public class Bloc extends Line implements Ast{
 
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
@@ -19,8 +17,8 @@ public class Bloc implements Ast{
     public ArrayList<Ast> instList;
 
     public Bloc(ArrayList<Ast> instList, int line) {
+        super(line);
         this.instList = instList;
-        this.line = line;
     }
 
 }

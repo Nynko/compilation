@@ -2,9 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.*;
 
-public class Return implements Ast {
-
-    public int line;
+public class Return extends Line implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -17,8 +15,8 @@ public class Return implements Ast {
     public Ast expr;
 
     public Return(Ast expr, int line) {
+        super(line);
         this.expr = expr;
-        this.line = line;
     }
 
 }
