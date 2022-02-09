@@ -1,6 +1,6 @@
 package compilateur.ast;
 
-import compilateur.TDS.*;
+import compilateur.tds.*;
 
 public class Sizeof implements Ast {
 

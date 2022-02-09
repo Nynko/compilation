@@ -8,7 +8,6 @@ struct a{
 
 struct b{
     struct a * c;
-    int c;
     int d;
     int e;
     int f;
@@ -17,7 +16,6 @@ struct b{
 
 int main(){
     int condition;
-
     if(condition){
         {
             int a;
@@ -30,6 +28,7 @@ int main(){
     else{
         int a;
         int condition;
+        a + condition;
         while(condition){
             int d;
             {
