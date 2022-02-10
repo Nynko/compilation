@@ -2,7 +2,7 @@ package compilateur.ARMGenerator;
 
 public class StringAggregator {
 
-    StringBuilder stringBuilder ;
+    private StringBuilder stringBuilder ;
 
     public StringAggregator(){
         stringBuilder = new StringBuilder();

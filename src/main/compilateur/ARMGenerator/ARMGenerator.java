@@ -41,7 +41,7 @@ import compilateur.tds.Tds;
 
 public class ARMGenerator implements ARMVisitor<String> {
 
-    StringAggregator stringAggregator;
+    private StringAggregator stringAggregator;
 
     public ARMGenerator(){
         stringAggregator = new StringAggregator();
