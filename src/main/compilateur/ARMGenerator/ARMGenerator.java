@@ -41,6 +41,12 @@ import compilateur.tds.Tds;
 
 public class ARMGenerator implements ARMVisitor<String> {
 
+    StringAggregator stringAggregator;
+
+    public ARMGenerator(){
+        stringAggregator = new StringAggregator();
+    }
+
     @Override
     public String visit(Fichier fichier, Tds tds) {
         // TODO Auto-generated method stub
