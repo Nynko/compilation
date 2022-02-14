@@ -1,9 +1,16 @@
 package compilateur.ast;
 
+import compilateur.ARMGenerator.ARMVisitor;
+import compilateur.tds.Tds;
+
 public class Expr_et extends Operateur {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
+        return visitor.visit(this, tds);
     }
 
     public Expr_et(Ast left, Ast right, int line) {
