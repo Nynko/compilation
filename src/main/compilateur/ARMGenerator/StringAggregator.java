@@ -17,6 +17,10 @@ public class StringAggregator {
         stringBuilder.append("\n");
     }
 
+    public void appendLine(){
+        stringBuilder.append("\n");
+    }
+
     public void printString(){
         System.out.println(stringBuilder.toString());
     }
