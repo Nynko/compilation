@@ -147,12 +147,13 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(While while1, Tds tds) {
-        stringAggregator.appendLine("while" + Integer.toString(getWhileIncr()) );
+        String whileNum = Integer.toString(getWhileIncr());
+        stringAggregator.appendLine("_while" + whileNum);
         stringAggregator.appendLine(while1.condition.accept(this, tds));
-        stringAggregator.appendLine("BEQ _finWhile" + Integer.toString(getWhileIncr()));
+        stringAggregator.appendLine("BEQ _finWhile" + whileNum);
         stringAggregator.appendLine(while1.doBlock.accept(this, tds));
-        stringAggregator.appendLine("B " + "while" + Integer.toString(getWhileIncr()) );
-        stringAggregator.appendLine("_finWhile");
+        stringAggregator.appendLine("B " + "_while" +  whileNum);
+        stringAggregator.appendLine("_finWhile" + whileNum);
         stringAggregator.appendLine();
         return null;
     }
