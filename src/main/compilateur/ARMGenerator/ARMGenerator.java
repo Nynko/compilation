@@ -1,6 +1,7 @@
 package compilateur.ARMGenerator;
 
 import compilateur.ast.Affectation;
+import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.DeclFctInt;
@@ -44,6 +45,7 @@ public class ARMGenerator implements ARMVisitor<String> {
     private StringAggregator stringAggregator;
 
     private int whileCompt = 0;
+    private int ifCompt = 0;
 
     public ARMGenerator(){
         stringAggregator = new StringAggregator();
@@ -53,6 +55,12 @@ public class ARMGenerator implements ARMVisitor<String> {
         int whileInt = whileCompt;
         whileCompt ++;
         return whileInt;
+    }
+
+    private int getIfIncr(){
+        int ifInt = ifCompt;
+        ifCompt ++;
+        return ifInt;
     }
 
     @Override
@@ -135,27 +143,45 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(IfThen ifThen, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        String ifNum = Integer.toString(getIfIncr());
+        str.appendLine(";if" + ifNum); // Commentaire pour debug
+        str.appendLine(ifThen.condition.accept(this, tds));
+        str.appendLine("BEQ _finIf" + ifNum);
+        str.appendLine(ifThen.thenBlock.accept(this, tds));
+        str.appendLine("_finIf" + ifNum);
+        str.appendLine();
+        return str.getString();
     }
 
     @Override
     public String visit(IfThenElse ifThenElse, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        String ifNum = Integer.toString(getIfIncr());
+        str.appendLine(";ifThenElse" + ifNum); // Commentaire pour debug
+        str.appendLine(ifThenElse.condition.accept(this, tds));
+        str.appendLine("BEQ _else" + ifNum);
+        str.appendLine(ifThenElse.thenBlock.accept(this, tds));
+        str.appendLine("B " + "_finIf" + ifNum);
+        str.appendLine("_else" + ifNum);
+        str.appendLine(ifThenElse.elseBlock.accept(this, tds));
+        str.appendLine("_finIf" + ifNum);
+        str.appendLine();
+        return str.getString();
     }
 
     @Override
     public String visit(While while1, Tds tds) {
+        StringAggregator str = new StringAggregator();
         String whileNum = Integer.toString(getWhileIncr());
-        stringAggregator.appendLine("_while" + whileNum);
-        stringAggregator.appendLine(while1.condition.accept(this, tds));
-        stringAggregator.appendLine("BEQ _finWhile" + whileNum);
-        stringAggregator.appendLine(while1.doBlock.accept(this, tds));
-        stringAggregator.appendLine("B " + "_while" +  whileNum);
-        stringAggregator.appendLine("_finWhile" + whileNum);
-        stringAggregator.appendLine();
-        return null;
+        str.appendLine(";while" + whileNum); // Commentaire pour debug
+        str.appendLine(while1.condition.accept(this, tds));
+        str.appendLine("BEQ _finWhile" + whileNum);
+        str.appendLine(while1.doBlock.accept(this, tds));
+        str.appendLine("B " + "_while" +  whileNum);
+        str.appendLine("_finWhile" + whileNum);
+        str.appendLine();
+        return str.getString();
     }
 
     @Override
@@ -166,8 +192,13 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Bloc bloc, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO 
+        StringAggregator str = new StringAggregator();
+        for(Ast instruction : bloc.instList){
+            str.appendString(instruction.accept(this, tds));
+        }
+        
+        return str.getString();
     }
 
     @Override
