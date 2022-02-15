@@ -5,20 +5,20 @@
 
 
 _start:
-        mov X1, #4
+        mov X1, #0
 
-
-;while1:
+;if1:
         CMP X1, #0
-        BEQ _finWhile1
+        BEQ _else1
+        ADD X1, X1, #1
+        B _finIf1
+_else1:
         SUB X1, X1, #1
-        B _while1
 
-_finWhile1:
+_finIf1:
 	B _end
 
 
-// Setup the parameters to exit the program
 _end:
         mov     X0, #0      // Use 0 return code
         mov     X16, #1     // Service command code 1 terminates this program

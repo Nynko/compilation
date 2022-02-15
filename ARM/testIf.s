@@ -16,8 +16,6 @@ _finif1:
 
 
 
-// Setup the parameters to exit the program
-// and then call Linux to do it.
 
 _end:
         mov     X0, #0      // Use 0 return code
