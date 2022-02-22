@@ -3,7 +3,7 @@ package compilateur.ast;
 import compilateur.ARMGenerator.ARMVisitor;
 import compilateur.tds.*;
 
-public class While extends Line implements Ast {
+public class While extends AstNode implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);

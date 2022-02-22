@@ -3,7 +3,7 @@ package compilateur.ast;
 import compilateur.ARMGenerator.ARMVisitor;
 import compilateur.tds.*;
 
-public class Semicolon extends Line implements Ast {
+public class Semicolon extends AstNode implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
