@@ -3,6 +3,7 @@ package compilateur.ARMGenerator;
 import compilateur.ast.Affectation;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
+import compilateur.ast.Comparaison;
 import compilateur.ast.DeclFctInt;
 import compilateur.ast.DeclFctStruct;
 import compilateur.ast.DeclVarInt;
@@ -209,48 +210,63 @@ public class ARMGenerator implements ARMVisitor<String> {
         return null;
     }
 
+    public String startCmp(Comparaison cmp, StringAggregator str, Tds tds) {
+        cmp.left.accept(this, tds);
+        //récup le registre depuis r0 dans le premier registre libre
+        cmp.right.accept(this, tds);
+        //same 
+        str.appendLine("CMP"); //TODO ajouter les registres
+        str.appendLine("MOV R0, #0");
+        return str.getString();
+    }
+
     @Override
     public String visit(Egal egal, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        startCmp(egal, str, tds);
+        str.appendLine("MOVEQ R0, #1");
+        return str.getString();
     }
 
     @Override
     public String visit(Different dif, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        startCmp(dif, str, tds);
+        str.appendLine("MOVNE R0, #1");
+        return str.getString();
     }
     
 
     @Override
     public String visit(Inferieur inf, Tds tds) {
         StringAggregator str = new StringAggregator();
-        inf.left.accept(this, tds);
-        inf.right.accept(this, tds);
-        //récup le registre où l'opération gauche est stocké
-        //récup le registre ou l'opération droite est stocké
-        str.appendLine("CMP"); //TODO ajouter les registres
-        str.appendLine("MOV R0, #0");
-        str.appendLine("MOV");
-        return null;
+        startCmp(inf, str, tds);
+        str.appendLine("MOVLT R0, #1");
+        return str.getString();
     }
 
     @Override
     public String visit(InferieurEgal infEgal, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        startCmp(infEgal, str, tds);
+        str.appendLine("MOVLE R0, #1");
+        return str.getString();
     }
 
     @Override
     public String visit(Superieur sup, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        startCmp(sup, str, tds);
+        str.appendLine("MOVGT R0, #1");
+        return str.getString();
     }
 
     @Override
     public String visit(SuperieurEgal supEgal, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        startCmp(supEgal, str, tds);
+        str.appendLine("MOVGE R0, #1");
+        return str.getString();
     }
 
     @Override
