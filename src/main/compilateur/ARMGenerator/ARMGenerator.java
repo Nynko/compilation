@@ -220,10 +220,18 @@ public class ARMGenerator implements ARMVisitor<String> {
         // TODO Auto-generated method stub
         return null;
     }
+    
 
     @Override
     public String visit(Inferieur inf, Tds tds) {
-        // TODO Auto-generated method stub
+        StringAggregator str = new StringAggregator();
+        inf.left.accept(this, tds);
+        inf.right.accept(this, tds);
+        //récup le registre où l'opération gauche est stocké
+        //récup le registre ou l'opération droite est stocké
+        str.appendLine("CMP"); //TODO ajouter les registres
+        str.appendLine("MOV R0, #0");
+        str.appendLine("MOV");
         return null;
     }
 
