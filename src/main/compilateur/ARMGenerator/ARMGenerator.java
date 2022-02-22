@@ -67,7 +67,7 @@ public class ARMGenerator implements ARMVisitor<String> {
             deplacement = sv.getDeplacement();
         }
 
-        return String.format("LDR R0, [%s #%d]\n", bp, deplacement);
+        return String.format("LDR R0, [%s #-%d]\n", bp, deplacement);
     }
 
     @Override
@@ -193,6 +193,14 @@ public class ARMGenerator implements ARMVisitor<String> {
             imbrication = tds.findImbrication(idf.name);
             // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
             // chainage statique pour mettre a jour bp
+            // chainage statique
+            if (tds.getImbrication() - imbrication != 0){
+                sb.append("MOV [R11, #4] , R7");
+                for (int i = 0; i < tds.getImbrication() - imbrication -1; i++) {
+                    sb.append("MOVE [R7], R7");
+                }
+                bp = "R7";
+            }
             Symbole s = tds.findSymbole(idf.name);
             if (s instanceof SymboleVar sv) {
                 decalage = sv.getDeplacement();
