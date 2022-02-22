@@ -37,13 +37,15 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
+import compilateur.tds.Symbole;
+import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
 
 public class ARMGenerator implements ARMVisitor<String> {
 
     private StringAggregator stringAggregator;
 
-    public ARMGenerator(){
+    public ARMGenerator() {
         stringAggregator = new StringAggregator();
     }
 
@@ -55,8 +57,17 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Idf idf, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        String bp = "R12";
+        int imbrication = tds.findImbrication(idf.name);
+        // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
+        // chainage statique pour mettre a jour bp
+        int deplacement = 0;
+        Symbole s = tds.findSymbole(idf.name);
+        if (s instanceof SymboleVar sv) {
+            deplacement = sv.getDeplacement();
+        }
+
+        return String.format("LDR R0, [%s #%d]\n", bp, deplacement);
     }
 
     @Override
@@ -163,14 +174,42 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(IntNode intNode, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        return String.format("LDR R0, =%d\n", intNode.parseInt);
     }
 
     @Override
     public String visit(Affectation affectation, Tds tds) {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder sb = new StringBuilder();
+        // on recupere le code assembleur de la partie droite de l'affectation, le code
+        // retourne le resultat de l'expression dans R0
+        sb.append(affectation.right.accept(this, tds));
+
+        // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
+        int decalage = 0;
+        String bp = "R11";
+        int imbrication;
+
+        if (affectation.left instanceof Idf idf) {
+            imbrication = tds.findImbrication(idf.name);
+            // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
+            // chainage statique pour mettre a jour bp
+            Symbole s = tds.findSymbole(idf.name);
+            if (s instanceof SymboleVar sv) {
+                decalage = sv.getDeplacement();
+            }
+        } else if (affectation.left instanceof Fleche fleche) {
+            // a->b ou type(b) = int
+            // decalage = decalage de a + decalage de b
+            // @a->b = base de declaration de a + decalage 
+            Idf idf = (Idf) fleche.right;
+            Symbole s = tds.findSymbole(idf.name);
+
+            if (s instanceof SymboleVar sv) {
+                decalage = sv.getDeplacement();
+            }
+        }
+        sb.append(String.format("STR R0, [%s #%d]", bp, decalage));
+        return sb.toString();
     }
 
     @Override
@@ -269,6 +308,4 @@ public class ARMGenerator implements ARMVisitor<String> {
         return null;
     }
 
-
-    
 }

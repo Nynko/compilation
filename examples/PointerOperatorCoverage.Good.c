@@ -76,6 +76,7 @@ int main(){
 }
 
 /*
+./examples/PointerOperatorCoverage.Good.c:21:8: warning: incompatible pointer types assigning to 'struct b *' from 'struct a *'
 examples/PointerOperatorCoverage.Good.c:20:8: warning: incompatible integer to pointer conversion assigning to 'struct b *' from 'int'
 examples/PointerOperatorCoverage.Good.c:21:7: warning: incompatible pointer to integer conversion assigning to 'int' from 'struct a *'
 examples/TDS5.Good.c:24:5: error: invalid argument type 'struct a *' to unary expression
@@ -104,7 +105,7 @@ examples/TDS5.Good.c:64:7: warning: ordered comparison between pointer and integ
 examples/TDS5.Good.c:65:7: warning: ordered comparison between pointer and integer ('int' and 'struct b *')
 examples/TDS5.Good.c:66:7: warning: ordered comparison between pointer and integer ('int' and 'struct b *')
 
-13 erreurs 14 warnings
+13 erreurs 15 warnings
 
 a voir si l'on rajoute ces warnings
 examples/TDS5.Good.c:41:8: warning: self-comparison always evaluates to false [-Wtautological-compare]
