@@ -22,6 +22,7 @@ public class ParamListMulti extends AstNode implements Ast {
     public ArrayList<Ast> paramList;
 
     public ParamListMulti(ArrayList<Ast> paramList) {
+        super(-1);
         this.paramList = paramList;
     }
 }
