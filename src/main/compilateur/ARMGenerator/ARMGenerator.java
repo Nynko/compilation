@@ -37,7 +37,6 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
-import compilateur.tds.Tds;
 
 public class ARMGenerator implements ARMVisitor<String> {
 
@@ -48,223 +47,223 @@ public class ARMGenerator implements ARMVisitor<String> {
     }
 
     @Override
-    public String visit(Fichier fichier, Tds tds) {
+    public String visit(Fichier fichier) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Idf idf, Tds tds) {
+    public String visit(Idf idf) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclVarInt declVarInt, Tds tds) {
+    public String visit(DeclVarInt declVarInt) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclVarStruct declVarStruct, Tds tds) {
+    public String visit(DeclVarStruct declVarStruct) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Decl_typ decl_typ, Tds tds) {
+    public String visit(Decl_typ decl_typ) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclFctInt declFctInt, Tds tds) {
+    public String visit(DeclFctInt declFctInt) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclFctStruct declFctStruct, Tds tds) {
+    public String visit(DeclFctStruct declFctStruct) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ParamListMulti paramListMulti, Tds tds) {
+    public String visit(ParamListMulti paramListMulti) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ParamInt paramInt, Tds tds) {
+    public String visit(ParamInt paramInt) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ParamStruct paramStruct, Tds tds) {
+    public String visit(ParamStruct paramStruct) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Sizeof sizeof, Tds tds) {
+    public String visit(Sizeof sizeof) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IdfParenthesis idfParenthesis, Tds tds) {
+    public String visit(IdfParenthesis idfParenthesis) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IdfParenthesisEmpty idfParenthesisEmpty, Tds tds) {
+    public String visit(IdfParenthesisEmpty idfParenthesisEmpty) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IfThen ifThen, Tds tds) {
+    public String visit(IfThen ifThen) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IfThenElse ifThenElse, Tds tds) {
+    public String visit(IfThenElse ifThenElse) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(While while1, Tds tds) {
+    public String visit(While while1) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Return return1, Tds tds) {
+    public String visit(Return return1) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Bloc bloc, Tds tds) {
+    public String visit(Bloc bloc) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(CharNode charNode, Tds tds) {
+    public String visit(CharNode charNode) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IntNode intNode, Tds tds) {
+    public String visit(IntNode intNode) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Affectation affectation, Tds tds) {
+    public String visit(Affectation affectation) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Fleche fleche, Tds tds) {
+    public String visit(Fleche fleche) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(MoinsUnaire unaire, Tds tds) {
+    public String visit(MoinsUnaire unaire) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Negation unaire, Tds tds) {
+    public String visit(Negation unaire) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Semicolon semicolon, Tds tds) {
+    public String visit(Semicolon semicolon) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Expr_ou expr_ou, Tds tds) {
+    public String visit(Expr_ou expr_ou) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Expr_et expr_et, Tds tds) {
+    public String visit(Expr_et expr_et) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Egal egal, Tds tds) {
+    public String visit(Egal egal) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Different dif, Tds tds) {
+    public String visit(Different dif) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Inferieur inf, Tds tds) {
+    public String visit(Inferieur inf) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(InferieurEgal infEgal, Tds tds) {
+    public String visit(InferieurEgal infEgal) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Superieur sup, Tds tds) {
+    public String visit(Superieur sup) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(SuperieurEgal supEgal, Tds tds) {
+    public String visit(SuperieurEgal supEgal) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Plus plus, Tds tds) {
+    public String visit(Plus plus) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Minus minus, Tds tds) {
+    public String visit(Minus minus) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Division div, Tds tds) {
+    public String visit(Division div) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Multiplication mult, Tds tds) {
+    public String visit(Multiplication mult) {
         // TODO Auto-generated method stub
         return null;
     }
