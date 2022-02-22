@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import compilateur.ARMGenerator.ARMVisitor;
 import compilateur.tds.*;
 
-public class DeclVarStruct extends Line implements Ast {
+public class DeclVarStruct extends AstNode implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);

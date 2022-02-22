@@ -3,7 +3,7 @@ package compilateur.ast;
 import compilateur.tds.Tds;
 import compilateur.tds.TdsVisitor;
 
-public abstract class Operateur extends Line implements Ast {
+public abstract class Operateur extends AstNode implements Ast {
     public Ast left;
     public Ast right;
 
