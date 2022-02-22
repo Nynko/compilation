@@ -3,7 +3,7 @@ package compilateur.ast;
 import compilateur.ARMGenerator.ARMVisitor;
 import compilateur.tds.*;
 
-public class IfThenElse extends Line implements Ast {
+public class IfThenElse extends AstNode implements Ast {
 
     public int lineElse;
 

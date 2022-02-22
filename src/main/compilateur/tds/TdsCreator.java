@@ -18,7 +18,7 @@ import compilateur.ast.IdfParenthesis;
 import compilateur.ast.IdfParenthesisEmpty;
 import compilateur.ast.IfThen;
 import compilateur.ast.IfThenElse;
-import compilateur.ast.Line;
+import compilateur.ast.AstNode;
 import compilateur.ast.IntNode;
 import compilateur.ast.MoinsUnaire;
 import compilateur.ast.Negation;
@@ -263,7 +263,7 @@ public class TdsCreator implements TdsVisitor<Void> {
             // verifie si il y a un return dans le bloc
             for (int index = 0; index < bloc.instList.size(); index++) {
                 if (asReturn) {
-                    this.errors.addError(new CodeNeverUseWarningException(((Line) bloc.instList.get(index)).line));
+                    this.errors.addError(new CodeNeverUseWarningException(((AstNode) bloc.instList.get(index)).line));
                 } else {
                     Ast a = bloc.instList.get(index);
                     if (a instanceof Return) {
@@ -290,7 +290,7 @@ public class TdsCreator implements TdsVisitor<Void> {
             }
             if (asReturn) {
                 for (int i = indexReturn + 1; i < bloc.instList.size(); i++) {
-                    this.errors.addError(new CodeNeverUseWarningException(((Line) bloc.instList.get(i)).line));
+                    this.errors.addError(new CodeNeverUseWarningException(((AstNode) bloc.instList.get(i)).line));
                 }
             }
         }

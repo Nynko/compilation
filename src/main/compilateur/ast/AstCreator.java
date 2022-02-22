@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import compilateur.grammar.circBaseVisitor;
 import compilateur.grammar.circParser;
 
-public class AstCreator extends circBaseVisitor<Ast>{
+public class AstCreator extends circBaseVisitor<Ast> {
 
 
 	/**
