@@ -101,8 +101,26 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(DeclFctStruct declFctStruct) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        // On ajoute le nom de la fonction pour pouvoir faire le jump
+        str.appendLine(declFctStruct.Idf.toString());
+        // Sauvegarde du pointeur de base
+        str.appendLine("MOV		R11, R13");
+        // Sauvegarde de l'adresse de retour
+        str.appendLine("STR		LR, [R13, #4]!");
+        
+        String blocContent = declFctStruct.bloc.accept(this);
+
+        str.appendLine(blocContent);
+        
+        
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV		R13, R11");
+        int numParams = declFctStruct.getTds().getParams().size();
+        str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
+        // Récupération de l'addresse de retour et retour à l'appelant
+        str.appendLine("LDR		PC, [R11, #4]");
+        return str.getString();
     }
 
     @Override
