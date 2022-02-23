@@ -1,7 +1,6 @@
 package compilateur.ast;
 
 import compilateur.ARMGenerator.ARMVisitor;
-import compilateur.tds.Tds;
 
 public class Minus extends Operateur {
 
@@ -9,9 +8,7 @@ public class Minus extends Operateur {
         return visitor.visit(this);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor){
-        return visitor.visit(this);
-    }
+
 
     public Minus(Ast left, Ast right, int line) {
         super(left, right, line);

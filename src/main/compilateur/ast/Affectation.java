@@ -15,9 +15,7 @@ public class Affectation extends Operateur {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor){
-        return visitor.visit(this);
-    }
+
 
     public Affectation(Ast left, Ast right, int line) {
         super(left, right, line);

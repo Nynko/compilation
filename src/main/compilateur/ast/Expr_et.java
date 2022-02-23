@@ -1,7 +1,6 @@
 package compilateur.ast;
 
 import compilateur.ARMGenerator.ARMVisitor;
-import compilateur.tds.Tds;
 
 public class Expr_et extends Operateur {
 
@@ -9,9 +8,7 @@ public class Expr_et extends Operateur {
         return visitor.visit(this);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor){
-        return visitor.visit(this);
-    }
+
 
     public Expr_et(Ast left, Ast right, int line) {
         super(left, right, line);

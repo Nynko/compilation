@@ -13,9 +13,7 @@ public class IfThen extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor){
-        return visitor.visit(this);
-    }
+
 
     public Ast condition;
     public Ast thenBlock;

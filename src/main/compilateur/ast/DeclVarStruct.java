@@ -15,9 +15,7 @@ public class DeclVarStruct extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor){
-        return visitor.visit(this);
-    }
+
 
     public ArrayList<Ast> idf;
 

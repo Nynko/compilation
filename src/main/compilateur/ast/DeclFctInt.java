@@ -4,7 +4,7 @@ import compilateur.ARMGenerator.ARMVisitor;
 import compilateur.tds.*;
 
 /**
- * Declaration of a function returning an int
+ * Déclaration d'une fonction qui retourne un int
  */
 public class DeclFctInt extends AstNode implements Ast {
 
@@ -16,12 +16,13 @@ public class DeclFctInt extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
     
-    public <T> T accept(ARMVisitor<T> visitor){
-        return visitor.visit(this);
-    }
 
+
+    /** Le nom de la fonction */
     public Ast Idf;
+    /** La liste des parametres de la fonction */
     public Ast param;
+    /** Le bloc d'intructions de la fonction */
     public Ast bloc;
 
     public DeclFctInt(Ast idf, Ast param, Ast bloc, int line) {

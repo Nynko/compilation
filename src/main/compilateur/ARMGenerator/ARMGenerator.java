@@ -2,6 +2,7 @@ package compilateur.ARMGenerator;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
+import compilateur.ast.AstVisitor;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.Comparaison;
@@ -40,15 +41,14 @@ import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
 
-public class ARMGenerator implements ARMVisitor<String> {
+public class ARMGenerator implements AstVisitor<String> {
 
-    private StringAggregator stringAggregator;
 
     private int whileCompt = 0;
     private int ifCompt = 0;
 
     public ARMGenerator(){
-        stringAggregator = new StringAggregator();
+
     }
 
     private int getWhileIncr(){
@@ -65,8 +65,33 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Fichier fichier) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+
+        str.appendLine("BL _main");
+        str.appendLine("B __end__");
+
+        for (Ast ast : fichier.instructions) {
+            String code = ast.accept(this);
+            str.appendLine(code);
+        }
+
+        // Ajout de la macro de sauvegarde des registres
+        str.appendLine("__save_reg__");
+        str.appendLine("\t\tSTMFA	R13!, {R1-R12}");
+        str.appendLine("\t\tMOV		PC, LR");
+        str.appendLine();
+
+        // Ajout de la macro de restauration des registres
+        str.appendLine("__restore_reg__");
+        str.appendLine("\t\tLDMFA	R13!, {R1-R12}");
+        str.appendLine("\t\tMOV		PC, LR");
+        str.appendLine();
+
+        // On place un label end à la fin de programme pour le quitter
+        // (l'instruction END n'est pas reconnue par le vrai ARM)
+        str.appendLine("__end__");
+
+        return str.getString();
     }
 
     @Override
@@ -97,7 +122,7 @@ public class ARMGenerator implements ARMVisitor<String> {
     public String visit(DeclFctInt declFctInt) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendLine(declFctInt.Idf.toString());
+        str.appendFormattedLine("_%s",((Idf)declFctInt.Idf).name);
         // Sauvegarde du pointeur de base
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'adresse de retour
@@ -119,8 +144,26 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(DeclFctStruct declFctStruct) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        // On ajoute le nom de la fonction pour pouvoir faire le jump
+        str.appendFormattedLine("_%s",((Idf)declFctStruct.Idf1).name);
+        // Sauvegarde du pointeur de base
+        str.appendLine("MOV		R11, R13");
+        // Sauvegarde de l'adresse de retour
+        str.appendLine("STR		LR, [R13, #4]!");
+        
+        String blocContent = declFctStruct.bloc.accept(this);
+
+        str.appendLine(blocContent);
+        
+        
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV		R13, R11");
+        int numParams = declFctStruct.getTds().getParams().size();
+        str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
+        // Récupération de l'addresse de retour et retour à l'appelant
+        str.appendLine("LDR		PC, [R11, #4]");
+        return str.getString();
     }
 
     @Override
@@ -149,8 +192,23 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+
+        // Sauvegarde des registres
+        str.appendLine("BL		__save_reg__");
+
+        // Ajout des parametres à la pile
+        for(Ast param: idfParenthesis.exprList) {
+            
+        }
+
+        // Appel de la fonction
+        str.appendFormattedLine("BL 		_%s", ((Idf)idfParenthesis.idf).name);
+
+        // Restauration des registres
+        str.appendLine("BL		__restore_reg__");
+
+        return str.getString();
     }
 
     @Override
