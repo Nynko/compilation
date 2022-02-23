@@ -270,8 +270,14 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Plus plus) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        plus.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE R1, R0");
+        plus.right.accept(this);
+        str.appendLine("ADD R0, R0, R1");
+        // TODO recup R1
+        return str.getString();
     }
 
     @Override
