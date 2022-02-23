@@ -162,7 +162,7 @@ public class ARMGenerator implements ARMVisitor<String> {
         str.appendLine(ifThenElse.condition.accept(this, tds));
         str.appendLine("BEQ _else" + ifNum);
         str.appendLine(ifThenElse.thenBlock.accept(this, tds));
-        str.appendLine("B " + "_finIf" + ifNum);
+        str.appendLine("B  _finIf" + ifNum);
         str.appendLine("_else" + ifNum);
         str.appendLine(ifThenElse.elseBlock.accept(this, tds));
         str.appendLine("_finIf" + ifNum);
@@ -174,11 +174,12 @@ public class ARMGenerator implements ARMVisitor<String> {
     public String visit(While while1, Tds tds) {
         StringAggregator str = new StringAggregator();
         String whileNum = Integer.toString(getWhileIncr());
-        str.appendLine(";while" + whileNum); // Commentaire pour debug
+        str.appendLine("_while" + whileNum); 
         str.appendLine(while1.condition.accept(this, tds));
+        //TODO RO
         str.appendLine("BEQ _finWhile" + whileNum);
         str.appendLine(while1.doBlock.accept(this, tds));
-        str.appendLine("B " + "_while" +  whileNum);
+        str.appendLine("B _while" +  whileNum);
         str.appendLine("_finWhile" + whileNum);
         str.appendLine();
         return str.getString();
