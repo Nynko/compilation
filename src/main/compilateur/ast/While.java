@@ -1,6 +1,6 @@
 package compilateur.ast;
 
-import compilateur.ARMGenerator.;
+
 import compilateur.tds.*;
 
 public class While extends AstNode implements Ast {
