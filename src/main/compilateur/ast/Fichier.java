@@ -14,8 +14,8 @@ public class Fichier implements Ast {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+    public <T> T accept(ARMVisitor<T> visitor){
+        return visitor.visit(this);
     }
 
     public ArrayList<Ast> instructions;

@@ -3,6 +3,9 @@ package compilateur.ast;
 import compilateur.ARMGenerator.ARMVisitor;
 import compilateur.tds.*;
 
+/**
+ * Declaration of a function returning an int
+ */
 public class DeclFctInt extends AstNode implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
@@ -13,8 +16,8 @@ public class DeclFctInt extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
     
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+    public <T> T accept(ARMVisitor<T> visitor){
+        return visitor.visit(this);
     }
 
     public Ast Idf;

@@ -15,8 +15,8 @@ public class Fleche extends Operateur {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+    public <T> T accept(ARMVisitor<T> visitor){
+        return visitor.visit(this);
     }
 
     public Fleche(Ast left, Ast right, int line) {
