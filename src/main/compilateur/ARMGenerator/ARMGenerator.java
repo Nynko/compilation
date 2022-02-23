@@ -345,26 +345,97 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Plus plus) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        plus.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE    R1, R0");
+        plus.right.accept(this);
+        str.appendLine("ADD     R0, R0, R1");
+        // TODO recup R1
+        return str.getString();
     }
 
     @Override
     public String visit(Minus minus) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        minus.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE    R1, R0");
+        minus.right.accept(this);
+        str.appendLine("SUB     R0, R0, R1");
+        // TODO recup R1
+        return str.getString();
     }
 
     @Override
     public String visit(Division div) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        div.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE    R1, R0");
+        div.right.accept(this);
+        str.appendLine("BL      div");
+        // TODO a ecrire qu'une fois :
+        str.appendLine("""
+                div         STMFA   SP!, {R2-R5}
+                            MOV     R0,#0
+                            MOV     R3,#0
+                            CMP     R1,#0
+                            RSBLT   R1,R1,#0
+                            EORLT   R3,R3,#1
+                            CMP     R2,#0
+                            RSBLT   R2,R2,#0
+                            EORLT   R3,R3,#1
+                            MOV     R4,R2
+                            MOV     R5,#1
+                _div_max    LSL     R4,R4,#1
+                            LSL     R5,R5,#1
+                            CMP     R4,R1
+                            BLE     _div_max
+                _div_loop   LSR     R4,R4,#1
+                            LSR     R5,R5,#1
+                            CMP     R4,R1
+                            BGT     _div_loop
+                            ADD     R0,R0,R5
+                            SUB     R1,R1,R4
+                            CMP     R1,R2
+                            BGE     _div_loop
+                            CMP     R3,#1
+                            BNE     _div_exit
+                            CMP     R1,#0
+                            ADDNE   R0,R0,#1
+                            RSB     R0,R0,#0
+                            RSB     R1,R1,#0
+                            ADDNE   R1,R1,R2
+                _div_exit   LDMFA   SP!, {R2-R5}
+                            LDR     PC, [R13, #-4]!
+                """);
+        // TODO recup R1
+        return str.getString();
     }
 
     @Override
     public String visit(Multiplication mult) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        mult.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE    R1, R0");
+        mult.right.accept(this);
+        str.appendLine("BL      mul");
+        // TODO a ecrire qu'une fois :
+        str.appendLine("""
+                mul         STMFA   SP!, {R1,R2}
+                            MOV     R0,#0
+                _mul_loop   LSRS    R2,R2,#1
+                            ADDCS   R0,R0,R1
+                            LSL     R1,R1,#1
+                            TST     R2,R2
+                            BNE     _mul_loop
+                            LDMFA   SP!, {R1,R2}
+                            LDRPC, [R13,#-4]!
+                """);
+        // TODO recup R1
+        return str.getString();
     }
 
 
