@@ -9,8 +9,8 @@ public class Expr_ou extends Operateur {
         return visitor.visit(this);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+    public <T> T accept(ARMVisitor<T> visitor){
+        return visitor.visit(this);
     }
 
     public Expr_ou(Ast left, Ast right, int line) {

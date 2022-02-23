@@ -9,8 +9,8 @@ public class Plus extends Operateur {
         return visitor.visit(this);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+    public <T> T accept(ARMVisitor<T> visitor){
+        return visitor.visit(this);
     }
 
     public Plus(Ast left, Ast right, int line) {

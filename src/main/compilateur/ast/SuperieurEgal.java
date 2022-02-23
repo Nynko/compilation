@@ -9,8 +9,8 @@ public class SuperieurEgal extends Comparaison {
         return visitor.visit(this);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
+    public <T> T accept(ARMVisitor<T> visitor){
+        return visitor.visit(this);
     }
 
     public SuperieurEgal(Ast left, Ast right, int line) {
