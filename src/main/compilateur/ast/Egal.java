@@ -1,7 +1,6 @@
 package compilateur.ast;
 
 import compilateur.ARMGenerator.ARMVisitor;
-import compilateur.tds.Tds;
 
 public class Egal extends Comparaison {
 

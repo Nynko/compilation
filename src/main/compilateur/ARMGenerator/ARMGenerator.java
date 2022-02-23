@@ -41,10 +41,8 @@ import compilateur.ast.While;
 
 public class ARMGenerator implements ARMVisitor<String> {
 
-    private StringAggregator stringAggregator;
-
     public ARMGenerator(){
-        stringAggregator = new StringAggregator();
+
     }
 
     @Override
