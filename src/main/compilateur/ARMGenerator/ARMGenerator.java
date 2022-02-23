@@ -50,6 +50,9 @@ public class ARMGenerator implements ARMVisitor<String> {
     public String visit(Fichier fichier) {
         StringAggregator str = new StringAggregator();
 
+        str.appendLine("BL _main");
+        str.appendLine("B __end__");
+
         for (Ast ast : fichier.instructions) {
             String code = ast.accept(this);
             str.appendLine(code);
@@ -59,11 +62,17 @@ public class ARMGenerator implements ARMVisitor<String> {
         str.appendLine("__save_reg__");
         str.appendLine("\t\tSTMFA	R13!, {R1-R12}");
         str.appendLine("\t\tMOV		PC, LR");
+        str.appendLine();
 
         // Ajout de la macro de restauration des registres
         str.appendLine("__restore_reg__");
         str.appendLine("\t\tLDMFA	R13!, {R1-R12}");
         str.appendLine("\t\tMOV		PC, LR");
+        str.appendLine();
+
+        // On place un label end à la fin de programme pour le quitter
+        // (l'instruction END n'est pas reconnue par le vrai ARM)
+        str.appendLine("__end__");
 
         return str.getString();
     }
@@ -96,7 +105,7 @@ public class ARMGenerator implements ARMVisitor<String> {
     public String visit(DeclFctInt declFctInt) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendLine(declFctInt.Idf.toString());
+        str.appendFormattedLine("_%s",((Idf)declFctInt.Idf).name);
         // Sauvegarde du pointeur de base
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'adresse de retour
@@ -120,7 +129,7 @@ public class ARMGenerator implements ARMVisitor<String> {
     public String visit(DeclFctStruct declFctStruct) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendLine(declFctStruct.Idf1.toString());
+        str.appendFormattedLine("_%s",((Idf)declFctStruct.Idf1).name);
         // Sauvegarde du pointeur de base
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'adresse de retour
@@ -166,8 +175,23 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+
+        // Sauvegarde des registres
+        str.appendLine("BL		__save_reg__");
+
+        // Ajout des parametres à la pile
+        for(Ast param: idfParenthesis.exprList) {
+            
+        }
+
+        // Appel de la fonction
+        str.appendFormattedLine("BL 		_%s", ((Idf)idfParenthesis.idf).name);
+
+        // Restauration des registres
+        str.appendLine("BL		__restore_reg__");
+
+        return str.getString();
     }
 
     @Override
