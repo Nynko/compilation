@@ -318,8 +318,26 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Multiplication mult) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        mult.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE    R1, R0");
+        mult.right.accept(this);
+        str.appendLine("BL      mul");
+        // TODO a ecrire qu'une fois
+        str.appendLine("""
+                mul         STMFA   SP!, {R1,R2}
+                            MOV     R0,#0
+                _mul_loop   LSRS    R2,R2,#1
+                            ADDCS   R0,R0,R1
+                            LSL     R1,R1,#1
+                            TST     R2,R2
+                            BNE     _mul_loop
+                            LDMFA   SP!, {R1,R2}
+                            LDRPC, [R13,#-4]!
+                """);
+        // TODO recup R1
+        return str.getString();
     }
 
 
