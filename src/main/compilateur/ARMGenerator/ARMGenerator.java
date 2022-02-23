@@ -103,7 +103,7 @@ public class ARMGenerator implements ARMVisitor<String> {
     public String visit(DeclFctStruct declFctStruct) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendLine(declFctStruct.Idf.toString());
+        str.appendLine(declFctStruct.Idf1.toString());
         // Sauvegarde du pointeur de base
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'adresse de retour
