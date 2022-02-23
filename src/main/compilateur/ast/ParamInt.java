@@ -1,6 +1,6 @@
 package compilateur.ast;
 
-import compilateur.ARMGenerator.ARMVisitor;
+import compilateur.ARMGenerator.;
 import compilateur.tds.*;
 
 public class ParamInt extends AstNode implements Ast {

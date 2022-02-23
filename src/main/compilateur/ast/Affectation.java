@@ -2,7 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.Tds;
 import compilateur.tds.TdsVisitor;
-import compilateur.ARMGenerator.ARMVisitor;
+import compilateur.ARMGenerator.;
 
 public class Affectation extends Operateur {
 
