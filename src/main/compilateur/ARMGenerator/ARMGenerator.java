@@ -1,6 +1,7 @@
 package compilateur.ARMGenerator;
 
 import compilateur.ast.Affectation;
+import compilateur.ast.Ast;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
 import compilateur.ast.Comparaison;
@@ -47,8 +48,24 @@ public class ARMGenerator implements ARMVisitor<String> {
 
     @Override
     public String visit(Fichier fichier) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+
+        for (Ast ast : fichier.instructions) {
+            String code = ast.accept(this);
+            str.appendLine(code);
+        }
+
+        // Ajout de la macro de sauvegarde des registres
+        str.appendLine("__save_reg__");
+        str.appendLine("\t\tSTMFA	R13!, {R1-R12}");
+        str.appendLine("\t\tMOV		PC, LR");
+
+        // Ajout de la macro de restauration des registres
+        str.appendLine("__restore_reg__");
+        str.appendLine("\t\tLDMFA	R13!, {R1-R12}");
+        str.appendLine("\t\tMOV		PC, LR");
+
+        return str.getString();
     }
 
     @Override
