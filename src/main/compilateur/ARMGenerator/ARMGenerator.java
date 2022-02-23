@@ -291,17 +291,23 @@ public class ARMGenerator implements ARMVisitor<String> {
         StringAggregator str = new StringAggregator();
         plus.left.accept(this);
         // TODO save R1
-        str.appendLine("MOVE R1, R0");
+        str.appendLine("MOVE    R1, R0");
         plus.right.accept(this);
-        str.appendLine("ADD R0, R0, R1");
+        str.appendLine("ADD     R0, R0, R1");
         // TODO recup R1
         return str.getString();
     }
 
     @Override
     public String visit(Minus minus) {
-        // TODO Auto-generated method stub
-        return null;
+        StringAggregator str = new StringAggregator();
+        minus.left.accept(this);
+        // TODO save R1
+        str.appendLine("MOVE    R1, R0");
+        minus.right.accept(this);
+        str.appendLine("SUB     R0, R0, R1");
+        // TODO recup R1
+        return str.getString();
     }
 
     @Override
