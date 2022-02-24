@@ -52,6 +52,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Fichier fichier, Tds tds) {
+        fichier.setTds(tds);
         tds.addnumRegion(0);
         if (fichier.instructions == null)
             return null;
