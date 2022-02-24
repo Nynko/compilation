@@ -1,5 +1,6 @@
 package compilateur.ARMGenerator;
 
+import compilateur.ast.AstNode;
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.AstVisitor;
@@ -40,12 +41,16 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
+import compilateur.tds.Tds;
 
 public class ARMGenerator implements AstVisitor<String> {
 
 
     private int whileCompt = 0;
     private int ifCompt = 0;
+
+    private int AdresseInitStack = 0xFF000000;
+    private int AdresseDisplay ;
 
     public ARMGenerator(){
 
@@ -63,10 +68,28 @@ public class ARMGenerator implements AstVisitor<String> {
         return ifInt;
     }
 
+    private int getImbricationMax(Tds tds){
+        int max = 0;
+        for(Tds tds_tmp: tds.getSousTDS()){
+            int imbrication = tds_tmp.getImbrication();
+            if(imbrication > max){
+                max = imbrication;
+            }
+        }
+        return max;
+    }
+
     @Override
     public String visit(Fichier fichier) {
         StringAggregator str = new StringAggregator();
 
+        // Creation du Display
+        Tds tds = ((AstNode) fichier).getTds();
+        int imbricationMax = getImbricationMax(tds);
+        str.appendLine( " ; MOV");
+
+        
+        // Initialisation
         str.appendLine("BL _main");
         str.appendLine("B __end__");
 
@@ -97,25 +120,25 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Idf idf) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(DeclVarInt declVarInt) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(DeclVarStruct declVarStruct) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Decl_typ decl_typ) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
@@ -169,25 +192,25 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(ParamListMulti paramListMulti) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(ParamInt paramInt) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(ParamStruct paramStruct) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Sizeof sizeof) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
@@ -214,18 +237,19 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(IfThen ifThen) {
         StringAggregator str = new StringAggregator();
-        String ifNum = Integer.toString(getIfIncr());
-        str.appendLine(";if" + ifNum); // Commentaire pour debug
+        int ifNum = getIfIncr();
+        str.appendFormattedLine(";if %d", ifNum);// Commentaire pour debug
         str.appendLine(ifThen.condition.accept(this));
-        str.appendLine("BEQ _finIf" + ifNum);
+        str.appendLine("CMP R0, #0");
+        str.appendFormattedLine("BEQ _finIf %d", ifNum);
         str.appendLine(ifThen.thenBlock.accept(this));
-        str.appendLine("_finIf" + ifNum);
+        str.appendFormattedLine("_finIf %d", ifNum);
         str.appendLine();
         return str.getString();
     }
@@ -233,15 +257,16 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(IfThenElse ifThenElse) {
         StringAggregator str = new StringAggregator();
-        String ifNum = Integer.toString(getIfIncr());
-        str.appendLine(";ifThenElse" + ifNum); // Commentaire pour debug
+        int ifNum = getIfIncr();
+        str.appendFormattedLine(";ifThenElse %d", ifNum);// Commentaire pour debug
         str.appendLine(ifThenElse.condition.accept(this));
-        str.appendLine("BEQ _else" + ifNum);
+        str.appendLine("CMP R0, #0");
+        str.appendFormattedLine("BEQ _else %d", ifNum);
         str.appendLine(ifThenElse.thenBlock.accept(this));
-        str.appendLine("B  _finIf" + ifNum);
-        str.appendLine("_else" + ifNum);
+        str.appendFormattedLine("B  _finIf %d", ifNum);
+        str.appendFormattedLine("_else %d", ifNum);
         str.appendLine(ifThenElse.elseBlock.accept(this));
-        str.appendLine("_finIf" + ifNum);
+        str.appendFormattedLine("_finIf %d", ifNum);
         str.appendLine();
         return str.getString();
     }
@@ -249,14 +274,14 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(While while1) {
         StringAggregator str = new StringAggregator();
-        String whileNum = Integer.toString(getWhileIncr());
-        str.appendLine("_while" + whileNum); 
+        int whileNum = getWhileIncr();
+        str.appendFormattedLine("_while %d", whileNum);
         str.appendLine(while1.condition.accept(this));
-        //TODO RO
-        str.appendLine("BEQ _finWhile" + whileNum);
+        str.appendLine("CMP R0, #0");
+        str.appendFormattedLine("BEQ _finWhile %d", whileNum);
         str.appendLine(while1.doBlock.accept(this));
-        str.appendLine("B _while" +  whileNum);
-        str.appendLine("_finWhile" + whileNum);
+        str.appendFormattedLine("B _while %d", whileNum);
+        str.appendFormattedLine("_finWhile %d", whileNum);
         str.appendLine();
         return str.getString();
     }
@@ -264,7 +289,7 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Return return1) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
@@ -281,55 +306,55 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(CharNode charNode) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(IntNode intNode) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Affectation affectation) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Fleche fleche) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(MoinsUnaire unaire) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Negation unaire) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Semicolon semicolon) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Expr_ou expr_ou) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String visit(Expr_et expr_et) {
         // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
