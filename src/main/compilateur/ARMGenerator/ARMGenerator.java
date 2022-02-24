@@ -1,6 +1,7 @@
 package compilateur.ARMGenerator;
 
-import compilateur.ast.AstNode;
+import java.util.ArrayList;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.AstVisitor;
@@ -45,12 +46,20 @@ import compilateur.tds.Tds;
 
 public class ARMGenerator implements AstVisitor<String> {
 
+    /**
+     * Informations/Conventions:
+     * Full Ascending: SP pointe vers une case "pleine" et SP augmente avec les adresses.
+     * R0 : Adresse de retour
+     */
+
+    public static final int  WORD_SIZE = 4 ; // Taille d'un mot en octet
 
     private int whileCompt = 0;
     private int ifCompt = 0;
 
     private int AdresseInitStack = 0xFF000000;
-    private int AdresseDisplay ;
+    private int AdresseDisplay ; // Adresse du bas du display
+    private int imbricationMax;
 
     public ARMGenerator(){
 
@@ -70,13 +79,20 @@ public class ARMGenerator implements AstVisitor<String> {
 
     private int getImbricationMax(Tds tds){
         int max = 0;
-        for(Tds tds_tmp: tds.getSousTDS()){
-            int imbrication = tds_tmp.getImbrication();
-            if(imbrication > max){
-                max = imbrication;
+        ArrayList<Tds> tdsList = tds.getSousTDS();
+        if(!tdsList.isEmpty()){
+            for(Tds tds_tmp: tdsList){
+                int imbrication = getImbricationMax(tds_tmp);
+                if(imbrication > max){
+                    max = imbrication;
+                }
             }
+            return max;
         }
-        return max;
+        else{
+            return tds.getImbrication();
+        }
+        
     }
 
     @Override
@@ -84,11 +100,16 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
 
         // Creation du Display
-        Tds tds = ((AstNode) fichier).getTds();
-        int imbricationMax = getImbricationMax(tds);
-        str.appendLine( " ; MOV");
+        // Rappel: display[i] contient à tout moment 
+        // la base du dernier bloc d'imbrication i actif
 
-        
+            //init pileDisplay
+        Tds tds = fichier.getTds();
+        this.imbricationMax = getImbricationMax(tds);
+        this.AdresseDisplay = AdresseInitStack - imbricationMax*WORD_SIZE;
+        str.appendFormattedLine("LDR R10, =%d", AdresseDisplay); 
+        str.appendLine("STR R11, [R10]"); //Ajout de la base dans le display (à la place)
+     
         // Initialisation
         str.appendLine("BL _main");
         str.appendLine("B __end__");
@@ -244,12 +265,12 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(IfThen ifThen) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
-        str.appendFormattedLine(";if %d", ifNum);// Commentaire pour debug
+        str.appendFormattedLine(";if%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThen.condition.accept(this));
         str.appendLine("CMP R0, #0");
-        str.appendFormattedLine("BEQ _finIf %d", ifNum);
+        str.appendFormattedLine("BEQ _finIf%d", ifNum);
         str.appendLine(ifThen.thenBlock.accept(this));
-        str.appendFormattedLine("_finIf %d", ifNum);
+        str.appendFormattedLine("_finIf%d", ifNum);
         str.appendLine();
         return str.getString();
     }
@@ -258,15 +279,15 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(IfThenElse ifThenElse) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
-        str.appendFormattedLine(";ifThenElse %d", ifNum);// Commentaire pour debug
+        str.appendFormattedLine(";ifThenElse%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThenElse.condition.accept(this));
         str.appendLine("CMP R0, #0");
-        str.appendFormattedLine("BEQ _else %d", ifNum);
+        str.appendFormattedLine("BEQ _else%d", ifNum);
         str.appendLine(ifThenElse.thenBlock.accept(this));
-        str.appendFormattedLine("B  _finIf %d", ifNum);
-        str.appendFormattedLine("_else %d", ifNum);
+        str.appendFormattedLine("B  _finIf%d", ifNum);
+        str.appendFormattedLine("_else%d", ifNum);
         str.appendLine(ifThenElse.elseBlock.accept(this));
-        str.appendFormattedLine("_finIf %d", ifNum);
+        str.appendFormattedLine("_finIf%d", ifNum);
         str.appendLine();
         return str.getString();
     }
@@ -294,11 +315,24 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(Bloc bloc) {
-        // TODO 
         StringAggregator str = new StringAggregator();
+        Tds tds = bloc.getTds();
+        int imbrication = tds.getImbrication();
+
+        //Display
+        str.appendFormattedLine("LDR R10, =%d", AdresseDisplay + imbrication*WORD_SIZE); 
+        str.appendLine("STR R11, [R10]"); //Ajout de la base du bloc dans le display
+
+        // Content
         for(Ast instruction : bloc.instList){
             str.appendString(instruction.accept(this));
         }
+
+        //Display Fin
+        // if(imbrication == tds.getPere().getPere())
+        // str.appendFormattedLine("LDR R10, =%d", AdresseDisplay + imbrication*WORD_SIZE);  // A delete si on garde R10 et qu'on y touche pas 
+        // str.appendLine("LDR R9,[R11]");
+        // str.appendLine("STR R9, [R10]"); //Remise de l'ancienne base dans le display
         
         return str.getString();
     }
