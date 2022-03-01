@@ -349,8 +349,7 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(CharNode charNode) {
-        // TODO Auto-generated method stub
-        return null;
+        return String.format("LDR R0, =%s\n", charNode.string);
     }
 
     @Override
