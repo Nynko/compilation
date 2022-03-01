@@ -68,17 +68,27 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(Idf idf) {
-        String bp = "R12";
+        StringAggregator str = new StringAggregator();
+        String bp = "R11";
+        int decalage = 0;
         int imbrication = idf.getTds().findImbrication(idf.name);
         // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
         // chainage statique pour mettre a jour bp
-        int deplacement = 0;
+        // chainage statique
+        if (idf.getTds().getImbrication() - imbrication != 0){
+            str.appendLine("MOV [R11, #4] , R0");
+            for (int i = 0; i < idf.getTds().getImbrication() - imbrication -1; i++) {
+                str.appendLine("MOV [R0], R0");
+            }
+            bp = "R0";
+        }
         Symbole s = idf.getTds().findSymbole(idf.name);
         if (s instanceof SymboleVar sv) {
-            deplacement = sv.getDeplacement();
+            decalage = sv.getDeplacement();
         }
+        str.appendFormattedLine("LDR R0, [%s #%d]", bp, decalage);
     
-        return String.format("LDR R0, [%s #-%d]\n", bp, deplacement);
+        return str.getString();
     }
 
     @Override
@@ -236,10 +246,10 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(Affectation affectation) {
-        StringBuilder sb = new StringBuilder();
+        StringAggregator sb = new StringAggregator();
         // on recupere le code assembleur de la partie droite de l'affectation, le code
         // retourne le resultat de l'expression dans R0
-        sb.append(affectation.right.accept(this));
+        sb.appendLine(affectation.right.accept(this));
 
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
@@ -252,9 +262,9 @@ public class ARMGenerator implements AstVisitor<String> {
             // chainage statique pour mettre a jour bp
             // chainage statique
             if (affectation.getTds().getImbrication() - imbrication != 0){
-                sb.append("MOV [R11, #4] , R7");
+                sb.appendLine("MOV [R11, #4] , R7");
                 for (int i = 0; i < affectation.getTds().getImbrication() - imbrication -1; i++) {
-                    sb.append("MOVE [R7], R7");
+                    sb.appendLine("MOV [R7], R7");
                 }
                 bp = "R7";
             }
@@ -273,8 +283,8 @@ public class ARMGenerator implements AstVisitor<String> {
                 decalage = sv.getDeplacement();
             }
         }
-        sb.append(String.format("STR R0, [%s #%d]", bp, decalage));
-        return sb.toString();
+        sb.appendFormattedLine("STR R0, [%s #%d]", bp, decalage);
+        return sb.getString();
     }
     
     public String visit(IfThen ifThen) {
