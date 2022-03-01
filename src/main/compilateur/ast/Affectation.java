@@ -2,7 +2,7 @@ package compilateur.ast;
 
 import compilateur.tds.Tds;
 import compilateur.tds.TdsVisitor;
-import compilateur.ARMGenerator.ARMVisitor;
+
 
 public class Affectation extends Operateur {
 
@@ -15,9 +15,7 @@ public class Affectation extends Operateur {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
-    }
+
 
     public Affectation(Ast left, Ast right, int line) {
         super(left, right, line);

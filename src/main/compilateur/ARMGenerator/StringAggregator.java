@@ -17,6 +17,11 @@ public class StringAggregator {
         stringBuilder.append("\n");
     }
 
+    public void appendFormattedLine(String str, Object ...obj) {
+        stringBuilder.append(String.format(str, obj));
+        stringBuilder.append("\n");
+    }
+
     public void appendLine(){
         stringBuilder.append("\n");
     }

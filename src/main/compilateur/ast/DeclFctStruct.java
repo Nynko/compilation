@@ -1,8 +1,12 @@
 package compilateur.ast;
 
-import compilateur.ARMGenerator.ARMVisitor;
+
 import compilateur.tds.*;
 
+
+/**
+ * Déclaration d'une fonction qui retourne une struct
+ */
 public class DeclFctStruct extends AstNode implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
@@ -13,13 +17,15 @@ public class DeclFctStruct extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
-    }
 
+
+    /** Le type de la struct */
     public Ast Idf0;
+    /** Le nom de la fonction */
     public Ast Idf1;
+    /** La liste des parametres de la fonction */
     public Ast param;
+    /** Le bloc d'intructions de la fonction */
     public Ast bloc;
 
     public DeclFctStruct(Ast idf0, Ast idf1, Ast param, Ast bloc, int line) {

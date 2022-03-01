@@ -1,6 +1,6 @@
 package compilateur.ast;
 
-import compilateur.ARMGenerator.ARMVisitor;
+
 import compilateur.tds.*;
 
 public class IfThenElse extends AstNode implements Ast {
@@ -15,9 +15,7 @@ public class IfThenElse extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
-    }
+
 
     public Ast condition;
     public Ast thenBlock;

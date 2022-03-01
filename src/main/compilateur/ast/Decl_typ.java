@@ -2,7 +2,7 @@ package compilateur.ast;
 
 import java.util.ArrayList;
 
-import compilateur.ARMGenerator.ARMVisitor;
+
 import compilateur.tds.*;
 
 public class Decl_typ extends AstNode implements Ast {
@@ -15,9 +15,7 @@ public class Decl_typ extends AstNode implements Ast {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
-    }
+
 
     public Ast idf;
     public ArrayList<Ast> decl;

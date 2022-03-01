@@ -1,6 +1,6 @@
 package compilateur.ast;
 
-import compilateur.ARMGenerator.ARMVisitor;
+
 import compilateur.tds.Tds;
 import compilateur.tds.TdsVisitor;
 
@@ -15,9 +15,7 @@ public class Fleche extends Operateur {
         return visitor.visit(this, tds);
     }
 
-    public <T> T accept(ARMVisitor<T> visitor, Tds tds){
-        return visitor.visit(this, tds);
-    }
+
 
     public Fleche(Ast left, Ast right, int line) {
         super(left, right, line);
