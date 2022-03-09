@@ -42,6 +42,8 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
+import compilateur.tds.Symbole;
+import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
 
 public class ARMGenerator implements AstVisitor<String> {
@@ -62,7 +64,7 @@ public class ARMGenerator implements AstVisitor<String> {
     public ARMGenerator(){
 
     }
-
+    
     private int getWhileIncr(){
         int whileInt = whileCompt;
         whileCompt ++;
@@ -73,6 +75,31 @@ public class ARMGenerator implements AstVisitor<String> {
         int ifInt = ifCompt;
         ifCompt ++;
         return ifInt;
+    }
+
+    @Override
+    public String visit(Idf idf) {
+        StringAggregator str = new StringAggregator();
+        String bp = "R11";
+        int decalage = 0;
+        int imbrication = idf.getTds().findImbrication(idf.name);
+        // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
+        // chainage statique pour mettre a jour bp
+        // chainage statique
+        if (idf.getTds().getImbrication() - imbrication != 0){
+            str.appendLine("MOV [R11, #4] , R0");
+            for (int i = 0; i < idf.getTds().getImbrication() - imbrication -1; i++) {
+                str.appendLine("MOV [R0], R0");
+            }
+            bp = "R0";
+        }
+        Symbole s = idf.getTds().findSymbole(idf.name);
+        if (s instanceof SymboleVar sv) {
+            decalage = sv.getDeplacement();
+        }
+        str.appendFormattedLine("LDR R0, [%s #%d]", bp, decalage);
+    
+        return str.getString();
     }
 
     @Override
@@ -105,12 +132,6 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("__end__");
 
         return str.getString();
-    }
-
-    @Override
-    public String visit(Idf idf) {
-        // TODO Auto-generated method stub
-        return "";
     }
 
     @Override
@@ -231,6 +252,53 @@ public class ARMGenerator implements AstVisitor<String> {
     }
 
     @Override
+    public String visit(IntNode intNode) {
+        return String.format("LDR R0, =%d\n", intNode.parseInt);
+    }
+
+    @Override
+    public String visit(Affectation affectation) {
+        StringAggregator sb = new StringAggregator();
+        // on recupere le code assembleur de la partie droite de l'affectation, le code
+        // retourne le resultat de l'expression dans R0
+        sb.appendLine(affectation.right.accept(this));
+
+        // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
+        int decalage = 0;
+        String bp = "R11";
+        int imbrication;
+
+        if (affectation.left instanceof Idf idf) {
+            imbrication = affectation.getTds().findImbrication(idf.name);
+            // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
+            // chainage statique pour mettre a jour bp
+            // chainage statique
+            if (affectation.getTds().getImbrication() - imbrication != 0){
+                sb.appendLine("MOV [R11, #4] , R7");
+                for (int i = 0; i < affectation.getTds().getImbrication() - imbrication -1; i++) {
+                    sb.appendLine("MOV [R7], R7");
+                }
+                bp = "R7";
+            }
+            Symbole s = affectation.getTds().findSymbole(idf.name);
+            if (s instanceof SymboleVar sv) {
+                decalage = sv.getDeplacement();
+            }
+        } else if (affectation.left instanceof Fleche fleche) {
+            // a->b ou type(b) = int
+            // decalage = decalage de a + decalage de b
+            // @a->b = base de declaration de a + decalage 
+            Idf idf = (Idf) fleche.right;
+            Symbole s = affectation.getTds().findSymbole(idf.name);
+
+            if (s instanceof SymboleVar sv) {
+                decalage = sv.getDeplacement();
+            }
+        }
+        sb.appendFormattedLine("STR R0, [%s #%d]", bp, decalage);
+        return sb.getString();
+    }
+    
     public String visit(IfThen ifThen) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
@@ -297,20 +365,7 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(CharNode charNode) {
-        // TODO Auto-generated method stub
-        return "";
-    }
-
-    @Override
-    public String visit(IntNode intNode) {
-        // TODO Auto-generated method stub
-        return "";
-    }
-
-    @Override
-    public String visit(Affectation affectation) {
-        // TODO Auto-generated method stub
-        return "";
+        return String.format("LDR R0, =%s\n", charNode.string);
     }
 
     @Override
@@ -505,6 +560,4 @@ public class ARMGenerator implements AstVisitor<String> {
         return str.getString();
     }
 
-
-    
 }

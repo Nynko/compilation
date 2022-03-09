@@ -127,6 +127,23 @@ public class Tds {
         return null;
     }
 
+    /** A partir d'un nom de symbole, retourne le numéro d'imbrication de la tds dans laquelle se trouve le symbole 
+     * 
+     * @param name le nom du symbole
+     * @return le numéro d'imbrication de la tds ou retourne -1
+     */
+    public int findImbrication(String name) {
+        Symbole s = this.listeSymboles.get(name);
+        if(s!=null) return this.getImbrication();
+        Tds table = this.getPere();
+        while(table != null) {
+            s = table.listeSymboles.get(name);
+            if(s!=null) return table.getImbrication();
+            table = table.getPere();
+        }
+        return -1;
+    }
+
     /** Trouver un symbole de déclaration de type struct
      * 
      * @param name le nom du symbole de struct
