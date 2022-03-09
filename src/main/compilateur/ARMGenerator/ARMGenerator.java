@@ -422,10 +422,10 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("; début comparaison");
         str.appendLine(cmp.left.accept(this));
         //récup le registre depuis r0 dans le premier registre libre
-        str.appendLine("MOV R0,R1");
+        str.appendLine("MOV R1,R0");
         str.appendLine(cmp.right.accept(this));
         //same 
-        str.appendLine("MOV R0, R2");
+        str.appendLine("MOV R2, R0");
         str.appendLine("CMP R1, R2"); 
         str.appendLine("MOV R0, #0");
         return str.getString();
