@@ -182,7 +182,9 @@ public class ARMGenerator implements ARMVisitor<String> {
 
         // Ajout des parametres à la pile
         for(Ast param: idfParenthesis.exprList) {
-            
+            str.appendLine(param.accept(this));
+            // Putting R0 in the stack
+            str.appendLine("STR		R0, [R13, #4]!");
         }
 
         // Appel de la fonction
