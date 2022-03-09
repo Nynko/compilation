@@ -1,5 +1,6 @@
 package compilateur;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -12,6 +13,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
+import compilateur.ARMGenerator.ARMGenerator;
 import compilateur.ast.Ast;
 import compilateur.ast.AstCreator;
 import compilateur.grammar.circLexer;
@@ -24,6 +26,25 @@ import compilateur.tds.TdsCreator;
 import compilateur.utils.ErrorAggregator;
 
 public class Main {
+
+    private static void outputARM(String str){
+        try (FileOutputStream output = new FileOutputStream("./out/ARM.s")) {
+            String buffer = str;
+            byte[] strToBytes = buffer.getBytes();
+            try {
+                output.write(strToBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -89,7 +110,13 @@ public class Main {
                     graphVizTds.createGraph(tds);
                     graphVizTds.dumpGraph("./out/tds.dot");
 
+                    // ARM
+                    ARMGenerator arm = new ARMGenerator();
+                    String str = ast.accept(arm);
+                    outputARM(str);
+                    
                 }
+
             } else {
                 System.out.println("erreur syntaxique");
             }
