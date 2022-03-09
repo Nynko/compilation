@@ -58,8 +58,6 @@ public class ARMGenerator implements AstVisitor<String> {
     private int ifCompt = 0;
 
     private int AdresseInitStack = 0xFF000000;
-    private int AdresseDisplay ; // Adresse du bas du display
-    private int imbricationMax;
 
     public ARMGenerator(){
 
@@ -77,38 +75,9 @@ public class ARMGenerator implements AstVisitor<String> {
         return ifInt;
     }
 
-    private int getImbricationMax(Tds tds){
-        int max = 0;
-        ArrayList<Tds> tdsList = tds.getSousTDS();
-        if(!tdsList.isEmpty()){
-            for(Tds tds_tmp: tdsList){
-                int imbrication = getImbricationMax(tds_tmp);
-                if(imbrication > max){
-                    max = imbrication;
-                }
-            }
-            return max;
-        }
-        else{
-            return tds.getImbrication();
-        }
-        
-    }
-
     @Override
     public String visit(Fichier fichier) {
         StringAggregator str = new StringAggregator();
-
-        // Creation du Display
-        // Rappel: display[i] contient à tout moment 
-        // la base du dernier bloc d'imbrication i actif
-
-            //init pileDisplay
-        Tds tds = fichier.getTds();
-        this.imbricationMax = getImbricationMax(tds);
-        this.AdresseDisplay = AdresseInitStack - imbricationMax*WORD_SIZE;
-        str.appendFormattedLine("LDR R10, =%d", AdresseDisplay); 
-        str.appendLine("STR R11, [R10]"); //Ajout de la base dans le display (à la place)
      
         // Initialisation
         str.appendLine("BL _main");
@@ -317,22 +286,11 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(Bloc bloc) {
         StringAggregator str = new StringAggregator();
         Tds tds = bloc.getTds();
-        int imbrication = tds.getImbrication();
-
-        //Display
-        str.appendFormattedLine("LDR R10, =%d", AdresseDisplay + imbrication*WORD_SIZE); 
-        str.appendLine("STR R11, [R10]"); //Ajout de la base du bloc dans le display
 
         // Content
         for(Ast instruction : bloc.instList){
             str.appendString(instruction.accept(this));
         }
-
-        //Display Fin
-        // if(imbrication == tds.getPere().getPere())
-        // str.appendFormattedLine("LDR R10, =%d", AdresseDisplay + imbrication*WORD_SIZE);  // A delete si on garde R10 et qu'on y touche pas 
-        // str.appendLine("LDR R9,[R11]");
-        // str.appendLine("STR R9, [R10]"); //Remise de l'ancienne base dans le display
         
         return str.getString();
     }
