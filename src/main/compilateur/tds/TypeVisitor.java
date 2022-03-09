@@ -225,7 +225,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             if (leftType.equals("int") && this.isPointer(rightType)
                     || this.isPointer(leftType) && rightType.equals("int")
                     || this.isPointer(leftType) && this.isPointer(rightType)
-                            && !this.isCompatible(leftType, rightType)) {
+                            && !rightType.equals("void_*") && !this.isCompatible(leftType, rightType)) {
                 errors.addError(new TypeWarningException(affectation.line, rightType, leftType));
             }
             if (affectation.left instanceof Idf idf) {
