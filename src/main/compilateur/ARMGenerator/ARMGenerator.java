@@ -251,8 +251,18 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+
+        // Sauvegarde des registres
+        str.appendLine("BL		__save_reg__");
+
+        // Appel de la fonction
+        str.appendFormattedLine("BL 		_%s", ((Idf)idfParenthesisEmpty.idf).name);
+
+        // Restauration des registres
+        str.appendLine("BL		__restore_reg__");
+
+        return str.getString();
     }
 
     @Override
