@@ -76,8 +76,8 @@ public class ARMGenerator implements AstVisitor<String> {
         // chainage statique pour mettre a jour bp
         // chainage statique
         if (idf.getTds().getImbrication() - imbrication != 0){
-            str.appendLine("MOV [R11, #4] , R0");
-            for (int i = 0; i < idf.getTds().getImbrication() - imbrication -1; i++) {
+            str.appendLine("MOV [R11] , R0");
+            str.appendLine("ADD R0, R0, #4");            for (int i = 0; i < idf.getTds().getImbrication() - imbrication -1; i++) {
                 str.appendLine("MOV [R0], R0");
             }
             bp = "R0";
@@ -262,7 +262,8 @@ public class ARMGenerator implements AstVisitor<String> {
             // chainage statique pour mettre a jour bp
             // chainage statique
             if (affectation.getTds().getImbrication() - imbrication != 0){
-                sb.appendLine("MOV [R11, #4] , R7");
+                sb.appendLine("MOV [R11] , R7");
+                sb.appendLine("ADD R7, R7, #4"); 
                 for (int i = 0; i < affectation.getTds().getImbrication() - imbrication -1; i++) {
                     sb.appendLine("MOV [R7], R7");
                 }
