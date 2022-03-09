@@ -360,8 +360,7 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(Return return1) {
-        // TODO Auto-generated method stub
-        return "";
+        return return1.expr.accept(this);
     }
 
     @Override
