@@ -99,7 +99,7 @@ public class ARMGenerator implements AstVisitor<String> {
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement();
         }
-        str.appendFormattedLine("LDR R0, [%s #%d]", bp, decalage);
+        str.appendFormattedLine("LDR R0, [%s, #%d]", bp, decalage);
     
         return str.getString();
     }
@@ -309,7 +309,7 @@ public class ARMGenerator implements AstVisitor<String> {
                 decalage = sv.getDeplacement();
             }
         }
-        sb.appendFormattedLine("STR R0, [%s #%d]", bp, decalage);
+        sb.appendFormattedLine("STR R0, [%s, #%d]", bp, decalage);
         return sb.getString();
     }
     
@@ -418,10 +418,11 @@ public class ARMGenerator implements AstVisitor<String> {
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
-        cmp.left.accept(this);
+        str.appendLine("; début comparaison");
+        str.appendLine(cmp.left.accept(this));
         //récup le registre depuis r0 dans le premier registre libre
         str.appendLine("MOV R0,R1");
-        cmp.right.accept(this);
+        str.appendLine(cmp.right.accept(this));
         //same 
         str.appendLine("MOV R0, R2");
         str.appendLine("CMP R1, R2"); 
@@ -481,10 +482,10 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Plus plus) {
         StringAggregator str = new StringAggregator();
-        plus.left.accept(this);
+        str.appendLine(plus.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOVE    R1, R0");
-        plus.right.accept(this);
+        str.appendLine("MOV   R1, R0");
+        str.appendLine(plus.right.accept(this));
         str.appendLine("ADD     R0, R0, R1");
         str.appendLine("BL      __restore_reg__");
         return str.getString();

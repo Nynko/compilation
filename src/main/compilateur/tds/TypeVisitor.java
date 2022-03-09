@@ -58,6 +58,7 @@ public class TypeVisitor implements TdsVisitor<String> {
     @Override
     public String visit(Idf idf, Tds tds) {
 
+        idf.setTds(tds);
         Symbole sym = tds.findSymbole(idf.name);
         if (sym instanceof SymboleFonction symfct) {
             return symfct.getReturnType();
