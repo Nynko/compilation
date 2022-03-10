@@ -17,7 +17,7 @@ public class Tds {
     private int imbrication;
     private int numRegion = compteur++;
     private Tds pointeurPere;
-    private int deplacement = 0;
+    private int deplacement = 8;
     private int compteurParams = 0;
     private int deplacementParam = -Offset.OFFSET;
     private HashMap<String,Symbole> listeSymboles;
@@ -155,6 +155,14 @@ public class Tds {
             table = table.getPere();
         }
         return (SymboleStructContent) table.listeSymboles.get(name);
+    }
+
+    /** Retourne la valeur du déplacement maximum par rapport au pointeur de base
+     * 
+     * @return le deplacement
+     */
+    public int getDeplacement() {
+        return this.deplacement;
     }
 
     /** Ajouter un symbole à la TDS
