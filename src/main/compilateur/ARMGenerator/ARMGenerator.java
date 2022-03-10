@@ -515,10 +515,10 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Minus minus) {
         StringAggregator str = new StringAggregator();
-        minus.left.accept(this);
+        str.appendLine(minus.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOVE    R1, R0");
-        minus.right.accept(this);
+        str.appendLine("MOV    R1, R0");
+        str.appendLine(minus.right.accept(this));
         str.appendLine("SUB     R0, R0, R1");
         str.appendLine("BL      __restore_reg__");
         return str.getString();
@@ -527,10 +527,11 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Division div) {
         StringAggregator str = new StringAggregator();
-        div.left.accept(this);
+        str.appendLine(div.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOVE    R1, R0");
-        div.right.accept(this);
+        str.appendLine("MOV    R1, R0");
+        str.appendLine(div.right.accept(this));
+        // TODO gérer div par 0
         str.appendLine("BL      div");
         if (!division) {
             str.appendLine("""
@@ -569,7 +570,6 @@ public class ARMGenerator implements AstVisitor<String> {
                     """);
             division = true;
         }
-        // TODO recup R1
         str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
@@ -577,10 +577,10 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Multiplication mult) {
         StringAggregator str = new StringAggregator();
-        mult.left.accept(this);
+        str.appendLine(mult.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOVE    R1, R0");
-        mult.right.accept(this);
+        str.appendLine("MOV    R1, R0");
+        str.appendLine(mult.right.accept(this));
         str.appendLine("BL      mul");
         if (!mul) {
             str.appendLine("""
