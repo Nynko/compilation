@@ -531,8 +531,13 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    R1, R0");
         str.appendLine(div.right.accept(this));
-        // TODO gérer div par 0
+        str.appendLine("MOV    R2, R0");
+        str.appendLine("""
+                CMP     R2, #0
+                BEQ      __end__ ; division par 0, exit
+                """);
         str.appendLine("BL      div");
+        str.appendLine();
         if (!division) {
             str.appendLine("""
                     div         STMFA   SP!, {R2-R5}
@@ -581,6 +586,7 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    R1, R0");
         str.appendLine(mult.right.accept(this));
+        str.appendLine("MOV    R2, R0");
         str.appendLine("BL      mul");
         if (!mul) {
             str.appendLine("""
@@ -592,7 +598,7 @@ public class ARMGenerator implements AstVisitor<String> {
                                 TST     R2,R2
                                 BNE     _mul_loop
                                 LDMFA   SP!, {R1,R2}
-                                LDRPC, [R13,#-4]!
+                                LDR     PC, [R13,#-4]!
                     """);
             mul = true;
         }
