@@ -178,7 +178,7 @@ public class ARMGenerator implements AstVisitor<String> {
         // Chainage statique
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", declFctInt.getTds().getDeplacement());
+        str.appendFormattedLine("ADD        R1, R11, #%d", declFctInt.getTds().getDeplacement()+4);
         str.appendLine("MOV        R13, R1");
         
         String blocContent = declFctInt.bloc.accept(this);
@@ -212,7 +212,7 @@ public class ARMGenerator implements AstVisitor<String> {
         // Chainage statique
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", declFctStruct.getTds().getDeplacement());
+        str.appendFormattedLine("ADD        R1, R11, #%d", declFctStruct.getTds().getDeplacement()+4);
         str.appendLine("MOV        R13, R1");
         
         
