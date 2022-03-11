@@ -52,6 +52,7 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Fichier fichier, Tds tds) {
+        fichier.setTds(tds);
         tds.addnumRegion(0);
         if (fichier.instructions == null)
             return null;
@@ -462,6 +463,8 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(Affectation affectation, Tds tds) {
         affectation.setTds(tds);
         affectation.accept(visitor, tds);
+        affectation.left.accept(this, tds);
+        affectation.right.accept(this, tds);
         return null;
     }
 
@@ -476,6 +479,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(MoinsUnaire unaire, Tds tds) {
         unaire.setTds(tds);
         unaire.accept(visitor, tds);
+        unaire.noeud.accept(this, tds);
         return null;
     }
 
@@ -496,6 +500,9 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(Operateur operateur, Tds tds) {
         operateur.setTds(tds);
         operateur.accept(visitor, tds);
+        operateur.left.accept(this, tds);
+        operateur.right.accept(this, tds);
+
         return null;
     }
 
