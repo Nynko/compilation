@@ -82,9 +82,9 @@ public class ARMGenerator implements AstVisitor<String> {
 
     // |<- R13
     // |var loc|
-    // |@stat |
-    // |@dyn |
-    // |@r | <- R11
+    // |@stat @bp |
+    // |dyn @bp |
+    // |@r | <- R11 (bp)
     // |param |
     @Override
     public String visit(Idf idf) {
@@ -96,10 +96,9 @@ public class ARMGenerator implements AstVisitor<String> {
         // chainage statique pour mettre a jour bp
         // chainage statique
         if (idf.getTds().getImbrication() - imbrication != 0) {
-            str.appendLine("MOV [R11] , R0");
-            str.appendLine("ADD R0, R0, #8");
+            str.appendLine("LDR R0 , [R11, #8]");
             for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
-                str.appendLine("MOV [R0], R0");
+                str.appendLine("LDR R0, [R0, #8]");
             }
             bp = "R0";
         }
@@ -168,30 +167,35 @@ public class ARMGenerator implements AstVisitor<String> {
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s", ((Idf) declFctInt.Idf).name);
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR		LR, [R13], #4");
+        str.appendLine("STR LR, [R13]");
         // On sauvegarde temporairement l'ancien pointeur de base dans R1
-        str.appendLine("MOV		R1, R11");
+        str.appendLine("MOV R1, R11");
         // On met le nouveau pointeur de base dans R11
-        str.appendLine("MOV		R11, R13");
+        str.appendLine("MOV R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR		R1, [R13], #4");
+        str.appendLine("STR R1, [R13, #4]");
         // Chainage statique
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", declFctInt.getTds().getDeplacement()+4);
-        str.appendLine("MOV        R13, R1");
-        
+        str.appendLine(";ajout place pour var local");
+        str.appendFormattedLine("ADD R1, R11, #%d", declFctInt.getTds().getDeplacement());
+        str.appendLine("MOV R13, R1");
+
         String blocContent = declFctInt.bloc.accept(this);
 
         str.appendLine(blocContent);
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV		R13, R11");
-        str.appendLine("SUB		R13, R13, #4");
+        str.appendLine("MOV R13, R11");
         int numParams = declFctInt.getTds().getParams().size();
-        str.appendFormattedLine("SUB		R13, R13, #%d", numParams * 4);
+        
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [R11, #-4]");
+        str.appendLine("LDR PC, [R11]");
+
+        if (numParams != 0) {
+            str.appendLine("; on depile les param");
+            str.appendFormattedLine("SUB R13, R13, #%d", numParams * 4);
+        }
         return str.getString();
     }
 
@@ -212,11 +216,9 @@ public class ARMGenerator implements AstVisitor<String> {
         // Chainage statique
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", declFctStruct.getTds().getDeplacement()+4);
+        str.appendFormattedLine("ADD        R1, R11, #%d", declFctStruct.getTds().getDeplacement() + 4);
         str.appendLine("MOV        R13, R1");
-        
-        
-        
+
         String blocContent = declFctStruct.bloc.accept(this);
 
         str.appendLine(blocContent);
@@ -258,22 +260,24 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
-
+        System.out.println(idfParenthesis.getTds().getName());
         // Sauvegarde des registres
-        str.appendLine("BL		__save_reg__");
+        str.appendLine(";debut appel fonction");
+        str.appendLine("BL __save_reg__");
 
         // Ajout des parametres à la pile
         for (Ast param : idfParenthesis.exprList) {
             str.appendLine(param.accept(this));
             // Putting R0 in the stack
-            str.appendLine("STR		R0, [R13], #4");
+            str.appendLine("STR R0, [R13], #4");
         }
 
         // Appel de la fonction
-        str.appendFormattedLine("BL 		_%s", ((Idf) idfParenthesis.idf).name);
+        str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
 
         // Restauration des registres
-        str.appendLine("BL		__restore_reg__");
+        str.appendLine("BL __restore_reg__");
+        str.appendLine(";fin appel de fonction");
 
         return str.getString();
     }
@@ -315,17 +319,18 @@ public class ARMGenerator implements AstVisitor<String> {
             imbrication = affectation.getTds().findImbrication(idf.name);
             // chainage statique
             if (affectation.getTds().getImbrication() - imbrication != 0) {
+                sb.appendLine();
                 // sauvegarde du registre R7 sur la pile
                 sb.appendLine("STR R7, [R13], #4");
-                // recupère l'adresse de base du bloc dans R7
-                sb.appendLine("MOV [R11] , R7");
-                // ajoute 8 pour pointer vers le chainage statique
-                sb.appendLine("ADD R7, R7, #8");
+
+                sb.appendLine(";Chainage statique");
+                // recupère l'adresse du chainage statique du bloc dans R7
+                sb.appendLine("LDR R7 , [R11, #8]");
 
                 // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
                 // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
                 for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
-                    sb.appendLine("MOV [R7], R7");
+                    sb.appendLine("LDR R7, [R7, #8]");
                 }
                 bp = "R7";
             }
@@ -347,8 +352,9 @@ public class ARMGenerator implements AstVisitor<String> {
         sb.appendFormattedLine("STR R0, [%s, #%d]", bp, decalage);
         if (bp.equals("R7")) {
             // charge l'ancienne valeur de R7
-            sb.appendLine("LDR R7, [R13], #-4");
+            sb.appendLine("LDR R7, [R13, #-4]!");
         }
+        sb.appendLine();
         return sb.getString();
     }
 
@@ -406,12 +412,45 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(Bloc bloc) {
         StringAggregator str = new StringAggregator();
         Tds tds = bloc.getTds();
+        if (tds.getName().equals("anonblock")) {
+            str.appendLine(";debut bloc anonyme");
 
+            // Sauvegarde des registres
+            str.appendLine("BL __save_reg__");
+
+            // Ignore l'adresse de retour
+            // On sauvegarde temporairement l'ancien pointeur de base dans R1
+            str.appendLine("MOV R1, R11");
+            // On met le nouveau pointeur de base dans R11
+            str.appendLine("MOV R11, R13");
+            // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
+            str.appendLine("STR R1, [R13, #4]");
+            // Chainage statique
+            str.appendLine("STR R1, [R13, #8]");
+            
+            // On s'assure que R13 pointe sur le maximum de son déplacement (ajoute la place
+            // pour var local)
+            str.appendLine(";ajout place pour var local");
+            str.appendFormattedLine("ADD R1, R11, #%d", tds.getDeplacement());
+            str.appendLine("MOV R13 , R1");
+        }
+
+        str.appendLine(";debut instructions");
         // Content
         for (Ast instruction : bloc.instList) {
             str.appendString(instruction.accept(this));
         }
+        str.appendLine(";fin instructions");
 
+        if (tds.getName().equals("anonblock")) {
+            // Remise du pointeur de pile à sa position avant l'appel de fonction
+            str.appendLine("MOV R13, R11");
+
+            // Restauration des registres
+            str.appendLine("BL __restore_reg__");
+
+            str.appendLine(";fin bloc anonyme");
+        }
         return str.getString();
     }
 
