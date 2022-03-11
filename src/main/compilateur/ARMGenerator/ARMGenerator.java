@@ -178,8 +178,8 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("ADD R1, R11, #%d", declFctInt.getTds().getDeplacement());
-        str.appendLine("MOV R13, R1");
+        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement());
+        str.appendLine("MOV        R13, R1");
 
         String blocContent = declFctInt.bloc.accept(this);
 
@@ -193,7 +193,6 @@ public class ARMGenerator implements AstVisitor<String> {
             str.appendLine("; on depile les param");
             str.appendFormattedLine("SUB R13, R13, #%d", numParams * 4);
         }
-        str.appendLine("MOV		R13, R11");
         
         // Récupération de l'addresse de retour et retour à l'appelant
         str.appendLine("LDR		PC, [R11]");
@@ -217,7 +216,7 @@ public class ARMGenerator implements AstVisitor<String> {
         // Chainage statique
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc)declFctStruct.bloc).getTds().getDeplacement()+4);
+        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
         str.appendLine("MOV        R13, R1");
 
         String blocContent = declFctStruct.bloc.accept(this);
@@ -226,8 +225,8 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV		R13, R11");
-        int numParams = ((Bloc)declFctStruct.bloc).getTds().getParams().size();
-        str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
+        int numParams = ((Bloc) declFctStruct.bloc).getTds().getParams().size();
+        str.appendFormattedLine("SUB		R13, R13, #%d", numParams * 4);
         // Récupération de l'addresse de retour et retour à l'appelant
         str.appendLine("LDR		PC, [R11]");
         return str.getString();
