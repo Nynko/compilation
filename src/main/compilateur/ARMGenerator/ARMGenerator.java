@@ -50,11 +50,12 @@ public class ARMGenerator implements AstVisitor<String> {
 
     /**
      * Informations/Conventions:
-     * Full Ascending: SP pointe vers une case "pleine" et SP augmente avec les adresses.
+     * Full Ascending: SP pointe vers une case "pleine" et SP augmente avec les
+     * adresses.
      * R0 : Adresse de retour
      */
 
-    public static final int  WORD_SIZE = 4 ; // Taille d'un mot en octet
+    public static final int WORD_SIZE = 4; // Taille d'un mot en octet
 
     private int whileCompt = 0;
     private int ifCompt = 0;
@@ -63,22 +64,28 @@ public class ARMGenerator implements AstVisitor<String> {
 
     private int AdresseInitStack = 0xFF000000;
 
-    public ARMGenerator(){
+    public ARMGenerator() {
 
     }
-    
-    private int getWhileIncr(){
+
+    private int getWhileIncr() {
         int whileInt = whileCompt;
-        whileCompt ++;
+        whileCompt++;
         return whileInt;
     }
 
-    private int getIfIncr(){
+    private int getIfIncr() {
         int ifInt = ifCompt;
-        ifCompt ++;
+        ifCompt++;
         return ifInt;
     }
 
+    // |<- R13
+    // |var loc|
+    // |@stat |
+    // |@dyn |
+    // |@r | <- R11
+    // |param |
     @Override
     public String visit(Idf idf) {
         StringAggregator str = new StringAggregator();
@@ -88,9 +95,10 @@ public class ARMGenerator implements AstVisitor<String> {
         // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
         // chainage statique pour mettre a jour bp
         // chainage statique
-        if (idf.getTds().getImbrication() - imbrication != 0){
+        if (idf.getTds().getImbrication() - imbrication != 0) {
             str.appendLine("MOV [R11] , R0");
-            str.appendLine("ADD R0, R0, #4");            for (int i = 0; i < idf.getTds().getImbrication() - imbrication -1; i++) {
+            str.appendLine("ADD R0, R0, #8");
+            for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
                 str.appendLine("MOV [R0], R0");
             }
             bp = "R0";
@@ -100,14 +108,14 @@ public class ARMGenerator implements AstVisitor<String> {
             decalage = sv.getDeplacement();
         }
         str.appendFormattedLine("LDR R0, [%s, #%d]", bp, decalage);
-    
+
         return str.getString();
     }
 
     @Override
     public String visit(Fichier fichier) {
         StringAggregator str = new StringAggregator();
-     
+
         // Initialisation
         str.appendLine("BL _main");
         str.appendLine("B __end__");
@@ -158,7 +166,7 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(DeclFctInt declFctInt) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendFormattedLine("_%s",((Idf)declFctInt.Idf).name);
+        str.appendFormattedLine("_%s", ((Idf) declFctInt.Idf).name);
         // Sauvegarde de l'adresse de retour
         str.appendLine("STR		LR, [R13, #4]!");
         // On sauvegarde temporairement l'ancien pointeur de base dans R1
@@ -167,17 +175,16 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         str.appendLine("STR		R1, [R13, #4]!");
-        
+
         String blocContent = declFctInt.bloc.accept(this);
 
         str.appendLine(blocContent);
-        
-        
+
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV		R13, R11");
         str.appendLine("SUB		R13, R13, #4");
         int numParams = declFctInt.getTds().getParams().size();
-        str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
+        str.appendFormattedLine("SUB		R13, R13, #%d", numParams * 4);
         // Récupération de l'addresse de retour et retour à l'appelant
         str.appendLine("LDR		PC, [R11]");
         return str.getString();
@@ -187,7 +194,7 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(DeclFctStruct declFctStruct) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendFormattedLine("_%s",((Idf)declFctStruct.Idf1).name);
+        str.appendFormattedLine("_%s", ((Idf) declFctStruct.Idf1).name);
 
         // Sauvegarde de l'adresse de retour
         str.appendLine("STR		LR, [R13, #4]!");
@@ -197,19 +204,16 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         str.appendLine("STR		R1, [R13, #4]!");
-        
-        
-        
+
         String blocContent = declFctStruct.bloc.accept(this);
 
         str.appendLine(blocContent);
-        
-        
+
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV		R13, R11");
         str.appendLine("SUB		R13, R13, #4");
         int numParams = declFctStruct.getTds().getParams().size();
-        str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
+        str.appendFormattedLine("SUB		R13, R13, #%d", numParams * 4);
         // Récupération de l'addresse de retour et retour à l'appelant
         str.appendLine("LDR		PC, [R11]");
         return str.getString();
@@ -251,14 +255,14 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("BL		__save_reg__");
 
         // Ajout des parametres à la pile
-        for(Ast param: idfParenthesis.exprList) {
+        for (Ast param : idfParenthesis.exprList) {
             str.appendLine(param.accept(this));
             // Putting R0 in the stack
             str.appendLine("STR		R0, [R13, #4]!");
         }
 
         // Appel de la fonction
-        str.appendFormattedLine("BL 		_%s", ((Idf)idfParenthesis.idf).name);
+        str.appendFormattedLine("BL 		_%s", ((Idf) idfParenthesis.idf).name);
 
         // Restauration des registres
         str.appendLine("BL		__restore_reg__");
@@ -278,7 +282,7 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("BL		__save_reg__");
 
         // Appel de la fonction
-        str.appendFormattedLine("BL 		_%s", ((Idf)idfParenthesisEmpty.idf).name);
+        str.appendFormattedLine("BL 		_%s", ((Idf) idfParenthesisEmpty.idf).name);
 
         // Restauration des registres
         str.appendLine("BL		__restore_reg__");
@@ -305,13 +309,18 @@ public class ARMGenerator implements AstVisitor<String> {
 
         if (affectation.left instanceof Idf idf) {
             imbrication = affectation.getTds().findImbrication(idf.name);
-            // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
-            // chainage statique pour mettre a jour bp
             // chainage statique
-            if (affectation.getTds().getImbrication() - imbrication != 0){
+            if (affectation.getTds().getImbrication() - imbrication != 0) {
+                // sauvegarde du registre R7 sur la pile
+                sb.appendLine("STR R7, [R13], #4");
+                // recupère l'adresse de base du bloc dans R7
                 sb.appendLine("MOV [R11] , R7");
-                sb.appendLine("ADD R7, R7, #4"); 
-                for (int i = 0; i < affectation.getTds().getImbrication() - imbrication -1; i++) {
+                // ajoute 8 pour pointer vers le chainage statique
+                sb.appendLine("ADD R7, R7, #8");
+
+                // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
+                // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
+                for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
                     sb.appendLine("MOV [R7], R7");
                 }
                 bp = "R7";
@@ -323,7 +332,7 @@ public class ARMGenerator implements AstVisitor<String> {
         } else if (affectation.left instanceof Fleche fleche) {
             // a->b ou type(b) = int
             // decalage = decalage de a + decalage de b
-            // @a->b = base de declaration de a + decalage 
+            // @a->b = base de declaration de a + decalage
             Idf idf = (Idf) fleche.right;
             Symbole s = affectation.getTds().findSymbole(idf.name);
 
@@ -332,9 +341,13 @@ public class ARMGenerator implements AstVisitor<String> {
             }
         }
         sb.appendFormattedLine("STR R0, [%s, #%d]", bp, decalage);
+        if (bp.equals("R7")) {
+            // charge l'ancienne valeur de R7
+            sb.appendLine("LDR R7, [R13], #-4");
+        }
         return sb.getString();
     }
-    
+
     public String visit(IfThen ifThen) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
@@ -391,10 +404,10 @@ public class ARMGenerator implements AstVisitor<String> {
         Tds tds = bloc.getTds();
 
         // Content
-        for(Ast instruction : bloc.instList){
+        for (Ast instruction : bloc.instList) {
             str.appendString(instruction.accept(this));
         }
-        
+
         return str.getString();
     }
 
@@ -442,12 +455,12 @@ public class ARMGenerator implements AstVisitor<String> {
     public String startCmp(Comparaison cmp, StringAggregator str) {
         str.appendLine("; début comparaison");
         str.appendLine(cmp.left.accept(this));
-        //récup le registre depuis r0 dans le premier registre libre
+        // récup le registre depuis r0 dans le premier registre libre
         str.appendLine("MOV R1,R0");
         str.appendLine(cmp.right.accept(this));
-        //same 
+        // same
         str.appendLine("MOV R2, R0");
-        str.appendLine("CMP R1, R2"); 
+        str.appendLine("CMP R1, R2");
         str.appendLine("MOV R0, #0");
         return str.getString();
     }
@@ -467,7 +480,6 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("MOVNE R0, #1");
         return str.getString();
     }
-    
 
     @Override
     public String visit(Inferieur inf) {
