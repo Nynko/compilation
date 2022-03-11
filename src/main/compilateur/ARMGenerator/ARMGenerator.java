@@ -119,13 +119,13 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // Ajout de la macro de sauvegarde des registres
         str.appendLine("__save_reg__");
-        str.appendLine("\t\tSTMFA	R13!, {R1-R12}");
+        str.appendLine("\t\tSTMEA	R13!, {R1-R12}");
         str.appendLine("\t\tMOV		PC, LR");
         str.appendLine();
 
         // Ajout de la macro de restauration des registres
         str.appendLine("__restore_reg__");
-        str.appendLine("\t\tLDMFA	R13!, {R1-R12}");
+        str.appendLine("\t\tLDMEA	R13!, {R1-R12}");
         str.appendLine("\t\tMOV		PC, LR");
         str.appendLine();
 
@@ -160,13 +160,13 @@ public class ARMGenerator implements AstVisitor<String> {
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s",((Idf)declFctInt.Idf).name);
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR		LR, [R13, #4]!");
+        str.appendLine("STR		LR, [R13], #4");
         // On sauvegarde temporairement l'ancien pointeur de base dans R1
         str.appendLine("MOV		R1, R11");
         // On met le nouveau pointeur de base dans R11
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR		R1, [R13, #4]!");
+        str.appendLine("STR		R1, [R13], #4");
         
         String blocContent = declFctInt.bloc.accept(this);
 
@@ -179,7 +179,7 @@ public class ARMGenerator implements AstVisitor<String> {
         int numParams = declFctInt.getTds().getParams().size();
         str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [R11]");
+        str.appendLine("LDR		PC, [R11, #-4]");
         return str.getString();
     }
 
@@ -190,13 +190,13 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendFormattedLine("_%s",((Idf)declFctStruct.Idf1).name);
 
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR		LR, [R13, #4]!");
+        str.appendLine("STR		LR, [R13], #4");
         // On sauvegarde temporairement l'ancien pointeur de base dans R1
         str.appendLine("MOV		R1, R11");
         // On met le nouveau pointeur de base dans R11
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR		R1, [R13, #4]!");
+        str.appendLine("STR		R1, [R13], #4");
         
         
         
@@ -211,7 +211,7 @@ public class ARMGenerator implements AstVisitor<String> {
         int numParams = declFctStruct.getTds().getParams().size();
         str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [R11]");
+        str.appendLine("LDR		PC, [R11, #-4]");
         return str.getString();
     }
 
@@ -254,7 +254,7 @@ public class ARMGenerator implements AstVisitor<String> {
         for(Ast param: idfParenthesis.exprList) {
             str.appendLine(param.accept(this));
             // Putting R0 in the stack
-            str.appendLine("STR		R0, [R13, #4]!");
+            str.appendLine("STR		R0, [R13], #4");
         }
 
         // Appel de la fonction
