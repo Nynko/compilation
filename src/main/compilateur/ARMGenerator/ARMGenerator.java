@@ -167,6 +167,11 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         str.appendLine("STR		R1, [R13], #4");
+        // Chainage statique
+
+        // On s'assure que R13 pointe sur le maximum de son déplacement
+        str.appendFormattedLine("ADD        R1, R11, #%d", declFctInt.getTds().getDeplacement());
+        str.appendLine("MOV        R13, R1");
         
         String blocContent = declFctInt.bloc.accept(this);
 
@@ -197,6 +202,11 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         str.appendLine("STR		R1, [R13], #4");
+        // Chainage statique
+
+        // On s'assure que R13 pointe sur le maximum de son déplacement
+        str.appendFormattedLine("ADD        R1, R11, #%d", declFctStruct.getTds().getDeplacement());
+        str.appendLine("MOV        R13, R1");
         
         
         
@@ -243,10 +253,6 @@ public class ARMGenerator implements AstVisitor<String> {
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
 
-        // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", idfParenthesis.getTds().getDeplacement());
-        str.appendLine("MOV        R13, R1");
-
         // Sauvegarde des registres
         str.appendLine("BL		__save_reg__");
 
@@ -269,10 +275,6 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty) {
         StringAggregator str = new StringAggregator();
-
-        // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", idfParenthesisEmpty.getTds().getDeplacement());
-        str.appendLine("MOV        R13, R1");
 
         // Sauvegarde des registres
         str.appendLine("BL		__save_reg__");
