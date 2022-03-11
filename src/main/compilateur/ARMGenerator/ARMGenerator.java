@@ -167,7 +167,7 @@ public class ARMGenerator implements AstVisitor<String> {
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s", ((Idf) declFctInt.Idf).name);
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR LR, [R13]");
+        str.appendLine("STR		LR, [R13]");
         // On sauvegarde temporairement l'ancien pointeur de base dans R1
         str.appendLine("MOV R1, R11");
         // On met le nouveau pointeur de base dans R11
@@ -187,15 +187,16 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV R13, R11");
-        int numParams = declFctInt.getTds().getParams().size();
-        
-        // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR PC, [R11]");
+        int numParams = ((Bloc)declFctInt.bloc).getTds().getParams().size();
 
         if (numParams != 0) {
             str.appendLine("; on depile les param");
             str.appendFormattedLine("SUB R13, R13, #%d", numParams * 4);
         }
+        str.appendLine("MOV		R13, R11");
+        
+        // Récupération de l'addresse de retour et retour à l'appelant
+        str.appendLine("LDR		PC, [R11]");
         return str.getString();
     }
 
@@ -206,17 +207,17 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendFormattedLine("_%s", ((Idf) declFctStruct.Idf1).name);
 
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR		LR, [R13], #4");
+        str.appendLine("STR		LR, [R13]");
         // On sauvegarde temporairement l'ancien pointeur de base dans R1
         str.appendLine("MOV		R1, R11");
         // On met le nouveau pointeur de base dans R11
         str.appendLine("MOV		R11, R13");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR		R1, [R13], #4");
+        str.appendLine("STR		R1, [R13, #4]");
         // Chainage statique
 
         // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", declFctStruct.getTds().getDeplacement() + 4);
+        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc)declFctStruct.bloc).getTds().getDeplacement()+4);
         str.appendLine("MOV        R13, R1");
 
         String blocContent = declFctStruct.bloc.accept(this);
@@ -225,11 +226,10 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV		R13, R11");
-        str.appendLine("SUB		R13, R13, #4");
-        int numParams = declFctStruct.getTds().getParams().size();
-        str.appendFormattedLine("SUB		R13, R13, #%d", numParams * 4);
+        int numParams = ((Bloc)declFctStruct.bloc).getTds().getParams().size();
+        str.appendFormattedLine("SUB		R13, R13, #%d", numParams*4);
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [R11, #-4]");
+        str.appendLine("LDR		PC, [R11]");
         return str.getString();
     }
 
