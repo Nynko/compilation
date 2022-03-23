@@ -52,7 +52,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * Full Ascending: SP pointe vers une case "pleine" et SP augmente avec les
      * adresses.
      * X0 : Adresse de retour
+     * 
+     * 
+     * Différence avec 32 bits: 
+     *  - Non accès PC: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Program-Counter-in-AArch64-state
+     *      vs 32 bits: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch32-state/Program-Counter-in-AArch32-state?lang=en
+     * 
      */
+
 
     public static final int WORD_SIZE = 4; // Taille d'un mot en octet
 
@@ -124,12 +131,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
 
         // Initialisation
-        if(systeme.equals("macos")){
-            str.appendLine("""
+        str.appendLine("""
             .global _main             // Provide program starting address to linker
             .align 4
             """);
-        }
         str.appendLine("BL _main");
         str.appendLine("B __end__");
 
@@ -170,8 +175,37 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 svc   #0x80  // Call macos to output the string
 
 
-                helloworld: .ascii  \"Hello World!\n\"
+                helloworld: .ascii  \"Hello World!\\n\"
                     """);
+        }
+        else{ // linux
+            str.appendLine("""
+                // Setup the parameters to exit the program
+                // and then call Linux to do it.
+                mov     X0, #0
+                mov     X8, #93
+                svc     0
+                // Use 0 return code
+                // Service code 93 terminates
+                // Call Linux to terminate
+                    """);
+
+            str.appendLine("""
+                    
+                _print:
+                mov     X0, #1     // 1 = StdOut
+                ldr   X1, =helloworld // string to print
+                mov   X2, #13
+                mov   X8, #64
+                svc   0
+                // length of our string
+                // Linux write system call
+                // Call Linux to output the string
+
+                .data
+                helloworld: .ascii  \"Hello World!\\n\"
+
+                    """;);
         }
 
         return str.getString();
