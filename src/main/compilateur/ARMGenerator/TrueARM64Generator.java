@@ -205,7 +205,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 .data
                 helloworld: .ascii  \"Hello World!\\n\"
 
-                    """;);
+                    """);
         }
 
         return str.getString();
