@@ -32,7 +32,7 @@ macos: FORCE
 		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
 		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
 		as -o ./out/ARM.o ./out/ARM.s
-		ld -o ARM ARM.o -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -e _main -arch arm64
+		ld -o ./out/ARM ./out/ARM.o -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -arch arm64
 
 FORCE:
 
