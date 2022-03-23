@@ -1,6 +1,8 @@
 package compilateur.ARMGenerator;
 
 
+import java.util.ArrayList;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.AstVisitor;
@@ -78,6 +80,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private boolean division = false;
 
     private StringAggregator data;
+    private ArrayList<Character> dataList;
 
     private int AdresseInitStack = 0xFF000000;
 
@@ -90,6 +93,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
            this.type= systeme.LINUX;
         }
         this.data = new StringAggregator();
+        this.dataList = new ArrayList<Character>();
     }
 
 
@@ -331,7 +335,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if(name.equals("print")){
 
             char caractere = ((CharNode) idfParenthesis.exprList.get(0)).string.charAt(1);
-            this.data.appendFormattedLine("data_%s: .ascii \"%s\"",caractere,caractere);
+            if(!dataList.contains(caractere)){ // si le caractère n'a pas déjà été ajouté dans les datas
+                dataList.add(caractere);
+                this.data.appendFormattedLine("data_%s: .ascii \"%s\"",caractere,caractere);
+            }
+           
             
             if(type==systeme.MACOS){
                 str.appendFormattedLine("""
