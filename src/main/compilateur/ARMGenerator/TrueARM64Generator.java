@@ -46,7 +46,7 @@ import compilateur.tds.Symbole;
 import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
 
-public class ARMGenerator implements AstVisitor<String> {
+public class TrueARM64Generator implements AstVisitor<String> {
 
     /**
      * Informations/Conventions:
@@ -64,7 +64,7 @@ public class ARMGenerator implements AstVisitor<String> {
 
     private int AdresseInitStack = 0xFF000000;
 
-    public ARMGenerator() {
+    public TrueARM64Generator() {
 
     }
 
