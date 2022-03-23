@@ -62,8 +62,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * 
      */
 
-
-
     private enum systeme{
         MACOS,
         LINUX
@@ -81,6 +79,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     private StringAggregator data;
     private ArrayList<Character> dataList;
+    private ArrayList<Integer> dataListInt;
 
     private int AdresseInitStack = 0xFF000000;
 
@@ -94,6 +93,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
         this.data = new StringAggregator();
         this.dataList = new ArrayList<Character>();
+        this.dataListInt = new ArrayList<Integer>();
     }
 
 
@@ -333,39 +333,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Ajout des parametres à la pile
         if(name.equals("print")){
-
-            char caractere = ((CharNode) idfParenthesis.exprList.get(0)).string.charAt(1);
-            if(!dataList.contains(caractere)){ // si le caractère n'a pas déjà été ajouté dans les datas
-                dataList.add(caractere);
-                this.data.appendFormattedLine("data_%s: .ascii \"%s\"",caractere,caractere);
-            }
-           
-            
-            if(type==systeme.MACOS){
-                str.appendFormattedLine("""
-                    ;print:
-                    mov   X0, #1   // 1 = StdOut
-                    adr   X1, data_%s   // string to print
-                    mov   X2, #1  // length of our string
-                    mov   X16, #4  // macos write system call
-                    svc   #0x80  // Call macos to output the string
-                        """, caractere);
-            }
-
-            else{ // linux
-
-                str.appendFormattedLine("""
-                    
-                    ;print:
-                    mov     X0, #1     // 1 = StdOut
-                    ldr   X1, =data_%s // string to print
-                    mov   X2, #1 // length of our string
-                    mov   X8, #64 // Linux write system call
-                    svc   0 // Call Linux to output the string                  
-                        """,caractere);
-
-            }
+            fonctionPrint(str,idfParenthesis);
         }
+
         else{
             for (Ast param : idfParenthesis.exprList) {
                 str.appendLine(param.accept(this));
@@ -695,45 +665,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 CMP     X2, #0
                 BEQ      __end__ ; division par 0, exit
                 """);
-        str.appendLine("BL      div");
+        str.appendLine("SDIV    X0, X1, X2");
         str.appendLine();
-        if (!division) {
-            str.appendLine("""
-                    div         STMFA   SP!, {X2-X5}
-                                MOV     X0,#0
-                                MOV     X3,#0
-                                CMP     X1,#0
-                                RSBLT   X1,X1,#0
-                                EORLT   X3,X3,#1
-                                CMP     X2,#0
-                                RSBLT   X2,X2,#0
-                                EORLT   X3,X3,#1
-                                MOV     X4,X2
-                                MOV     X5,#1
-                    _div_max    LSL     X4,X4,#1
-                                LSL     X5,X5,#1
-                                CMP     X4,X1
-                                BLE     _div_max
-                    _div_loop   LSR     X4,X4,#1
-                                LSR     X5,X5,#1
-                                CMP     X4,X1
-                                BGT     _div_loop
-                                ADD     X0,X0,X5
-                                SUB     X1,X1,X4
-                                CMP     X1,X2
-                                BGE     _div_loop
-                                CMP     X3,#1
-                                BNE     _div_exit
-                                CMP     X1,#0
-                                ADDNE   X0,X0,#1
-                                RSB     X0,X0,#0
-                                RSB     X1,X1,#0
-                                ADDNE   X1,X1,X2
-                    _div_exit   LDMFA   SP!, {X2-X5}
-                                LDR     PC, [SP, #-4]!
-                    """);
-            division = true;
-        }
         str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
@@ -746,23 +679,85 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV    X1, X0");
         str.appendLine(mult.right.accept(this));
         str.appendLine("MOV    X2, X0");
-        str.appendLine("BL      mul");
-        if (!mul) {
-            str.appendLine("""
-                    mul         STMFA   SP!, {X1,X2}
-                                MOV     X0,#0
-                    _mul_loop   LSRS    X2,X2,#1
-                                ADDCS   X0,X0,X1
-                                LSL     X1,X1,#1
-                                TST     X2,X2
-                                BNE     _mul_loop
-                                LDMFA   SP!, {X1,X2}
-                                LDR     PC, [SP,#-4]!
-                    """);
-            mul = true;
-        }
+        str.appendLine("MUL X0,X1,X2");
         str.appendLine("BL      __restore_reg__");
         return str.getString();
+    }
+
+
+
+
+
+
+
+    private void fonctionPrint(StringAggregator str, IdfParenthesis idfParenthesis){
+        Ast entree = idfParenthesis.exprList.get(0);
+        int longueur = 1;
+        
+
+        // on remplie le début du print
+        str.appendLine("""
+
+                ;print:
+                mov     X0, #1  // 1 = StdOut
+                """);
+
+        //on test si c'est un caractère ou un int
+        
+        if(entree instanceof CharNode){// si on a un caractère en entrée
+            char caractere = ((CharNode) idfParenthesis.exprList.get(0)).string.charAt(1);
+            if(!dataList.contains(caractere)){ // si le caractère n'a pas déjà été ajouté dans les datas
+                dataList.add(caractere);
+                this.data.appendFormattedLine("data_%s: .ascii \"%s\"",caractere,caractere);
+            }
+            // On remplie le début du print selon macos ou linux
+            if(type==systeme.MACOS){
+                str.appendFormattedLine("adr   X1, data_%s   // string to print", caractere);
+            }
+
+            else{ // linux
+                str.appendFormattedLine("ldr   X1, =data_%s // string to print",caractere);
+            }
+        }
+
+
+        else{ // Si on a un int en entrée
+
+            Integer entier = ((IntNode)idfParenthesis.exprList.get(0)).parseInt ;
+            if(!dataListInt.contains(entier)){
+                dataListInt.add(entier);
+                this.data.appendFormattedLine("data_%d: .ascii \"%d\"",entier,entier);
+            }
+            longueur = entier.toString().length();
+
+            if(type==systeme.MACOS){
+                str.appendFormattedLine("adr   X1, data_%d   // string to print", entier);
+            }
+
+            else{ // linux
+                str.appendFormattedLine("ldr   X1, =data_%d // string to print",entier);
+            }
+
+        }
+
+        if(type==systeme.MACOS){
+            str.appendFormattedLine("""
+                mov   X2, #%d  // length of our string
+                mov   X16, #4  // macos write system call
+                svc   #0x80  // Call macos to output the string
+                    """, longueur);
+        }
+
+        else{ // linux
+
+            str.appendFormattedLine("""
+                mov   X2, #%d // length of our string
+                mov   X8, #64 // Linux write system call
+                svc   0 // Call Linux to output the string                  
+                    """,longueur);
+
+        }
+        
     }
 
 }
