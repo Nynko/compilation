@@ -49,7 +49,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     /**
      * Informations/Conventions:
-     * Full Ascending: SP pointe vers une case "pleine" et SP augmente avec les
+     * Empty Ascending: SP pointe vers une case "vide" et SP augmente avec les
      * adresses.
      * X0 : Adresse de retour
      * 
@@ -70,6 +70,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private systeme type;
 
     public static final int WORD_SIZE = 16; // Taille d'un mot en octet
+    public static final int DEPLACEMENT = 4;
 
     private int whileCompt = 0;
     private int ifCompt = 0;
@@ -147,6 +148,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("BL _main");
         str.appendLine("B __end__");
 
+        //Si on est en linux: on doit ajouter .data à this.data
+        if(type==systeme.LINUX){
+            this.data.appendLine(".data");
+        }
+
         for (Ast ast : fichier.instructions) {
             String code = ast.accept(this);
             str.appendLine(code);
@@ -154,13 +160,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Ajout de la macro de sauvegarde des registres
         str.appendLine("__save_reg__:");
-        str.appendLine("\t\tSTMEA	SP!, {X1-X12}");
+        // str.appendLine("\t\tSTM	SP!, {X1-X12}");
         str.appendLine("\t\tRET");
         str.appendLine();
 
         // Ajout de la macro de restauration des registres
         str.appendLine("__restore_reg__:");
-        str.appendLine("\t\tLDMEA	SP!, {X1-X12}");
+        // str.appendLine("\t\tLDMDB	SP!, {X1-X12}");
         str.appendLine("\t\tRET");
         str.appendLine();
 
@@ -168,27 +174,16 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // (l'instruction END n'est pas reconnue par le vrai ARM)
         str.appendLine("__end__:");
         if(type == systeme.MACOS){
+            
             str.appendLine("""
                 mov     X0, #0      // Use 0 return code
                 mov     X16, #1     // Service command code 1 terminates this program
                 svc     0           // Call MacOS to terminate the program 
             """);
 
-            str.appendLine("""
-
-                _print:
-                mov   X0, #1   // 1 = StdOut
-                adr   X1, helloworld   // string to print
-                mov   X2, #13  // length of our string
-                mov   X16, #4  // macos write system call
-                svc   #0x80  // Call macos to output the string
-
-
-                helloworld: .ascii  \"Hello World!\\n\"
-                    """);
-
             str.appendLine(data.getString());
         }
+
         else{ // linux
             str.appendLine("""
                 // Setup the parameters to exit the program
@@ -200,24 +195,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 // Service code 93 terminates
                 // Call Linux to terminate
                     """);
-//TODO à changer le helloworld
-            str.appendLine("""
-                    
-                _print:
-                mov     X0, #1     // 1 = StdOut
-                ldr   X1, =helloworld // string to print
-                mov   X2, #13
-                mov   X8, #64
-                svc   0
-                // length of our string
-                // Linux write system call
-                // Call Linux to output the string
-                    """);
 
-            str.appendLine("""
-            .data
-            helloworld: .ascii  \"Hello World!\\n\"
-            """);
             str.appendLine(this.data.getString());
         }
 
@@ -259,7 +237,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("ADD        X1, X11, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement());
+        str.appendFormattedLine("ADD        X1, X11, #%d", DEPLACEMENT*((Bloc) declFctInt.bloc).getTds().getDeplacement());
         str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctInt.bloc.accept(this);
@@ -272,7 +250,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         if (numParams != 0) {
             str.appendLine("; on depile les param");
-            str.appendFormattedLine("SUB SP, SP, #%d", numParams * 4);
+            str.appendFormattedLine("SUB SP, SP, #%d", numParams * 4 * DEPLACEMENT);
         }
         
         // Récupération de l'addresse de retour et retour à l'appelant
@@ -298,7 +276,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Chainage statique
 
         // On s'assure que SP pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        X1, X11, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
+        str.appendFormattedLine("ADD        X1, X11, #%d", DEPLACEMENT*((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
         str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctStruct.bloc.accept(this);
@@ -308,7 +286,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV		SP, X11");
         int numParams = ((Bloc) declFctStruct.bloc).getTds().getParams().size();
-        str.appendFormattedLine("SUB		SP, SP, #%d", numParams * 4);
+        str.appendFormattedLine("SUB		SP, SP, #%d", numParams * 4 * DEPLACEMENT);
         // Récupération de l'addresse de retour et retour à l'appelant
         str.appendLine("LDR   LR, [X11]   // POP LR");
         str.appendLine("RET");
@@ -342,25 +320,59 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
-        System.out.println(idfParenthesis.getTds().getName());
+        System.out.println(idfParenthesis.getTds().getName()); // le nom de la tds englobante !!
         // Sauvegarde des registres
         str.appendLine(";debut appel fonction");
         str.appendLine("BL __save_reg__");
+        
+        String name = ((Idf) idfParenthesis.idf).name;
 
         // Ajout des parametres à la pile
-        for (Ast param : idfParenthesis.exprList) {
-            str.appendLine(param.accept(this));
-            // Putting X0 in the stack
-            str.appendFormattedLine("STR X0, [SP], #%d", WORD_SIZE);
+        if(name.equals("print")){
+
+            char caractere = ((CharNode) idfParenthesis.exprList.get(0)).string.charAt(1);
+            this.data.appendFormattedLine("data_%s: .ascii \"%s\"",caractere,caractere);
+            
+            if(type==systeme.MACOS){
+                str.appendFormattedLine("""
+                    ;print:
+                    mov   X0, #1   // 1 = StdOut
+                    adr   X1, data_%s   // string to print
+                    mov   X2, #1  // length of our string
+                    mov   X16, #4  // macos write system call
+                    svc   #0x80  // Call macos to output the string
+                        """, caractere);
+            }
+
+            else{ // linux
+
+                str.appendFormattedLine("""
+                    
+                    ;print:
+                    mov     X0, #1     // 1 = StdOut
+                    ldr   X1, =data_%s // string to print
+                    mov   X2, #1 // length of our string
+                    mov   X8, #64 // Linux write system call
+                    svc   0 // Call Linux to output the string                  
+                        """,caractere);
+
+            }
         }
+        else{
+            for (Ast param : idfParenthesis.exprList) {
+                str.appendLine(param.accept(this));
+                // Putting X0 in the stack
+                str.appendFormattedLine("STR X0, [SP], #%d", WORD_SIZE);
+            }
 
-        // Appel de la fonction
+            // Appel de la fonction
 
-        str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
+            str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
 
-        // Restauration des registres
-        str.appendLine("BL __restore_reg__");
-        str.appendLine(";fin appel de fonction");
+            // Restauration des registres
+            str.appendLine("BL __restore_reg__");
+            str.appendLine(";fin appel de fonction");
+        }
 
         return str.getString();
     }
@@ -514,7 +526,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
             str.appendLine(";ajout place pour var local");
-            str.appendFormattedLine("ADD X1, X11, #%d", tds.getDeplacement());
+            str.appendFormattedLine("ADD X1, X11, #%d", DEPLACEMENT*tds.getDeplacement());
             str.appendLine("MOV SP , X1");
         }
 
