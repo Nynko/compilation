@@ -1,6 +1,5 @@
 package compilateur.ARMGenerator;
 
-import java.util.ArrayList;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
@@ -52,10 +51,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * Informations/Conventions:
      * Full Ascending: SP pointe vers une case "pleine" et SP augmente avec les
      * adresses.
-     * R0 : Adresse de retour
+     * X0 : Adresse de retour
      */
 
     public static final int WORD_SIZE = 4; // Taille d'un mot en octet
+
+    private String systeme;
 
     private int whileCompt = 0;
     private int ifCompt = 0;
@@ -64,9 +65,16 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     private int AdresseInitStack = 0xFF000000;
 
-    public TrueARM64Generator() {
+    public TrueARM64Generator(String type) {
+        if(type.equals("macos")){
+        systeme = type;
+        }
 
+        else{
+            systeme = "linux";
+        }
     }
+
 
     private int getWhileIncr() {
         int whileInt = whileCompt;
@@ -80,33 +88,33 @@ public class TrueARM64Generator implements AstVisitor<String> {
         return ifInt;
     }
 
-    // |<- R13
+    // |<- SP
     // |var loc|
     // |@stat @bp |
     // |dyn @bp |
-    // |@r | <- R11 (bp)
+    // |@r | <- X11 (bp)
     // |param |
     @Override
     public String visit(Idf idf) {
         StringAggregator str = new StringAggregator();
-        String bp = "R11";
+        String bp = "X11";
         int decalage = 0;
         int imbrication = idf.getTds().findImbrication(idf.name);
         // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
         // chainage statique pour mettre a jour bp
         // chainage statique
         if (idf.getTds().getImbrication() - imbrication != 0) {
-            str.appendLine("LDR R0 , [R11, #8]");
+            str.appendLine("LDR X0 , [X11, #8]");
             for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
-                str.appendLine("LDR R0, [R0, #8]");
+                str.appendLine("LDR X0, [X0, #8]");
             }
-            bp = "R0";
+            bp = "X0";
         }
         Symbole s = idf.getTds().findSymbole(idf.name);
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement();
         }
-        str.appendFormattedLine("LDR R0, [%s, #%d]", bp, decalage);
+        str.appendFormattedLine("LDR X0, [%s, #%d]", bp, decalage);
 
         return str.getString();
     }
@@ -116,6 +124,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
 
         // Initialisation
+        if(systeme.equals("macos")){
+            str.appendLine("""
+            .global _main             // Provide program starting address to linker
+            .align 4
+            """);
+        }
         str.appendLine("BL _main");
         str.appendLine("B __end__");
 
@@ -125,20 +139,40 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
 
         // Ajout de la macro de sauvegarde des registres
-        str.appendLine("__save_reg__");
-        str.appendLine("\t\tSTMEA	R13!, {R1-R12}");
+        str.appendLine("__save_reg__:");
+        str.appendLine("\t\tSTMEA	SP!, {X1-X12}");
         str.appendLine("\t\tMOV		PC, LR");
         str.appendLine();
 
         // Ajout de la macro de restauration des registres
-        str.appendLine("__restore_reg__");
-        str.appendLine("\t\tLDMEA	R13!, {R1-R12}");
+        str.appendLine("__restore_reg__:");
+        str.appendLine("\t\tLDMEA	SP!, {X1-X12}");
         str.appendLine("\t\tMOV		PC, LR");
         str.appendLine();
 
         // On place un label end à la fin de programme pour le quitter
         // (l'instruction END n'est pas reconnue par le vrai ARM)
-        str.appendLine("__end__");
+        str.appendLine("__end__:");
+        if(systeme.equals("macos")){
+            str.appendLine("""
+                mov     X0, #0      // Use 0 return code
+                mov     X16, #1     // Service command code 1 terminates this program
+                svc     0           // Call MacOS to terminate the program 
+            """);
+
+            str.appendLine("""
+
+                _print:
+                mov   X0, #1   // 1 = StdOut
+                adr   X1, helloworld   // string to print
+                mov   X2, #13  // length of our string
+                mov   X16, #4  // macos write system call
+                svc   #0x80  // Call macos to output the string
+
+
+                helloworld: .ascii  \"Hello World!\n\"
+                    """);
+        }
 
         return str.getString();
     }
@@ -165,37 +199,37 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(DeclFctInt declFctInt) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendFormattedLine("_%s", ((Idf) declFctInt.Idf).name);
+        str.appendFormattedLine("_%s:", ((Idf) declFctInt.Idf).name);
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR		LR, [R13]");
-        // On sauvegarde temporairement l'ancien pointeur de base dans R1
-        str.appendLine("MOV R1, R11");
-        // On met le nouveau pointeur de base dans R11
-        str.appendLine("MOV R11, R13");
+        str.appendLine("STR		LR, [SP]");
+        // On sauvegarde temporairement l'ancien pointeur de base dans X1
+        str.appendLine("MOV X1, X11");
+        // On met le nouveau pointeur de base dans X11
+        str.appendLine("MOV X11, SP");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR R1, [R13, #4]");
+        str.appendLine("STR X1, [SP, #4]");
         // Chainage statique
 
-        // On s'assure que R13 pointe sur le maximum de son déplacement
+        // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement());
-        str.appendLine("MOV        R13, R1");
+        str.appendFormattedLine("ADD        X1, X11, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement());
+        str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctInt.bloc.accept(this);
 
         str.appendLine(blocContent);
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV R13, R11");
+        str.appendLine("MOV SP, X11");
         int numParams = ((Bloc)declFctInt.bloc).getTds().getParams().size();
 
         if (numParams != 0) {
             str.appendLine("; on depile les param");
-            str.appendFormattedLine("SUB R13, R13, #%d", numParams * 4);
+            str.appendFormattedLine("SUB SP, SP, #%d", numParams * 4);
         }
         
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [R11]");
+        str.appendLine("LDR		PC, [X11]");
         return str.getString();
     }
 
@@ -203,32 +237,32 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(DeclFctStruct declFctStruct) {
         StringAggregator str = new StringAggregator();
         // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendFormattedLine("_%s", ((Idf) declFctStruct.Idf1).name);
+        str.appendFormattedLine("_%s:", ((Idf) declFctStruct.Idf1).name);
 
         // Sauvegarde de l'adresse de retour
-        str.appendLine("STR		LR, [R13]");
-        // On sauvegarde temporairement l'ancien pointeur de base dans R1
-        str.appendLine("MOV		R1, R11");
-        // On met le nouveau pointeur de base dans R11
-        str.appendLine("MOV		R11, R13");
+        str.appendLine("STR		LR, [SP]");
+        // On sauvegarde temporairement l'ancien pointeur de base dans X1
+        str.appendLine("MOV		X1, X11");
+        // On met le nouveau pointeur de base dans X11
+        str.appendLine("MOV		X11, SP");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR		R1, [R13, #4]");
+        str.appendLine("STR		X1, [SP, #4]");
         // Chainage statique
 
-        // On s'assure que R13 pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
-        str.appendLine("MOV        R13, R1");
+        // On s'assure que SP pointe sur le maximum de son déplacement
+        str.appendFormattedLine("ADD        X1, X11, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
+        str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctStruct.bloc.accept(this);
 
         str.appendLine(blocContent);
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV		R13, R11");
+        str.appendLine("MOV		SP, X11");
         int numParams = ((Bloc) declFctStruct.bloc).getTds().getParams().size();
-        str.appendFormattedLine("SUB		R13, R13, #%d", numParams * 4);
+        str.appendFormattedLine("SUB		SP, SP, #%d", numParams * 4);
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [R11]");
+        str.appendLine("LDR		PC, [X11]");
         return str.getString();
     }
 
@@ -267,11 +301,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Ajout des parametres à la pile
         for (Ast param : idfParenthesis.exprList) {
             str.appendLine(param.accept(this));
-            // Putting R0 in the stack
-            str.appendLine("STR R0, [R13], #4");
+            // Putting X0 in the stack
+            str.appendLine("STR X0, [SP], #4");
         }
 
         // Appel de la fonction
+
         str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
 
         // Restauration des registres
@@ -299,19 +334,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(IntNode intNode) {
-        return String.format("LDR R0, =%d\n", intNode.parseInt);
+        return String.format("LDR X0, =%d\n", intNode.parseInt);
     }
 
     @Override
     public String visit(Affectation affectation) {
         StringAggregator sb = new StringAggregator();
         // on recupere le code assembleur de la partie droite de l'affectation, le code
-        // retourne le resultat de l'expression dans R0
+        // retourne le resultat de l'expression dans X0
         sb.appendLine(affectation.right.accept(this));
 
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
-        String bp = "R11";
+        String bp = "X11";
         int imbrication;
 
         if (affectation.left instanceof Idf idf) {
@@ -319,19 +354,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // chainage statique
             if (affectation.getTds().getImbrication() - imbrication != 0) {
                 sb.appendLine();
-                // sauvegarde du registre R7 sur la pile
-                sb.appendLine("STR R7, [R13], #4");
+                // sauvegarde du registre X7 sur la pile
+                sb.appendLine("STR X7, [SP], #4");
 
                 sb.appendLine(";Chainage statique");
-                // recupère l'adresse du chainage statique du bloc dans R7
-                sb.appendLine("LDR R7 , [R11, #8]");
+                // recupère l'adresse du chainage statique du bloc dans X7
+                sb.appendLine("LDR X7 , [X11, #8]");
 
                 // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
                 // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
                 for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
-                    sb.appendLine("LDR R7, [R7, #8]");
+                    sb.appendLine("LDR X7, [X7, #8]");
                 }
-                bp = "R7";
+                bp = "X7";
             }
             Symbole s = affectation.getTds().findSymbole(idf.name);
             if (s instanceof SymboleVar sv) {
@@ -348,10 +383,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 decalage = sv.getDeplacement();
             }
         }
-        sb.appendFormattedLine("STR R0, [%s, #%d]", bp, decalage);
-        if (bp.equals("R7")) {
-            // charge l'ancienne valeur de R7
-            sb.appendLine("LDR R7, [R13, #-4]!");
+        sb.appendFormattedLine("STR X0, [%s, #%d]", bp, decalage);
+        if (bp.equals("X7")) {
+            // charge l'ancienne valeur de X7
+            sb.appendLine("LDR X7, [SP, #-4]!");
         }
         sb.appendLine();
         return sb.getString();
@@ -362,10 +397,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int ifNum = getIfIncr();
         str.appendFormattedLine(";if%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThen.condition.accept(this));
-        str.appendLine("CMP R0, #0");
+        str.appendLine("CMP X0, #0");
         str.appendFormattedLine("BEQ _finIf%d", ifNum);
         str.appendLine(ifThen.thenBlock.accept(this));
-        str.appendFormattedLine("_finIf%d", ifNum);
+        str.appendFormattedLine("_finIf%d:", ifNum);
         str.appendLine();
         return str.getString();
     }
@@ -376,13 +411,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int ifNum = getIfIncr();
         str.appendFormattedLine(";ifThenElse%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThenElse.condition.accept(this));
-        str.appendLine("CMP R0, #0");
+        str.appendLine("CMP X0, #0");
         str.appendFormattedLine("BEQ _else%d", ifNum);
         str.appendLine(ifThenElse.thenBlock.accept(this));
         str.appendFormattedLine("B  _finIf%d", ifNum);
-        str.appendFormattedLine("_else%d", ifNum);
+        str.appendFormattedLine("_else%d:", ifNum);
         str.appendLine(ifThenElse.elseBlock.accept(this));
-        str.appendFormattedLine("_finIf%d", ifNum);
+        str.appendFormattedLine("_finIf%d:", ifNum);
         str.appendLine();
         return str.getString();
     }
@@ -391,13 +426,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(While while1) {
         StringAggregator str = new StringAggregator();
         int whileNum = getWhileIncr();
-        str.appendFormattedLine("_while %d", whileNum);
+        str.appendFormattedLine("_while %d:", whileNum);
         str.appendLine(while1.condition.accept(this));
-        str.appendLine("CMP R0, #0");
+        str.appendLine("CMP X0, #0");
         str.appendFormattedLine("BEQ _finWhile %d", whileNum);
         str.appendLine(while1.doBlock.accept(this));
         str.appendFormattedLine("B _while %d", whileNum);
-        str.appendFormattedLine("_finWhile %d", whileNum);
+        str.appendFormattedLine("_finWhile %d:", whileNum);
         str.appendLine();
         return str.getString();
     }
@@ -418,20 +453,20 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendLine("BL __save_reg__");
 
             // Ignore l'adresse de retour
-            // On sauvegarde temporairement l'ancien pointeur de base dans R1
-            str.appendLine("MOV R1, R11");
-            // On met le nouveau pointeur de base dans R11
-            str.appendLine("MOV R11, R13");
+            // On sauvegarde temporairement l'ancien pointeur de base dans X1
+            str.appendLine("MOV X1, X11");
+            // On met le nouveau pointeur de base dans X11
+            str.appendLine("MOV X11, SP");
             // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-            str.appendLine("STR R1, [R13, #4]");
+            str.appendLine("STR X1, [SP, #4]");
             // Chainage statique
-            str.appendLine("STR R1, [R13, #8]");
+            str.appendLine("STR X1, [SP, #8]");
             
-            // On s'assure que R13 pointe sur le maximum de son déplacement (ajoute la place
+            // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
             str.appendLine(";ajout place pour var local");
-            str.appendFormattedLine("ADD R1, R11, #%d", tds.getDeplacement());
-            str.appendLine("MOV R13 , R1");
+            str.appendFormattedLine("ADD X1, X11, #%d", tds.getDeplacement());
+            str.appendLine("MOV SP , X1");
         }
 
         str.appendLine(";debut instructions");
@@ -443,7 +478,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         if (tds.getName().equals("anonblock")) {
             // Remise du pointeur de pile à sa position avant l'appel de fonction
-            str.appendLine("MOV R13, R11");
+            str.appendLine("MOV SP, X11");
 
             // Restauration des registres
             str.appendLine("BL __restore_reg__");
@@ -455,7 +490,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(CharNode charNode) {
-        return String.format("LDR R0, =%s\n", charNode.string);
+        return String.format("LDR X0, =%s\n", charNode.string);
     }
 
     @Override
@@ -498,12 +533,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("; début comparaison");
         str.appendLine(cmp.left.accept(this));
         // récup le registre depuis r0 dans le premier registre libre
-        str.appendLine("MOV R1,R0");
+        str.appendLine("MOV X1,X0");
         str.appendLine(cmp.right.accept(this));
         // same
-        str.appendLine("MOV R2, R0");
-        str.appendLine("CMP R1, R2");
-        str.appendLine("MOV R0, #0");
+        str.appendLine("MOV X2, X0");
+        str.appendLine("CMP X1, X2");
+        str.appendLine("MOV X0, #0");
         return str.getString();
     }
 
@@ -511,7 +546,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Egal egal) {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
-        str.appendLine("MOVEQ R0, #1");
+        str.appendLine("MOVEQ X0, #1");
         return str.getString();
     }
 
@@ -519,7 +554,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Different dif) {
         StringAggregator str = new StringAggregator();
         startCmp(dif, str);
-        str.appendLine("MOVNE R0, #1");
+        str.appendLine("MOVNE X0, #1");
         return str.getString();
     }
 
@@ -527,7 +562,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Inferieur inf) {
         StringAggregator str = new StringAggregator();
         startCmp(inf, str);
-        str.appendLine("MOVLT R0, #1");
+        str.appendLine("MOVLT X0, #1");
         return str.getString();
     }
 
@@ -535,7 +570,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(InferieurEgal infEgal) {
         StringAggregator str = new StringAggregator();
         startCmp(infEgal, str);
-        str.appendLine("MOVLE R0, #1");
+        str.appendLine("MOVLE X0, #1");
         return str.getString();
     }
 
@@ -543,7 +578,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Superieur sup) {
         StringAggregator str = new StringAggregator();
         startCmp(sup, str);
-        str.appendLine("MOVGT R0, #1");
+        str.appendLine("MOVGT X0, #1");
         return str.getString();
     }
 
@@ -551,7 +586,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(SuperieurEgal supEgal) {
         StringAggregator str = new StringAggregator();
         startCmp(supEgal, str);
-        str.appendLine("MOVGE R0, #1");
+        str.appendLine("MOVGE X0, #1");
         return str.getString();
     }
 
@@ -560,9 +595,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine(plus.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV   R1, R0");
+        str.appendLine("MOV   X1, X0");
         str.appendLine(plus.right.accept(this));
-        str.appendLine("ADD     R0, R0, R1");
+        str.appendLine("ADD     X0, X0, X1");
         str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
@@ -572,9 +607,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine(minus.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV    R1, R0");
+        str.appendLine("MOV    X1, X0");
         str.appendLine(minus.right.accept(this));
-        str.appendLine("SUB     R0, R0, R1");
+        str.appendLine("SUB     X0, X0, X1");
         str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
@@ -584,49 +619,49 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine(div.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV    R1, R0");
+        str.appendLine("MOV    X1, X0");
         str.appendLine(div.right.accept(this));
-        str.appendLine("MOV    R2, R0");
+        str.appendLine("MOV    X2, X0");
         str.appendLine("""
-                CMP     R2, #0
+                CMP     X2, #0
                 BEQ      __end__ ; division par 0, exit
                 """);
         str.appendLine("BL      div");
         str.appendLine();
         if (!division) {
             str.appendLine("""
-                    div         STMFA   SP!, {R2-R5}
-                                MOV     R0,#0
-                                MOV     R3,#0
-                                CMP     R1,#0
-                                RSBLT   R1,R1,#0
-                                EORLT   R3,R3,#1
-                                CMP     R2,#0
-                                RSBLT   R2,R2,#0
-                                EORLT   R3,R3,#1
-                                MOV     R4,R2
-                                MOV     R5,#1
-                    _div_max    LSL     R4,R4,#1
-                                LSL     R5,R5,#1
-                                CMP     R4,R1
+                    div         STMFA   SP!, {X2-X5}
+                                MOV     X0,#0
+                                MOV     X3,#0
+                                CMP     X1,#0
+                                RSBLT   X1,X1,#0
+                                EORLT   X3,X3,#1
+                                CMP     X2,#0
+                                RSBLT   X2,X2,#0
+                                EORLT   X3,X3,#1
+                                MOV     X4,X2
+                                MOV     X5,#1
+                    _div_max    LSL     X4,X4,#1
+                                LSL     X5,X5,#1
+                                CMP     X4,X1
                                 BLE     _div_max
-                    _div_loop   LSR     R4,R4,#1
-                                LSR     R5,R5,#1
-                                CMP     R4,R1
+                    _div_loop   LSR     X4,X4,#1
+                                LSR     X5,X5,#1
+                                CMP     X4,X1
                                 BGT     _div_loop
-                                ADD     R0,R0,R5
-                                SUB     R1,R1,R4
-                                CMP     R1,R2
+                                ADD     X0,X0,X5
+                                SUB     X1,X1,X4
+                                CMP     X1,X2
                                 BGE     _div_loop
-                                CMP     R3,#1
+                                CMP     X3,#1
                                 BNE     _div_exit
-                                CMP     R1,#0
-                                ADDNE   R0,R0,#1
-                                RSB     R0,R0,#0
-                                RSB     R1,R1,#0
-                                ADDNE   R1,R1,R2
-                    _div_exit   LDMFA   SP!, {R2-R5}
-                                LDR     PC, [R13, #-4]!
+                                CMP     X1,#0
+                                ADDNE   X0,X0,#1
+                                RSB     X0,X0,#0
+                                RSB     X1,X1,#0
+                                ADDNE   X1,X1,X2
+                    _div_exit   LDMFA   SP!, {X2-X5}
+                                LDR     PC, [SP, #-4]!
                     """);
             division = true;
         }
@@ -639,21 +674,21 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine(mult.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV    R1, R0");
+        str.appendLine("MOV    X1, X0");
         str.appendLine(mult.right.accept(this));
-        str.appendLine("MOV    R2, R0");
+        str.appendLine("MOV    X2, X0");
         str.appendLine("BL      mul");
         if (!mul) {
             str.appendLine("""
-                    mul         STMFA   SP!, {R1,R2}
-                                MOV     R0,#0
-                    _mul_loop   LSRS    R2,R2,#1
-                                ADDCS   R0,R0,R1
-                                LSL     R1,R1,#1
-                                TST     R2,R2
+                    mul         STMFA   SP!, {X1,X2}
+                                MOV     X0,#0
+                    _mul_loop   LSRS    X2,X2,#1
+                                ADDCS   X0,X0,X1
+                                LSL     X1,X1,#1
+                                TST     X2,X2
                                 BNE     _mul_loop
-                                LDMFA   SP!, {R1,R2}
-                                LDR     PC, [R13,#-4]!
+                                LDMFA   SP!, {X1,X2}
+                                LDR     PC, [SP,#-4]!
                     """);
             mul = true;
         }
