@@ -27,5 +27,12 @@ tds : FORCE
 		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
 		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
 
+macos: FORCE
+		./gradlew run --args "$(ARGS)"
+		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
+		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
+		as -o ./out/ARM.o ./out/ARM.s
+		ld -o ARM ARM.o -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -e _main -arch arm64
+
 FORCE:
 
