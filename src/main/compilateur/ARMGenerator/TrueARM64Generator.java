@@ -61,25 +61,34 @@ public class TrueARM64Generator implements AstVisitor<String> {
      */
 
 
-    public static final int WORD_SIZE = 4; // Taille d'un mot en octet
 
-    private String systeme;
+    private enum systeme{
+        MACOS,
+        LINUX
+    };
+
+    private systeme type;
+
+    public static final int WORD_SIZE = 16; // Taille d'un mot en octet
 
     private int whileCompt = 0;
     private int ifCompt = 0;
     private boolean mul = false;
     private boolean division = false;
 
+    private StringAggregator data;
+
     private int AdresseInitStack = 0xFF000000;
 
     public TrueARM64Generator(String type) {
         if(type.equals("macos")){
-        systeme = type;
+        this.type = systeme.MACOS;
         }
 
         else{
-            systeme = "linux";
+           this.type= systeme.LINUX;
         }
+        this.data = new StringAggregator();
     }
 
 
@@ -146,19 +155,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Ajout de la macro de sauvegarde des registres
         str.appendLine("__save_reg__:");
         str.appendLine("\t\tSTMEA	SP!, {X1-X12}");
-        str.appendLine("\t\tMOV		PC, LR");
+        str.appendLine("\t\tRET");
         str.appendLine();
 
         // Ajout de la macro de restauration des registres
         str.appendLine("__restore_reg__:");
         str.appendLine("\t\tLDMEA	SP!, {X1-X12}");
-        str.appendLine("\t\tMOV		PC, LR");
+        str.appendLine("\t\tRET");
         str.appendLine();
 
         // On place un label end à la fin de programme pour le quitter
         // (l'instruction END n'est pas reconnue par le vrai ARM)
         str.appendLine("__end__:");
-        if(systeme.equals("macos")){
+        if(type == systeme.MACOS){
             str.appendLine("""
                 mov     X0, #0      // Use 0 return code
                 mov     X16, #1     // Service command code 1 terminates this program
@@ -177,6 +186,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
                 helloworld: .ascii  \"Hello World!\\n\"
                     """);
+
+            str.appendLine(data.getString());
         }
         else{ // linux
             str.appendLine("""
@@ -189,7 +200,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 // Service code 93 terminates
                 // Call Linux to terminate
                     """);
-
+//TODO à changer le helloworld
             str.appendLine("""
                     
                 _print:
@@ -201,11 +212,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 // length of our string
                 // Linux write system call
                 // Call Linux to output the string
-
-                .data
-                helloworld: .ascii  \"Hello World!\\n\"
-
                     """);
+
+            str.appendLine("""
+            .data
+            helloworld: .ascii  \"Hello World!\\n\"
+            """);
+            str.appendLine(this.data.getString());
         }
 
         return str.getString();
@@ -241,7 +254,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On met le nouveau pointeur de base dans X11
         str.appendLine("MOV X11, SP");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR X1, [SP, #4]");
+        str.appendFormattedLine("STR X1, [SP, #%d]", WORD_SIZE);
         // Chainage statique
 
         // On s'assure que SP pointe sur le maximum de son déplacement
@@ -263,7 +276,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
         
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [X11]");
+        str.appendLine("LDR   LR, [X11]    // POP LR");
+        str.appendLine("RET");
         return str.getString();
     }
 
@@ -280,7 +294,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On met le nouveau pointeur de base dans X11
         str.appendLine("MOV		X11, SP");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendLine("STR		X1, [SP, #4]");
+        str.appendLine("STR		X1, [SP, #%d]");
         // Chainage statique
 
         // On s'assure que SP pointe sur le maximum de son déplacement
@@ -296,7 +310,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int numParams = ((Bloc) declFctStruct.bloc).getTds().getParams().size();
         str.appendFormattedLine("SUB		SP, SP, #%d", numParams * 4);
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR		PC, [X11]");
+        str.appendLine("LDR   LR, [X11]   // POP LR");
+        str.appendLine("RET");
         return str.getString();
     }
 
@@ -336,7 +351,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         for (Ast param : idfParenthesis.exprList) {
             str.appendLine(param.accept(this));
             // Putting X0 in the stack
-            str.appendLine("STR X0, [SP], #4");
+            str.appendFormattedLine("STR X0, [SP], #%d", WORD_SIZE);
         }
 
         // Appel de la fonction
@@ -389,7 +404,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             if (affectation.getTds().getImbrication() - imbrication != 0) {
                 sb.appendLine();
                 // sauvegarde du registre X7 sur la pile
-                sb.appendLine("STR X7, [SP], #4");
+                sb.appendFormattedLine("STR X7, [SP], #%d", WORD_SIZE);
 
                 sb.appendLine(";Chainage statique");
                 // recupère l'adresse du chainage statique du bloc dans X7
@@ -492,7 +507,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // On met le nouveau pointeur de base dans X11
             str.appendLine("MOV X11, SP");
             // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-            str.appendLine("STR X1, [SP, #4]");
+            str.appendFormattedLine("STR X1, [SP, #%d]", WORD_SIZE);
             // Chainage statique
             str.appendLine("STR X1, [SP, #8]");
             
