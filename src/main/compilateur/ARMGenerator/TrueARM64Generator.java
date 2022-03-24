@@ -78,8 +78,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private boolean division = false;
 
     private StringAggregator data;
-    private ArrayList<Character> dataList;
-    private ArrayList<Integer> dataListInt;
+    private ArrayList<String> dataList;
 
     private int AdresseInitStack = 0xFF000000;
 
@@ -92,8 +91,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
            this.type= systeme.LINUX;
         }
         this.data = new StringAggregator();
-        this.dataList = new ArrayList<Character>();
-        this.dataListInt = new ArrayList<Integer>();
+        this.dataList = new ArrayList<String>();
     }
 
 
@@ -333,7 +331,16 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Ajout des parametres à la pile
         if(name.equals("print")){
-            fonctionPrint(str,idfParenthesis);
+            String entree;
+            if(idfParenthesis.exprList.get(0) instanceof CharNode){ // si c'est un caractère de type 'c' --> on récupère juste c
+                entree = Character.toString( ((CharNode) idfParenthesis.exprList.get(0)).string.charAt(1) );
+                fonctionPrint(str,entree);
+            }
+            else{
+                // str.appendLine(idfParenthesis.exprList.get(0).accept(this));
+                fonctionPrint(str, Integer.toString(((IntNode) idfParenthesis.exprList.get(0)).parseInt));
+            }
+            
         }
 
         else{
@@ -690,74 +697,71 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
 
 
-    private void fonctionPrint(StringAggregator str, IdfParenthesis idfParenthesis){
-        Ast entree = idfParenthesis.exprList.get(0);
+    private void fonctionPrint(StringAggregator str, String entree){
         int longueur = 1;
-        
 
-        // on remplie le début du print
-        str.appendLine("""
+        // on test si int ou caractère:
+        if(entree.equals("X0")){ // si on a le resultat qui est dans X0
+            str.appendLine("""
 
                 ;print:
-                mov     X0, #1  // 1 = StdOut
-                """);
-
-        //on test si c'est un caractère ou un int
-        
-        if(entree instanceof CharNode){// si on a un caractère en entrée
-            char caractere = ((CharNode) idfParenthesis.exprList.get(0)).string.charAt(1);
-            if(!dataList.contains(caractere)){ // si le caractère n'a pas déjà été ajouté dans les datas
-                dataList.add(caractere);
-                this.data.appendFormattedLine("data_%s: .ascii \"%s\"",caractere,caractere);
+                mov  X1, X0  // string to print
+                mov   X0, #1  // 1 = StdOut
+                mov   X2, #20  // length of the max pour 64 bits unsigned integer
+                    """);
+            if(type==systeme.MACOS){    
+                str.appendLine("""
+                    mov   X16, #4  // macos write system call
+                    svc   #0x80  // Call macos to output the string
+                        """);
             }
-            // On remplie le début du print selon macos ou linux
+
+            else{// linux
+                str.appendLine("""
+                    mov   X8, #64 // Linux write system call
+                    svc   0 // Call Linux to output the string   
+                        """);
+
+            }
+        }
+
+        else{
+            // on remplie le début du print
+            str.appendLine("""
+
+            ;print:
+            mov     X0, #1  // 1 = StdOut
+            """);
+
+            if(!dataList.contains(entree)){ // si le caractère n'a pas déjà été ajouté dans les datas
+                dataList.add(entree);
+                this.data.appendFormattedLine("data_%s: .ascii \"%s\"",entree,entree);
+            }
+            // On remplie le print selon macos ou linux
             if(type==systeme.MACOS){
-                str.appendFormattedLine("adr   X1, data_%s   // string to print", caractere);
+                str.appendFormattedLine("""
+                    adr   X1, data_%s   // string to print
+                    mov   X2, #%d  // length of our string
+                    mov   X16, #4  // macos write system call
+                    svc   #0x80  // Call macos to output the string
+                        """, entree, longueur);
             }
 
             else{ // linux
-                str.appendFormattedLine("ldr   X1, =data_%s // string to print",caractere);
+
+                str.appendFormattedLine("""
+                    ldr   X1, =data_%s // string to print
+                    mov   X2, #%d // length of our string
+                    mov   X8, #64 // Linux write system call
+                    svc   0 // Call Linux to output the string                  
+                        """,entree,longueur);
+
             }
-        }
-
-
-        else{ // Si on a un int en entrée
-
-            Integer entier = ((IntNode)idfParenthesis.exprList.get(0)).parseInt ;
-            if(!dataListInt.contains(entier)){
-                dataListInt.add(entier);
-                this.data.appendFormattedLine("data_%d: .ascii \"%d\"",entier,entier);
-            }
-            longueur = entier.toString().length();
-
-            if(type==systeme.MACOS){
-                str.appendFormattedLine("adr   X1, data_%d   // string to print", entier);
-            }
-
-            else{ // linux
-                str.appendFormattedLine("ldr   X1, =data_%d // string to print",entier);
-            }
-
-        }
-
-        if(type==systeme.MACOS){
-            str.appendFormattedLine("""
-                mov   X2, #%d  // length of our string
-                mov   X16, #4  // macos write system call
-                svc   #0x80  // Call macos to output the string
-                    """, longueur);
-        }
-
-        else{ // linux
-
-            str.appendFormattedLine("""
-                mov   X2, #%d // length of our string
-                mov   X8, #64 // Linux write system call
-                svc   0 // Call Linux to output the string                  
-                    """,longueur);
-
-        }
         
+        }
+
     }
+
+      
 
 }
