@@ -337,7 +337,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 fonctionPrint(str,entree);
             }
             else{
-                // str.appendLine(idfParenthesis.exprList.get(0).accept(this));
+                str.appendLine(idfParenthesis.exprList.get(0).accept(this));
                 fonctionPrint(str, Integer.toString(((IntNode) idfParenthesis.exprList.get(0)).parseInt));
             }
             
