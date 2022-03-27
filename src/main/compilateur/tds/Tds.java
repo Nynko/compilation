@@ -202,6 +202,7 @@ public class Tds {
             sym.setDeplacement(this.deplacementParam);
             this.deplacementParam -= Offset.OFFSET;
             this.compteurParams += 1;
+            sym.setInitalized(true);
         }
         this.listeSymboles.put(name, symbole);
         Tds.incrementNumberSymbole();
