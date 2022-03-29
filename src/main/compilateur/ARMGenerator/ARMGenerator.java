@@ -266,8 +266,9 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // Ajout des parametres à la pile
         for (Ast param : idfParenthesis.exprList) {
+            // On met le paramètre dans R0
             str.appendLine(param.accept(this));
-            // Putting R0 in the stack
+            // On met R0 sur la pile
             str.appendLine("STR R0, [SP], #4");
         }
 
