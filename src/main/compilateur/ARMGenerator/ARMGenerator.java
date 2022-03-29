@@ -420,6 +420,7 @@ public class ARMGenerator implements AstVisitor<String> {
     public String startCmp(Comparaison cmp, StringAggregator str) {
         str.appendLine("; début comparaison");
         str.appendLine(cmp.left.accept(this));
+        str.appendLine("BL      __save_reg__");
         //récup le registre depuis r0 dans le premier registre libre
         str.appendLine("MOV R1,R0");
         str.appendLine(cmp.right.accept(this));
@@ -435,6 +436,7 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
         str.appendLine("MOVEQ R0, #1");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -443,6 +445,7 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(dif, str);
         str.appendLine("MOVNE R0, #1");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
     
@@ -452,6 +455,7 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(inf, str);
         str.appendLine("MOVLT R0, #1");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -460,6 +464,7 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(infEgal, str);
         str.appendLine("MOVLE R0, #1");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -468,6 +473,7 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(sup, str);
         str.appendLine("MOVGT R0, #1");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -476,6 +482,7 @@ public class ARMGenerator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(supEgal, str);
         str.appendLine("MOVGE R0, #1");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
