@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
 import compilateur.ARMGenerator.ARMGenerator;
+import compilateur.ARMGenerator.TrueARM64Generator;
 import compilateur.ast.Ast;
 import compilateur.ast.AstCreator;
 import compilateur.grammar.circLexer;
@@ -111,7 +112,7 @@ public class Main {
                     graphVizTds.dumpGraph("./out/tds.dot");
 
                     // ARM
-                    ARMGenerator arm = new ARMGenerator();
+                    TrueARM64Generator arm = new TrueARM64Generator("macos");
                     String str = ast.accept(arm);
                     outputARM(str);
                     
