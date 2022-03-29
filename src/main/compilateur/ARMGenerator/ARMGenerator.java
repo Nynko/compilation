@@ -104,7 +104,7 @@ public class ARMGenerator implements AstVisitor<String> {
         }
         Symbole s = idf.getTds().findSymbole(idf.name);
         if (s instanceof SymboleVar sv) {
-            decalage = sv.getDeplacement();
+            decalage = sv.getDeplacement(WORD_SIZE);
         }
         str.appendFormattedLine("LDR R0, [%s, #%d]", bp, decalage);
 
@@ -178,7 +178,7 @@ public class ARMGenerator implements AstVisitor<String> {
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement());
+        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement(WORD_SIZE));
         str.appendLine("MOV        SP, R1");
 
         String blocContent = declFctInt.bloc.accept(this);
@@ -216,7 +216,7 @@ public class ARMGenerator implements AstVisitor<String> {
         // Chainage statique
 
         // On s'assure que SP pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
+        str.appendFormattedLine("ADD        R1, R11, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement(WORD_SIZE) + 4);
         str.appendLine("MOV        SP, R1");
 
         String blocContent = declFctStruct.bloc.accept(this);
@@ -336,7 +336,7 @@ public class ARMGenerator implements AstVisitor<String> {
             }
             Symbole s = affectation.getTds().findSymbole(idf.name);
             if (s instanceof SymboleVar sv) {
-                decalage = sv.getDeplacement();
+                decalage = sv.getDeplacement(WORD_SIZE);
             }
         } else if (affectation.left instanceof Fleche fleche) {
             // a->b ou type(b) = int
@@ -346,7 +346,7 @@ public class ARMGenerator implements AstVisitor<String> {
             Symbole s = affectation.getTds().findSymbole(idf.name);
 
             if (s instanceof SymboleVar sv) {
-                decalage = sv.getDeplacement();
+                decalage = sv.getDeplacement(WORD_SIZE);
             }
         }
         sb.appendFormattedLine("STR R0, [%s, #%d]", bp, decalage);
@@ -431,7 +431,7 @@ public class ARMGenerator implements AstVisitor<String> {
             // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
             str.appendLine(";ajout place pour var local");
-            str.appendFormattedLine("ADD R1, R11, #%d", tds.getDeplacement());
+            str.appendFormattedLine("ADD R1, R11, #%d", tds.getDeplacement(WORD_SIZE));
             str.appendLine("MOV SP , R1");
         }
 
