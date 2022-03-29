@@ -255,7 +255,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s:", ((Idf) declFctInt.Idf).name);
         // Sauvegarde de l'adresse de retour
-        str.appendFormattedLine("STR		LR, [SP, #-%d]", WORD_SIZE);
+        str.appendFormattedLine("STR		LR, [SP, #-%d]!", WORD_SIZE);
         // On sauvegarde temporairement l'ancien pointeur de base dans X1
         str.appendLine("MOV X1, X29");
         // On met le nouveau pointeur de base dans X29
@@ -295,7 +295,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendFormattedLine("_%s:", ((Idf) declFctStruct.Idf1).name);
 
         // Sauvegarde de l'adresse de retour
-        str.appendFormattedLine("STR		LR, [SP, #-%d]", WORD_SIZE);
+        str.appendFormattedLine("STR		LR, [SP, #-%d]!", WORD_SIZE);
         // On sauvegarde temporairement l'ancien pointeur de base dans X1
         str.appendLine("MOV X1, X29");
         // On met le nouveau pointeur de base dans X29
@@ -711,7 +711,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("_print:");
 
         // Sauvegarde de l'adresse de retour
-        str.appendFormattedLine("STR		LR, [SP, #-%d]", WORD_SIZE);
+        str.appendFormattedLine("STR		LR, [SP, #-%d]!", WORD_SIZE);
         // On sauvegarde temporairement l'ancien pointeur de base dans X1
         str.appendLine("MOV X1, X29");
         // On met le nouveau pointeur de base dans X29
