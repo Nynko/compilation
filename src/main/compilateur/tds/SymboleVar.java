@@ -29,6 +29,10 @@ public abstract class SymboleVar extends Symbole {
         return this.paramIndex;
     } 
 
+    public int getDeplacement(int wordsize){
+        return this.deplacement * wordsize;
+    }
+
     public int getDeplacement(){
         return this.deplacement;
     }
