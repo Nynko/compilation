@@ -414,7 +414,18 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(Expr_et expr_et) {
         // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine(expr_et.left.accept(this));
+        str.appendLine("BL      __save_reg__");
+        str.appendLine("MOV R1,R0");
+
+        str.appendLine(expr_et.right.accept(this));
+        str.appendLine("MOV R2,R0");
+        str.appendLine("CMP R2, #1");
+        str.appendLine("CMPEQ R1, R2");
+        str.appendLine("MOV R0, #0");
+        str.appendLine("MOVEQ R0, #1");
+        return str.getString();
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
