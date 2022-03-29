@@ -15,7 +15,7 @@ public class Tds {
     private int imbrication;
     private int numRegion = compteur++;
     private Tds pointeurPere;
-    private int deplacement = 12;
+    private int deplacement = 3;
     private int compteurParams = 0;
     private int deplacementParam = -1;
     private HashMap<String,Symbole> listeSymboles;
