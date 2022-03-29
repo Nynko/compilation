@@ -3,8 +3,6 @@ package compilateur.tds;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import compilateur.Offset;
-
 
 
 public class Tds {
@@ -17,9 +15,9 @@ public class Tds {
     private int imbrication;
     private int numRegion = compteur++;
     private Tds pointeurPere;
-    private int deplacement = 0;
+    private int deplacement = 3;
     private int compteurParams = 0;
-    private int deplacementParam = -Offset.OFFSET;
+    private int deplacementParam = -1;
     private HashMap<String,Symbole> listeSymboles;
     private ArrayList<Tds> sousTDS = new ArrayList<>();
     
@@ -157,6 +155,18 @@ public class Tds {
         return (SymboleStructContent) table.listeSymboles.get(name);
     }
 
+    /** Retourne la valeur du déplacement maximum par rapport au pointeur de base
+     * 
+     * @return le deplacement
+     */
+    public int getDeplacement() {
+        return this.deplacement;
+    }
+
+    public int getDeplacement(int wordsize) {
+        return this.deplacement * wordsize;
+    }
+
     /** Ajouter un symbole à la TDS
      * 
      * @param name le nom du symbole
@@ -169,7 +179,7 @@ public class Tds {
         }
         if(symbole instanceof SymboleVar sym) {
             sym.setDeplacement(this.deplacement);
-            this.deplacement += Offset.OFFSET;
+            this.deplacement += 1;
         }
         this.listeSymboles.put(name, symbole);
         Tds.incrementNumberSymbole();
@@ -192,8 +202,9 @@ public class Tds {
         if(symbole instanceof SymboleVar sym) {
             sym.setParam(this.compteurParams);
             sym.setDeplacement(this.deplacementParam);
-            this.deplacementParam -= Offset.OFFSET;
+            this.deplacementParam -= 1;
             this.compteurParams += 1;
+            sym.setInitalized(true);
         }
         this.listeSymboles.put(name, symbole);
         Tds.incrementNumberSymbole();
