@@ -111,19 +111,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
     // |var loc|
     // |@stat @bp |
     // |dyn @bp |
-    // |@r | <- X11 (bp)
+    // |@r | <- X29 (bp)
     // |param |
     @Override
     public String visit(Idf idf) {
         StringAggregator str = new StringAggregator();
-        String bp = "X11";
+        String bp = "X29";
         int decalage = 0;
         int imbrication = idf.getTds().findImbrication(idf.name);
         // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
         // chainage statique pour mettre a jour bp
         // chainage statique
         if (idf.getTds().getImbrication() - imbrication != 0) {
-            str.appendLine("LDR X0 , [X11, #8]");
+            str.appendLine("LDR X0 , [X29, #8]");
             for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
                 str.appendLine("LDR X0, [X0, #8]");
             }
@@ -133,7 +133,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement();
         }
-        str.appendFormattedLine("LDR X0, [%s, #%d]", bp, decalage);
+        str.appendFormattedLine("LDR X0, [%s, #%d]", bp, decalage*DEPLACEMENT);
 
         return str.getString();
     }
@@ -162,13 +162,34 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Ajout de la macro de sauvegarde des registres
         str.appendLine("__save_reg__:");
-        // str.appendLine("\t\tSTM	SP!, {X1-X12}");
+        str.appendLine("""
+
+            stp       X2, X3, [SP, #16]!
+            stp       X4, X5, [SP, #16]!
+            stp       X6, X7, [SP, #16]!
+            stp       X8, X9, [SP, #16]!
+            stp       X10, X11, [SP, #16]!
+            stp       X12, X13, [SP, #16]!
+            stp       X14, X15, [SP, #16]!
+            stp       X16, X17, [SP, #16]!
+            stp       X18, LR, [SP, #16]!
+                """);
         str.appendLine("\t\tRET");
         str.appendLine();
 
         // Ajout de la macro de restauration des registres
         str.appendLine("__restore_reg__:");
-        // str.appendLine("\t\tLDMDB	SP!, {X1-X12}");
+        str.appendLine("""
+            ldp     X18, LR, [SP], #-16
+            ldp     X16, X17, [SP], #-16
+            ldp     X14, X15, [SP], #-16
+            ldp     X12, X13, [SP], #-16
+            ldp     X10, X11, [SP], #-16
+            ldp     X8, X9, [SP], #-16
+            ldp     X6, X7, [SP], #-16
+            ldp     X4, X5, [SP], #-16
+            ldp     X2, X3, [SP], #-16
+                """);
         str.appendLine("\t\tRET");
         str.appendLine();
 
@@ -176,13 +197,17 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // (l'instruction END n'est pas reconnue par le vrai ARM)
         str.appendLine("__end__:");
         if(type == systeme.MACOS){
-            
+          
             str.appendLine("""
                 mov     X0, #0      // Use 0 return code
                 mov     X16, #1     // Service command code 1 terminates this program
                 svc     0           // Call MacOS to terminate the program 
             """);
-
+            this.data.appendLine("""
+                .section	__TEXT,__cstring,cstring_literals
+                l_.str:                                 ; @.str
+                    .asciz	\"%d\n\"                
+                    """);
             str.appendLine(data.getString());
         }
 
@@ -230,16 +255,16 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Sauvegarde de l'adresse de retour
         str.appendLine("STR		LR, [SP]");
         // On sauvegarde temporairement l'ancien pointeur de base dans X1
-        str.appendLine("MOV X1, X11");
-        // On met le nouveau pointeur de base dans X11
-        str.appendLine("MOV X11, SP");
+        str.appendLine("MOV X1, X29");
+        // On met le nouveau pointeur de base dans X29
+        str.appendLine("MOV X29, SP");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         str.appendFormattedLine("STR X1, [SP, #%d]", WORD_SIZE);
         // Chainage statique
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("ADD        X1, X11, #%d", DEPLACEMENT*((Bloc) declFctInt.bloc).getTds().getDeplacement());
+        str.appendFormattedLine("ADD        X1, X29, #%d", DEPLACEMENT*((Bloc) declFctInt.bloc).getTds().getDeplacement());
         str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctInt.bloc.accept(this);
@@ -247,7 +272,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine(blocContent);
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV SP, X11");
+        str.appendLine("MOV SP, X29");
         int numParams = ((Bloc)declFctInt.bloc).getTds().getParams().size();
 
         if (numParams != 0) {
@@ -256,7 +281,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
         
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR   LR, [X11]    // POP LR");
+        str.appendLine("LDR   LR, [X29]    // POP LR");
         str.appendLine("RET");
         return str.getString();
     }
@@ -270,15 +295,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Sauvegarde de l'adresse de retour
         str.appendLine("STR		LR, [SP]");
         // On sauvegarde temporairement l'ancien pointeur de base dans X1
-        str.appendLine("MOV		X1, X11");
-        // On met le nouveau pointeur de base dans X11
-        str.appendLine("MOV		X11, SP");
+        str.appendLine("MOV		X1, X29");
+        // On met le nouveau pointeur de base dans X29
+        str.appendLine("MOV		X29, SP");
         // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         str.appendLine("STR		X1, [SP, #%d]");
         // Chainage statique
 
         // On s'assure que SP pointe sur le maximum de son déplacement
-        str.appendFormattedLine("ADD        X1, X11, #%d", DEPLACEMENT*((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
+        str.appendFormattedLine("ADD        X1, X29, #%d", DEPLACEMENT*((Bloc) declFctStruct.bloc).getTds().getDeplacement() + 4);
         str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctStruct.bloc.accept(this);
@@ -286,11 +311,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine(blocContent);
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV		SP, X11");
+        str.appendLine("MOV		SP, X29");
         int numParams = ((Bloc) declFctStruct.bloc).getTds().getParams().size();
         str.appendFormattedLine("SUB		SP, SP, #%d", numParams * 4 * DEPLACEMENT);
         // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR   LR, [X11]   // POP LR");
+        str.appendLine("LDR   LR, [X29]   // POP LR");
         str.appendLine("RET");
         return str.getString();
     }
@@ -338,7 +363,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
             }
             else{
                 str.appendLine(idfParenthesis.exprList.get(0).accept(this));
-                fonctionPrint(str, Integer.toString(((IntNode) idfParenthesis.exprList.get(0)).parseInt));
+                // fonctionPrint(str, Integer.toString(((IntNode) idfParenthesis.exprList.get(0)).parseInt));
+                fonctionPrint(str, "X0");
             }
             
         }
@@ -392,7 +418,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
-        String bp = "X11";
+        String bp = "X29";
         int imbrication;
 
         if (affectation.left instanceof Idf idf) {
@@ -405,7 +431,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
                 sb.appendLine(";Chainage statique");
                 // recupère l'adresse du chainage statique du bloc dans X7
-                sb.appendLine("LDR X7 , [X11, #8]");
+                sb.appendLine("LDR X7 , [X29, #8]");
 
                 // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
                 // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
@@ -429,10 +455,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 decalage = sv.getDeplacement();
             }
         }
-        sb.appendFormattedLine("STR X0, [%s, #%d]", bp, decalage);
+        sb.appendFormattedLine("STR X0, [%s, #%d]", bp, decalage*DEPLACEMENT);
         if (bp.equals("X7")) {
             // charge l'ancienne valeur de X7
-            sb.appendLine("LDR X7, [SP, #-4]!");
+            sb.appendLine("LDR X7, [SP, #-8]!");
         }
         sb.appendLine();
         return sb.getString();
@@ -500,9 +526,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // Ignore l'adresse de retour
             // On sauvegarde temporairement l'ancien pointeur de base dans X1
-            str.appendLine("MOV X1, X11");
-            // On met le nouveau pointeur de base dans X11
-            str.appendLine("MOV X11, SP");
+            str.appendLine("MOV X1, X29");
+            // On met le nouveau pointeur de base dans X29
+            str.appendLine("MOV X29, SP");
             // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
             str.appendFormattedLine("STR X1, [SP, #%d]", WORD_SIZE);
             // Chainage statique
@@ -511,7 +537,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
             str.appendLine(";ajout place pour var local");
-            str.appendFormattedLine("ADD X1, X11, #%d", DEPLACEMENT*tds.getDeplacement());
+            str.appendFormattedLine("ADD X1, X29, #%d", DEPLACEMENT*tds.getDeplacement());
             str.appendLine("MOV SP , X1");
         }
 
@@ -524,7 +550,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         if (tds.getName().equals("anonblock")) {
             // Remise du pointeur de pile à sa position avant l'appel de fonction
-            str.appendLine("MOV SP, X11");
+            str.appendLine("MOV SP, X29");
 
             // Restauration des registres
             str.appendLine("BL __restore_reg__");
@@ -705,14 +731,22 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendLine("""
 
                 ;print:
-                mov  X1, X0  // string to print
-                mov   X0, #1  // 1 = StdOut
-                mov   X2, #20  // length of the max pour 64 bits unsigned integer
                     """);
             if(type==systeme.MACOS){    
                 str.appendLine("""
-                    mov   X16, #4  // macos write system call
-                    svc   #0x80  // Call macos to output the string
+                    // bl __save_reg__
+                    mov	    X8, X0
+                    stur	X8, [x29, #16]
+                    ldur	X9, [x29, #16]
+                    mov	    x8, x9
+                    adrp	x0, l_.str@PAGE
+                    add	x0, x0, l_.str@PAGEOFF
+                    mov	x9, sp
+                    str	x8, [x9]
+                    bl	_printf
+                    add     SP, SP, #32 // Clean up stack
+
+                    // bl __restore_reg__
                         """);
             }
 
