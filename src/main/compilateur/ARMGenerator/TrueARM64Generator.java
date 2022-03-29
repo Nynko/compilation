@@ -266,7 +266,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("SUB        X1, X29, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement(WORD_SIZE)-WORD_SIZE);
+        str.appendFormattedLine("SUB        X1, X29, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement(WORD_SIZE)-2*WORD_SIZE);
         str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctInt.bloc.accept(this);
@@ -306,7 +306,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("SUB        X1, X29, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement(WORD_SIZE)-WORD_SIZE);
+        str.appendFormattedLine("SUB        X1, X29, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement(WORD_SIZE)-2*WORD_SIZE);
         str.appendLine("MOV        SP, X1");
 
         String blocContent = declFctStruct.bloc.accept(this);
@@ -526,7 +526,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
             str.appendLine(";ajout place pour var local");
-            str.appendFormattedLine("ADD X1, X29, #-%d", tds.getDeplacement(WORD_SIZE));
+            str.appendFormattedLine("ADD X1, X29, #-%d", tds.getDeplacement(WORD_SIZE) - 2*WORD_SIZE);
             str.appendLine("MOV SP , X1");
         }
 
@@ -722,7 +722,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("SUB        X1, X29, #%d", 3*WORD_SIZE);
+        str.appendFormattedLine("SUB        X1, X29, #%d", 2*WORD_SIZE);
         str.appendLine("MOV        SP, X1");
   
           if(type==systeme.MACOS){    
