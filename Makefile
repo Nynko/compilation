@@ -34,5 +34,12 @@ macos: FORCE
 		as -o ./out/ARM.o ./out/ARM.s
 		ld -o ./out/ARM ./out/ARM.o -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -arch arm64
 
+linux: FORCE
+		./gradlew run --args "$(ARGS)"
+		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
+		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
+		as -o ./out/ARM.o ./out/ARM.s
+		ld -o ./out/ARM ./out/ARM.o -lSystem -dynamic-linker /usr/lib/aarch64-linux-gnu/libc.so -arch arm64
+
 FORCE:
 
