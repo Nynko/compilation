@@ -52,7 +52,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * Full Descending: SP pointe vers une case "pleine" et SP diminue quand on push sur la stack
      * adresses.
      * X0 : Adresse de retour
-     * 
+     * X1 : Utilisable pour les retours dans les "fonctions intermédiaire" quand on charge des valeurs...
      * 
      * Différence avec 32 bits: 
      *  - Non accès PC: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Program-Counter-in-AArch64-state
@@ -296,7 +296,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
-        System.out.println(idfParenthesis.getTds().getName()); // le nom de la tds englobante !!
+        // System.out.println(idfParenthesis.getTds().getName()); // le nom de la tds englobante !!
         // Sauvegarde des registres
         str.appendLine(";debut appel fonction");
         // str.appendLine("BL __save_reg__");
@@ -314,7 +314,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         
         str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
 
-        str.appendFormattedLine("_breakpoint_%s:", ((Idf) idfParenthesis.idf).name);
+        // str.appendFormattedLine("_breakpoint_%s:", ((Idf) idfParenthesis.idf).name);
         // Restauration des registres
         // str.appendLine("BL __restore_reg__");
         str.appendLine(";fin appel de fonction");
@@ -552,7 +552,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Egal egal) {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
-        str.appendLine("MOVEQ X0, #1");
+        str.appendLine("BEQ _egal");
+        str.appendLine("MOV X0, #1");
+        str.appendLine("_egal:");
         return str.getString();
     }
 
@@ -568,7 +570,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Inferieur inf) {
         StringAggregator str = new StringAggregator();
         startCmp(inf, str);
-        str.appendLine("MOVLT X0, #1");
+        str.appendLine("BLO _inf");
+        str.appendLine("MOV X0, #1");
+        str.appendLine("_inf:");
         return str.getString();
     }
 
@@ -728,6 +732,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * @param bloc
      */
     private void declFct(StringAggregator str, String name, Bloc bloc){
+        
         int numParams = bloc.getTds().getParams().size();
         int deplacement = bloc.getTds().getDeplacement(WORD_SIZE)-2*WORD_SIZE;
         // On ajoute le nom de la fonction pour pouvoir faire le jump
