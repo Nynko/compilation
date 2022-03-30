@@ -1,6 +1,4 @@
 package compilateur.ARMGenerator;
-
-
 import java.util.ArrayList;
 
 import compilateur.ast.Affectation;
@@ -51,7 +49,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     /**
      * Informations/Conventions:
-     * Empty Ascending: SP pointe vers une case "vide" et SP augmente avec les
+     * Full Descending: SP pointe vers une case "pleine" et SP diminue quand on push sur la stack
      * adresses.
      * X0 : Adresse de retour
      * 
@@ -59,7 +57,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * Différence avec 32 bits: 
      *  - Non accès PC: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Program-Counter-in-AArch64-state
      *      vs 32 bits: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch32-state/Program-Counter-in-AArch32-state?lang=en
+     * Sources ARM 64bits:
+     *  - https://github.com/ARM-software/abi-aa/releases
      * 
+     * Autres sources pour MACOS ARM: 
+     *  - https://github.com/below/HelloSilicon
+     *  - https://developer.apple.com/documentation/xcode/writing-arm64-code-for-apple-platforms
+     *  
      */
 
     private enum systeme{
@@ -110,21 +114,21 @@ public class TrueARM64Generator implements AstVisitor<String> {
     // |var loc|
     // |@stat @bp |
     // |dyn @bp |
-    // |@r | <- X29 (bp)
+    // |@r | <- FP (bp)
     // |param |
     @Override
     public String visit(Idf idf) {
         StringAggregator str = new StringAggregator();
-        String bp = "X29";
+        String bp = "FP";
         int decalage = 0;
         int imbrication = idf.getTds().findImbrication(idf.name);
         // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
         // chainage statique pour mettre a jour bp
         // chainage statique
         if (idf.getTds().getImbrication() - imbrication != 0) {
-            str.appendFormattedLine("LDR X0 , [X29, #-%d]",WORD_SIZE);
+            // str.appendFormattedLine("LDR X0 , [FP, #-%d]",WORD_SIZE);
             for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
-                str.appendFormattedLine("LDR X0, [X0, #-%d]", WORD_SIZE);
+                // str.appendFormattedLine("LDR X0, [X0, #-%d]", WORD_SIZE);
             }
             bp = "X0";
         }
@@ -132,7 +136,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement(WORD_SIZE);
         }
-        str.appendFormattedLine("LDR X0, [%s, #-%d]", bp, decalage);
+        // str.appendFormattedLine("LDR X0, [%s, #-%d]", bp, decalage);
 
         return str.getString();
     }
@@ -144,10 +148,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Initialisation
         str.appendLine("""
             .global _main             // Provide program starting address to linker
-            .align 4
+            .align 4        // Nécessaire d'être aligné par 4 pour Darwin
             """);
-        str.appendLine("BL _main");
-        str.appendLine("B __end__");
 
         //Si on est en linux: on doit ajouter .data à this.data
         if(type==systeme.LINUX){
@@ -159,8 +161,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendLine(code);
         }
 
-        // print
-
+        // Écriture de la fonction _print
         fonctionPrint(str);
 
         // Ajout de la macro de sauvegarde des registres
@@ -176,7 +177,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             stp       X14, X15, [SP, #-16]!
             stp       X16, X17, [SP, #-16]!
                 """);
-        str.appendLine("\t\tRET");
+        str.appendLine("RET");
         str.appendLine();
 
         // Ajout de la macro de restauration des registres
@@ -191,38 +192,38 @@ public class TrueARM64Generator implements AstVisitor<String> {
             ldp     X4, X5, [SP],#16
             ldp     X2, X3, [SP],#16
                 """);
-        str.appendLine("\t\tRET");
+        str.appendLine("RET");
         str.appendLine();
 
         // On place un label end à la fin de programme pour le quitter
         // (l'instruction END n'est pas reconnue par le vrai ARM)
-        str.appendLine("__end__:");
+        // str.appendLine("__end__:");
         if(type == systeme.MACOS){
           
-            str.appendLine("""
-                mov     X0, #0      // Use 0 return code
-                mov     X16, #1     // Service command code 1 terminates this program
-                svc     0           // Call MacOS to terminate the program 
-            """);
+            // str.appendLine("""
+            //     mov     X0, #0      // Use 0 return code
+            //     mov     X16, #1     // Service command code 1 terminates this program
+            //     svc     0           // Call MacOS to terminate the program 
+            // """);
             this.data.appendLine("""
                 .section	__TEXT,__cstring,cstring_literals
                 l_.str:                                 ; @.str
-                    .asciz	\"%d\n\"                
+                    .asciz	\"%d\\n\"                
                     """);
             str.appendLine(data.getString());
         }
 
         else{ // linux
-            str.appendLine("""
-                // Setup the parameters to exit the program
-                // and then call Linux to do it.
-                mov     X0, #0
-                mov     X8, #93
-                svc     0
-                // Use 0 return code
-                // Service code 93 terminates
-                // Call Linux to terminate
-                    """);
+            // str.appendLine("""
+            //     // Setup the parameters to exit the program
+            //     // and then call Linux to do it.
+            //     mov     X0, #0
+            //     mov     X8, #93
+            //     svc     0
+            //     // Use 0 return code
+            //     // Service code 93 terminates
+            //     // Call Linux to terminate
+            //         """);
 
             str.appendLine(this.data.getString());
         }
@@ -233,7 +234,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(DeclVarInt declVarInt) {
         // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        
+        return str.getString();
     }
 
     @Override
@@ -251,76 +254,18 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(DeclFctInt declFctInt) {
         StringAggregator str = new StringAggregator();
-        // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendFormattedLine("_%s:", ((Idf) declFctInt.Idf).name);
-        // Sauvegarde de l'adresse de retour
-        str.appendFormattedLine("STR		LR, [SP, #-%d]!", WORD_SIZE);
-        
-        // On sauvegarde temporairement l'ancien pointeur de base dans X1
-        str.appendLine("MOV X1, FP");
-        // On met le nouveau pointeur de base dans X29
-        str.appendLine("MOV x29, SP");
-        // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendFormattedLine("STR X1, [x29, #-%d]", WORD_SIZE);
-        // Chainage statique
-
-        // On s'assure que SP pointe sur le maximum de son déplacement
-        str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("SUB        X1, SP, #%d", ((Bloc) declFctInt.bloc).getTds().getDeplacement(WORD_SIZE)-WORD_SIZE);
-        str.appendLine("MOV        SP, X1");
-
-        String blocContent = declFctInt.bloc.accept(this);
-
-        str.appendLine(blocContent);
-
-        // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV SP, X29");
-        int numParams = ((Bloc)declFctInt.bloc).getTds().getParams().size();
-
-        if (numParams != 0) {
-            str.appendLine("; on depile les param");
-            str.appendFormattedLine("ADD SP, SP, #%d", numParams * WORD_SIZE);
-        }
-        
-        // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR   LR, [SP], #16    // POP LR");
-        str.appendLine("RET");
+        String name =  ((Idf) declFctInt.Idf).name;
+        Bloc bloc = (Bloc) declFctInt.bloc;
+        declFct(str,name,bloc);
         return str.getString();
     }
 
     @Override
     public String visit(DeclFctStruct declFctStruct) {
         StringAggregator str = new StringAggregator();
-        // On ajoute le nom de la fonction pour pouvoir faire le jump
-        str.appendFormattedLine("_%s:", ((Idf) declFctStruct.Idf1).name);
-
-        // Sauvegarde de l'adresse de retour
-        str.appendFormattedLine("STR		LR, [SP, #-%d]!", WORD_SIZE);
-        // On sauvegarde temporairement l'ancien pointeur de base dans X1
-        str.appendLine("MOV X1, X29");
-        // On met le nouveau pointeur de base dans X29
-        str.appendLine("MOV X29, SP");
-        // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendFormattedLine("STR X1, [SP, #-%d]", WORD_SIZE);
-        // Chainage statique
-
-        // On s'assure que SP pointe sur le maximum de son déplacement
-        str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("SUB        X1, X29, #%d", ((Bloc) declFctStruct.bloc).getTds().getDeplacement(WORD_SIZE)-WORD_SIZE);
-        str.appendLine("MOV        SP, X1");
-
-        String blocContent = declFctStruct.bloc.accept(this);
-
-        str.appendLine(blocContent);
-
-        // Remise du pointeur de pile à sa position avant l'appel de fonction
-        str.appendLine("MOV	SP, X29");
-        int numParams = ((Bloc) declFctStruct.bloc).getTds().getParams().size();
-        str.appendFormattedLine("ADD SP, SP, #%d", numParams *WORD_SIZE);
-
-        // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("LDR   LR, [SP], #16    // POP LR");
-        str.appendLine("RET");
+        String name = ((Idf) declFctStruct.Idf1).name;
+        Bloc bloc = (Bloc) declFctStruct.bloc;
+        declFct(str,name,bloc);
         return str.getString();
     }
 
@@ -407,7 +352,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
-        String bp = "X29";
+        String bp = "FP";
         int imbrication;
 
         if (affectation.left instanceof Idf idf) {
@@ -420,12 +365,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
                 sb.appendLine(";Chainage statique");
                 // recupère l'adresse du chainage statique du bloc dans X7
-                sb.appendFormattedLine("LDR X7 , [X29, #-%d]", WORD_SIZE);
+                // sb.appendFormattedLine("LDR X7 , [FP, #-%d]", WORD_SIZE);
 
                 // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
                 // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
                 for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
-                    sb.appendFormattedLine("LDR X7, [X7, #-%d]", WORD_SIZE);
+                    // sb.appendFormattedLine("LDR X7, [X7, #-%d]", WORD_SIZE);
                 }
                 bp = "X7";
             }
@@ -444,10 +389,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 decalage = sv.getDeplacement(WORD_SIZE);
             }
         }
-        sb.appendFormattedLine("STR X0, [%s, #-%d]", bp, decalage);
+        // sb.appendFormattedLine("STR X0, [%s, #-%d]", bp, decalage);
         if (bp.equals("X7")) {
             // charge l'ancienne valeur de X7
-            sb.appendFormattedLine("LDR X7, [SP, #-%d]!", WORD_SIZE);
+            // sb.appendFormattedLine("LDR X7, [SP, #-%d]!", WORD_SIZE);
         }
         sb.appendLine();
         return sb.getString();
@@ -515,9 +460,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // Ignore l'adresse de retour
             // On sauvegarde temporairement l'ancien pointeur de base dans X1
-            str.appendLine("MOV X1, X29");
-            // On met le nouveau pointeur de base dans X29
-            str.appendLine("MOV X29, SP");
+            str.appendLine("MOV X1, FP");
+            // On met le nouveau pointeur de base dans FP
+            str.appendLine("MOV FP, SP");
             // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
             str.appendFormattedLine("STR X1, [SP, #-%d]", WORD_SIZE);
             // Chainage statique
@@ -526,7 +471,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
             str.appendLine(";ajout place pour var local");
-            str.appendFormattedLine("ADD X1, X29, #-%d", tds.getDeplacement(WORD_SIZE) - WORD_SIZE);
+            str.appendFormattedLine("ADD X1, FP, #-%d", tds.getDeplacement(WORD_SIZE) - WORD_SIZE);
             str.appendLine("MOV SP , X1");
         }
 
@@ -539,7 +484,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         if (tds.getName().equals("anonblock")) {
             // Remise du pointeur de pile à sa position avant l'appel de fonction
-            str.appendLine("MOV SP, X29");
+            str.appendLine("MOV SP, FP");
 
             // Restauration des registres
             // str.appendLine("BL __restore_reg__");
@@ -710,51 +655,120 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private void fonctionPrint(StringAggregator str){
         str.appendLine("_print:");
 
-        // Sauvegarde de l'adresse de retour
-        str.appendFormattedLine("STR LR, [SP, #-%d]! // PUSH LR ", WORD_SIZE);
-        // On sauvegarde temporairement l'ancien pointeur de base dans X1
-        str.appendLine("MOV X1, X29");
-        // On met le nouveau pointeur de base dans X29
-        str.appendLine("MOV X29, SP");
-        // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-        str.appendFormattedLine("STR X1, [SP, #-%d]", WORD_SIZE);
-        // Chainage statique
-
-        // On s'assure que SP pointe sur le maximum de son déplacement
-        str.appendLine(";ajout place pour var local");
-        str.appendFormattedLine("SUB        X1, X29, #%d", 3*WORD_SIZE);
-        str.appendLine("MOV        SP, X1");
+        // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
+        pushLRFP(str);
+          
+        // On met le nouveau pointeur de base dans FP
+        str.appendLine("MOV FP, SP");
   
-          if(type==systeme.MACOS){    
+        if(type==systeme.MACOS){    
             str.appendLine("""
-                ldr     X0, [x29,#16]
-                mov	    X8, X0
-                stur	X8, [x29, #-16]
-                ldur	X9, [x29, #-16]
-                mov	    x8, x9
+                mov	    X8, X0  // Argument dans X0, on passe à printf par X8
                 adrp	x0, l_.str@PAGE
                 add	x0, x0, l_.str@PAGEOFF
-                mov	x9, sp
-                str	x8, [x9]
+                str	x8, [sp,#-16]!
                 bl	_printf
+                add SP, SP, #16 // Clean up stack
                     """);
         }
   
   
-          // Remise du pointeur de pile à sa position avant l'appel de fonction
-          str.appendLine("MOV SP, X29");
-          int numParams = 1;
-  
-          if (numParams != 0) {
-              str.appendLine("; on depile les param");
-              str.appendFormattedLine("ADD SP, SP, #%d", numParams * WORD_SIZE);
-          }
-          
-          // Récupération de l'addresse de retour et retour à l'appelant
-          str.appendLine("LDR   LR, [SP], #16    // POP LR");
-          str.appendLine("RET");
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV SP, FP");
 
+        // Récupération de l'addresse de retour et retour à l'appelant
+        popLRFP(str);
+
+        str.appendLine("RET");
+    
+    }
+    /**
+     * Push avec pré-decrémentation de SP sur la stack
+     * @param str
+     * @param registre
+     */
+    private void push(StringAggregator str, String registre ){
+        str.appendFormattedLine("STR    %s, [SP,#-%d]! //PUSH %s sur SP avec pré-décrémentation", registre, WORD_SIZE,registre);
+    }
+    
+
+    private void pushLRFP(StringAggregator str){
+        // Sauvegarde de l'adresse de retour et FP
+        str.appendFormattedLine("STP   LR, FP, [SP, #-%d]! // PUSH LR, FP", WORD_SIZE);
+    }
+
+    /**
+     * On pop LR et FP
+     * @param str
+     */
+    private void popLRFP(StringAggregator str){
+        // Récupération de l'addresse de retour et retour à l'appelant
+        str.appendFormattedLine("LDP   LR, FP, [SP], #%d // Restore LR, FP avec post incrémentation",WORD_SIZE);
+        
     }
 
 
+    private void empileParams(StringAggregator str, int numParams){
+        // if (numParams != 0) {
+        //     str.appendLine("// On empile les param");
+        //     str.appendFormattedLine("SUB SP, SP, #%d", numParams * WORD_SIZE);
+        // }
+    }
+
+    private void staticPush(StringAggregator str){
+         // chainage statique
+    }
+
+
+    /**
+     * 
+     * @param str
+     * @param name  nom de la fonction
+     * @param deplacement    
+     * @param bloc
+     */
+    private void declFct(StringAggregator str, String name, Bloc bloc){
+        int numParams = bloc.getTds().getParams().size();
+        int deplacement = bloc.getTds().getDeplacement(WORD_SIZE)-2*WORD_SIZE;
+        // On ajoute le nom de la fonction pour pouvoir faire le jump
+        str.appendFormattedLine("_%s:",name);
+
+        // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
+        pushLRFP(str);
+
+        // Buffer pour les variables locales
+        // TODO : déterminer 
+
+        
+        // On met le nouveau pointeur de base dans FP
+        str.appendLine("MOV FP, SP");
+
+        // Récupération des variables locales
+        // recupParams(str);
+        //tmp juste X0 
+
+        // Chainage statique
+        // staticPush(str);
+
+        // On s'assure que SP pointe sur le maximum de son déplacement
+        //TODO : to check
+        // str.appendLine(";ajout place pour var local");
+        // str.appendFormattedLine("SUB  X1, SP, #%d", deplacement);
+        // str.appendLine("MOV SP, X1");
+
+        str.appendLine( bloc.accept(this));
+
+
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV SP, FP");
+
+        // Récupération de l'addresse de retour et retour à l'appelant
+        popLRFP(str);
+
+        str.appendLine("RET");
+    }
+    
+
+
 }
+
