@@ -161,6 +161,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             _start:
             BL _main
+            BL __end__
             """);
             //Si on est en linux: on doit ajouter .data à this.data
             this.data.appendLine(".data");
@@ -203,19 +204,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
             ldp     X4, X5, [SP],#16
             ldp     X2, X3, [SP],#16
                 """);
-        str.appendLine("RET");
-        str.appendLine();
+       
 
-        // On place un label end à la fin de programme pour le quitter
-        // (l'instruction END n'est pas reconnue par le vrai ARM)
-        // str.appendLine("__end__:");
+
         if(type == systeme.MACOS){
-          
-            // str.appendLine("""
-            //     mov     X0, #0      // Use 0 return code
-            //     mov     X16, #1     // Service command code 1 terminates this program
-            //     svc     0           // Call MacOS to terminate the program 
-            // """);
+            // end 
+            str.appendLine("RET");
+            // data
             this.data.appendLine("""
                 .section	__TEXT,__cstring,cstring_literals
                 l_.str:                                 ; @.str
@@ -225,16 +220,17 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
 
         else{ // linux
-            // str.appendLine("""
-            //     // Setup the parameters to exit the program
-            //     // and then call Linux to do it.
-            //     mov     X0, #0
-            //     mov     X8, #93
-            //     svc     0
-            //     // Use 0 return code
-            //     // Service code 93 terminates
-            //     // Call Linux to terminate
-            //         """);
+            // On place un label end à la fin de programme pour le quitter
+            // (l'instruction END n'est pas reconnue par le vrai ARM)
+            str.appendLine("__end__:");
+            str.appendLine("""
+                // Setup the parameters to exit the program
+                // and then call Linux to do it.
+                mov     X0, #0      // Use 0 return code
+                mov     X8, #93     // Service code 93 terminates
+                svc     0           // Call Linux to terminate
+                    """);
+        
             this.data.appendLine("""
                 l_.str:                                 
                     .asciz	\"%d\\n\"                
