@@ -77,13 +77,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     private int whileCompt = 0;
     private int ifCompt = 0;
-    private boolean mul = false;
-    private boolean division = false;
 
     private StringAggregator data;
     private ArrayList<String> dataList;
 
-    private int AdresseInitStack = 0xFF000000;
 
     public TrueARM64Generator(String type) {
         if(type.equals("macos")){
@@ -705,16 +702,20 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("RET");
     
     }
+
     /**
      * Push avec pré-decrémentation de SP sur la stack
-     * @param str
-     * @param registre
+     * @param str : le StringAggregator qui contient le code à écrire 
+     * @param registre : le registre à mettre sur la stack
      */
     private void push(StringAggregator str, String registre ){
         str.appendFormattedLine("STR    %s, [SP,#-%d]! //PUSH %s sur SP avec pré-décrémentation", registre, WORD_SIZE,registre);
     }
     
-
+    /**
+     * Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
+     * @param str : le StringAggregator qui contient le code à écrire
+     */
     private void pushLRFP(StringAggregator str){
         // Sauvegarde de l'adresse de retour et FP
         str.appendFormattedLine("STP   LR, FP, [SP, #-%d]! // PUSH LR, FP", WORD_SIZE);
@@ -722,7 +723,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     /**
      * On pop LR et FP
-     * @param str
+     * @param str : le StringAggregator qui contient le code à écrire
      */
     private void popLRFP(StringAggregator str){
         // Récupération de l'addresse de retour et retour à l'appelant
@@ -731,7 +732,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     }
 
 
-    private void empileParams(StringAggregator str, int numParams){
+    private void stackParams(StringAggregator str, int numParams){
         // if (numParams != 0) {
         //     str.appendLine("// On empile les param");
         //     str.appendFormattedLine("SUB SP, SP, #%d", numParams * WORD_SIZE);
@@ -744,9 +745,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
 
     /**
-     * 
      * @param str
-     * @param name  nom de la fonction
+     * @param name : nom de la fonction
      * @param deplacement    
      * @param bloc
      */
