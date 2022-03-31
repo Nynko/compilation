@@ -145,15 +145,26 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Fichier fichier) {
         StringAggregator str = new StringAggregator();
 
-        // Initialisation
-        str.appendLine("""
+       
+        if(type==systeme.MACOS){
+            // Initialisation
+            str.appendLine("""
             .global _main             // Provide program starting address to linker
             .align 4        // Nécessaire d'être aligné par 4 pour Darwin
             """);
+        }
+        else{
+            // Initialisation
+            str.appendLine("""
+            .global _start             // Provide program starting address to linker
+            .align 4        
 
-        //Si on est en linux: on doit ajouter .data à this.data
-        if(type==systeme.LINUX){
+            _start:
+            BL _main
+            """);
+            //Si on est en linux: on doit ajouter .data à this.data
             this.data.appendLine(".data");
+
         }
 
         for (Ast ast : fichier.instructions) {
