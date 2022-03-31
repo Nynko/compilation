@@ -347,7 +347,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(IntNode intNode) {
-        return String.format("LDR X0, =%d\n", intNode.parseInt);
+        return String.format("MOV X0, #%d\n", intNode.parseInt);
     }
 
     @Override
