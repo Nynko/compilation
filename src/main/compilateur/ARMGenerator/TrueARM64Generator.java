@@ -224,7 +224,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
             //     // Service code 93 terminates
             //     // Call Linux to terminate
             //         """);
-
+            this.data.appendLine("""
+                l_.str:                                 
+                    .asciz	\"%d\\n\"                
+                    """);
             str.appendLine(this.data.getString());
         }
 
