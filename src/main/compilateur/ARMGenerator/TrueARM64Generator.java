@@ -298,7 +298,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         // System.out.println(idfParenthesis.getTds().getName()); // le nom de la tds englobante !!
         // Sauvegarde des registres
-        str.appendLine(";debut appel fonction");
+        str.appendLine("//debut appel fonction");
         // str.appendLine("BL __save_reg__");
         
         String name = ((Idf) idfParenthesis.idf).name;
@@ -317,7 +317,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // str.appendFormattedLine("_breakpoint_%s:", ((Idf) idfParenthesis.idf).name);
         // Restauration des registres
         // str.appendLine("BL __restore_reg__");
-        str.appendLine(";fin appel de fonction");
+        str.appendLine("//fin appel de fonction");
 
         return str.getString();
     }
@@ -480,7 +480,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         for (Ast instruction : bloc.instList) {
             str.appendString(instruction.accept(this));
         }
-        str.appendLine(";fin instructions");
+        str.appendLine("//fin instructions");
 
         if (tds.getName().equals("anonblock")) {
             // Remise du pointeur de pile à sa position avant l'appel de fonction
@@ -489,7 +489,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // Restauration des registres
             // str.appendLine("BL __restore_reg__");
 
-            str.appendLine(";fin bloc anonyme");
+            str.appendLine("//fin bloc anonyme");
         }
         return str.getString();
     }
