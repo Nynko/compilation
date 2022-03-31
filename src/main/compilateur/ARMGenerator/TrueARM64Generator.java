@@ -760,10 +760,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         pushLRFP(str);
 
-        // Buffer pour les variables locales
-        // TODO : déterminer 
-
+        // Sauvegarde du pointeur du bloc englobant (chaînage statique)
         
+        push(str, "X0");
+
+        // Espace libre pour les variables locales
+        // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
+        // TODO adapter la TDS
+        str.appendFormattedLine("SUB   SP, SP, %d", bloc.getTds().getDeplacement(WORD_SIZE) - WORD_SIZE);
+
         // On met le nouveau pointeur de base dans FP
         str.appendLine("MOV FP, SP");
 
@@ -791,8 +796,5 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         str.appendLine("RET");
     }
-    
-
-
 }
 
