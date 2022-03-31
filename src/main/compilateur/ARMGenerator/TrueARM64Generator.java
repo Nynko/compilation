@@ -213,7 +213,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // data
             this.data.appendLine("""
                 .section	__TEXT,__cstring,cstring_literals
-                l_.str:                                 ; @.str
+                l_.str:                                 //@.str
                     .asciz	\"%d\\n\"                
                     """);
             str.appendLine(data.getString());
@@ -546,7 +546,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
-        str.appendLine("; début comparaison");
+        str.appendLine("// début comparaison");
         str.appendLine(cmp.left.accept(this));
         // récup le registre depuis r0 dans le premier registre libre
         str.appendLine("MOV X1,X0");
@@ -644,7 +644,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV    X2, X0");
         str.appendLine("""
                 CMP     X2, #0
-                BEQ      __end__ ; division par 0, exit
+                BEQ      __end__ //division par 0, exit
                 """);
         str.appendLine("SDIV    X0, X1, X2");
         str.appendLine();
