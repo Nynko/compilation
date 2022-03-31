@@ -39,7 +39,7 @@ linux: FORCE
 		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
 		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
 		as -o ./out/ARM.o ./out/ARM.s
-		ld -o ./out/ARM ./out/ARM.o -lSystem -dynamic-linker /usr/lib/aarch64-linux-gnu/libc.so -arch arm64
+		ld -o ./out/ARM ./out/ARM.o -lc -L'/usr/lib/aarch64-linux-gnu/' 
 
 FORCE:
 
