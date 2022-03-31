@@ -453,7 +453,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         Tds tds = bloc.getTds();
         if (tds.getName().equals("anonblock")) {
-            str.appendLine(";debut bloc anonyme");
+            str.appendLine("//debut bloc anonyme");
 
             // Sauvegarde des registres
             // str.appendLine("BL __save_reg__");
@@ -475,7 +475,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendLine("MOV SP , X1");
         }
 
-        str.appendLine(";debut instructions");
+        str.appendLine("//debut instructions");
         // Content
         for (Ast instruction : bloc.instList) {
             str.appendString(instruction.accept(this));
