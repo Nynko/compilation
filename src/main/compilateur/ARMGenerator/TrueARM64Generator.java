@@ -373,7 +373,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 // sauvegarde du registre X7 sur la pile
                 sb.appendFormattedLine("STR X7, [SP], #%d", WORD_SIZE);
 
-                sb.appendLine(";Chainage statique");
+                sb.appendLine("//Chainage statique");
                 // recupère l'adresse du chainage statique du bloc dans X7
                 // sb.appendFormattedLine("LDR X7 , [FP, #-%d]", WORD_SIZE);
 
@@ -411,7 +411,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(IfThen ifThen) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
-        str.appendFormattedLine(";if%d", ifNum);// Commentaire pour debug
+        str.appendFormattedLine("//if%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThen.condition.accept(this));
         str.appendLine("CMP X0, #0");
         str.appendFormattedLine("BEQ _finIf%d", ifNum);
@@ -425,7 +425,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(IfThenElse ifThenElse) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
-        str.appendFormattedLine(";ifThenElse%d", ifNum);// Commentaire pour debug
+        str.appendFormattedLine("//ifThenElse%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThenElse.condition.accept(this));
         str.appendLine("CMP X0, #0");
         str.appendFormattedLine("BEQ _else%d", ifNum);
@@ -480,7 +480,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             
             // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
             // pour var local)
-            str.appendLine(";ajout place pour var local");
+            str.appendLine("//ajout place pour var local");
             str.appendFormattedLine("ADD X1, FP, #-%d", tds.getDeplacement(WORD_SIZE) - WORD_SIZE);
             str.appendLine("MOV SP , X1");
         }
@@ -776,7 +776,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On s'assure que SP pointe sur le maximum de son déplacement
         //TODO : to check
-        // str.appendLine(";ajout place pour var local");
+        // str.appendLine("//ajout place pour var local");
         // str.appendFormattedLine("SUB  X1, SP, #%d", deplacement);
         // str.appendLine("MOV SP, X1");
 
