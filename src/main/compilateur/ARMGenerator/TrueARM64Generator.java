@@ -753,7 +753,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private void declFct(StringAggregator str, String name, Bloc bloc){
         
         int numParams = bloc.getTds().getParams().size();
-        int deplacement = bloc.getTds().getDeplacement(WORD_SIZE)-2*WORD_SIZE;
+        int deplacement = bloc.getTds().getDeplacement(WORD_SIZE);
+        System.out.println(bloc.getTds().getDeplacement(16));
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s:",name);
 
@@ -764,12 +765,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV FP, SP");
 
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
-        push(str, "X0");
+        // push(str, "X0");
 
         // Espace libre pour les variables locales
         // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
         // TODO adapter la TDS
-        str.appendFormattedLine("SUB   SP, SP, %d", bloc.getTds().getDeplacement(WORD_SIZE) - WORD_SIZE);
+        str.appendFormattedLine("SUB   SP, FP, %d", bloc.getTds().getDeplacement(WORD_SIZE));
 
 
         // Récupération des variables locales
