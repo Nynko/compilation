@@ -537,13 +537,17 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(Negation unaire) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine(unaire.noeud.accept(this));
+        str.appendLine("CMP R0, #0");
+        str.appendLine("MOV R0, #0");
+        str.appendLine("BLNE __cmp__");
+        return str.getString();
     }
 
     @Override
     public String visit(Semicolon semicolon) {
-        // TODO Auto-generated method stub
+        // TODO suppr jamais visité
         return "";
     }
 
