@@ -77,6 +77,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     private int whileCompt = 0;
     private int ifCompt = 0;
+    private boolean hasCmp = false;
+    private boolean hasEtExpr = false;
 
     private StringAggregator data;
     private ArrayList<String> dataList;
@@ -173,10 +175,20 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Écriture de la fonction _print
         fonctionPrint(str);
 
-        // Écriture des comparaisons
-        str.appendLine("__cmp__");
-        str.appendLine("MOV X0, #1");
-        str.appendLine("RET");
+        // Résultats des comparaisons
+        if (hasCmp) {
+            str.appendLine("__cmp__");
+            str.appendLine("MOV X0, #1");
+            str.appendLine("RET");
+        }
+
+        // Comparaison pour les expressions et
+        if (hasEtExpr) {
+            str.appendLine("__Et_Expr__");
+            str.appendLine("CMP R1, R2");
+            str.appendLine("BEQ __cmp__");
+            str.appendLine("RET");
+        }
 
         // Ajout de la macro de sauvegarde des registres
         str.appendLine("__save_reg__:");
@@ -537,17 +549,43 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(Expr_ou expr_ou) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine("; Expr_ou");
+        str.appendLine(expr_ou.left.accept(this));
+        str.appendLine("BL      __save_reg__");
+        str.appendLine("MOV R1,R0");
+
+        str.appendLine(expr_ou.right.accept(this));
+        str.appendLine("MOV R2,R0");
+        str.appendLine("MOV R0, #0");
+        str.appendLine("CMP R2, #1");
+        str.appendLine("BLEQ __cmp__");
+        str.appendLine("CMP R1, #1");
+        str.appendLine("BLEQ __cmp__");
+        str.appendLine("; Expr_ou");
+        return str.getString();
     }
 
     @Override
     public String visit(Expr_et expr_et) {
-        // TODO Auto-generated method stub
-        return "";
+        hasEtExpr = true;
+        StringAggregator str = new StringAggregator();
+        str.appendLine("; Expr_et");
+        str.appendLine(expr_et.left.accept(this));
+        str.appendLine("BL      __save_reg__");
+        str.appendLine("MOV R1,R0");
+
+        str.appendLine(expr_et.right.accept(this));
+        str.appendLine("MOV R2,R0");
+        str.appendLine("MOV R0, #0");
+        str.appendLine("CMP R1, #1");
+        str.appendLine("BLEQ __Et_Expr__");
+        str.appendLine("; Expr_et");
+        return str.getString();
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
+        hasCmp = true;
         str.appendLine("// début comparaison");
         str.appendLine(cmp.left.accept(this));
         // récup le registre depuis r0 dans le premier registre libre
