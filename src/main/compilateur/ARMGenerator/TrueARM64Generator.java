@@ -714,7 +714,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         else{ // linux
             str.appendLine("""
                 mov	    X8, X0  // Argument dans X0, on passe à printf par X8
-                ldr 	x0, =l_.str
+                adrp 	x0, l_.str
                 str	    x8, [sp,#-16]!
                 bl	printf
                 add SP, SP, #16 // Clean up stack
