@@ -131,9 +131,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
         Symbole s = idf.getTds().findSymbole(idf.name);
         if (s instanceof SymboleVar sv) {
-            decalage = sv.getDeplacement(WORD_SIZE);
+            decalage = sv.getDeplacement(WORD_SIZE*(-1));
         }
-        // str.appendFormattedLine("LDR X0, [%s, #-%d]", bp, decalage);
+        str.appendFormattedLine("LDR X0, [%s, #%d]", bp, decalage);
 
         return str.getString();
     }
@@ -311,11 +311,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
         String name = ((Idf) idfParenthesis.idf).name;
 
         // Ajout des parametres à la pile
-        for (Ast param : idfParenthesis.exprList) {
+        int nb_param = idfParenthesis.exprList.size();
+        for (int i = 0; i < nb_param; i++) {
+            Ast param = idfParenthesis.exprList.get(i);
             str.appendLine(param.accept(this));
             // Putting X0 in the stack
-            str.appendFormattedLine("STR X0, [SP, #-%d]!", WORD_SIZE);
+            str.appendFormattedLine("STR X0, [SP, #-%d]", WORD_SIZE*(nb_param-i));
         }
+        str.appendFormattedLine("SUB  SP, SP, #%d ", WORD_SIZE*nb_param);
 
         // Appel de la fonction
         
@@ -753,7 +756,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private void declFct(StringAggregator str, String name, Bloc bloc){
         
         int numParams = bloc.getTds().getParams().size();
-        int deplacement = bloc.getTds().getDeplacement(WORD_SIZE);
+        int deplacement = bloc.getTds().getDeplacement();
+        System.out.println("deplacement : " + deplacement);
         System.out.println(bloc.getTds().getDeplacement(16));
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s:",name);
@@ -766,15 +770,18 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
         // push(str, "X0");
+        str.appendLine("MOV     X2, #2");
+        str.appendFormattedLine("STR    X2, [SP,#-%d]!",WORD_SIZE);
 
         // Espace libre pour les variables locales
         // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
         // TODO adapter la TDS
-        str.appendFormattedLine("SUB   SP, FP, %d", bloc.getTds().getDeplacement(WORD_SIZE));
-
-
-        // Récupération des variables locales
-        // recupParams(str);
+        // str.appendFormattedLine("SUB   SP, FP, %d", bloc.getTds().getDeplacement(WORD_SIZE));
+        str.appendLine("MOV     X3, #0");
+        for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
+            str.appendFormattedLine("STR    X3, [SP,#-%d]!", WORD_SIZE);
+        }
+   
         //tmp juste X0 
 
         // Chainage statique
