@@ -593,7 +593,7 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    R1, R0");
         str.appendLine(minus.right.accept(this));
-        str.appendLine("SUB     R0, R0, R1");
+        str.appendLine("SUB     R0, R1, R0");
         str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
