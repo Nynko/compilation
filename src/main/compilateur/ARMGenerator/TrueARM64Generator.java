@@ -320,6 +320,17 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
         str.appendFormattedLine("SUB  SP, SP, #%d ", WORD_SIZE*nb_param);
 
+        // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
+        int imbricationPere = idfParenthesis.getTds().getImbrication();
+        int imbricationAppelee = idfParenthesis.getTds().findImbrication(((Idf) idfParenthesis.idf).name);
+        if(imbricationPere == imbricationAppelee){
+            // Si les imbrications sont identiques, on enregistre l'adresse pointée par le chainage statique de l'appelant dans X0
+            str.appendFormattedLine("LDR X0, [FP, #-%d]", 1*WORD_SIZE);
+        }
+        else{
+            // Sinon, on enregistre l'adresse de base de l'appelant dans X0
+            str.appendFormattedLine("MOV X0, FP");
+        }
         // Appel de la fonction
         
         str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
@@ -769,9 +780,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV FP, SP");
 
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
-        // push(str, "X0");
-        str.appendLine("MOV     X2, #2");
-        str.appendFormattedLine("STR    X2, [SP,#-%d]!",WORD_SIZE);
+        push(str, "X0");
 
         // Espace libre pour les variables locales
         // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
