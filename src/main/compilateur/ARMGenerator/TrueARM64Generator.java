@@ -350,6 +350,18 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Sauvegarde des registres
         // str.appendLine("BL		__save_reg__");
 
+        // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
+        int imbricationPere = idfParenthesisEmpty.getTds().getImbrication();
+        int imbricationAppelee = idfParenthesisEmpty.getTds().findImbrication(((Idf) idfParenthesisEmpty.idf).name);
+        if(imbricationPere == imbricationAppelee){
+            // Si les imbrications sont identiques, on enregistre l'adresse pointée par le chainage statique de l'appelant dans X0
+            str.appendFormattedLine("LDR X0, [FP, #-%d]", 1*WORD_SIZE);
+        }
+        else{
+            // Sinon, on enregistre l'adresse de base de l'appelant dans X0
+            str.appendFormattedLine("MOV X0, FP");
+        }
+
         // Appel de la fonction
         str.appendFormattedLine("BL 		_%s", ((Idf) idfParenthesisEmpty.idf).name);
 
