@@ -259,7 +259,7 @@ public class ARMGenerator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
-        System.out.println(idfParenthesis.getTds().getName());
+       // System.out.println(idfParenthesis.getTds().getName());
         // Sauvegarde des registres
         str.appendLine(";debut appel fonction");
         str.appendLine("BL __save_reg__");
@@ -491,8 +491,8 @@ public class ARMGenerator implements AstVisitor<String> {
 
     @Override
     public String visit(Expr_et expr_et) {
-        // TODO Auto-generated method stub
         StringAggregator str = new StringAggregator();
+        str.appendLine("; Expr_et");
         str.appendLine(expr_et.left.accept(this));
         str.appendLine("BL      __save_reg__");
         str.appendLine("MOV R1,R0");
@@ -503,11 +503,11 @@ public class ARMGenerator implements AstVisitor<String> {
         str.appendLine("CMPEQ R1, R2");
         str.appendLine("MOV R0, #0");
         str.appendLine("MOVEQ R0, #1");
+        str.appendLine("; Expr_et");
         return str.getString();
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
-        str.appendLine("; début comparaison");
         str.appendLine(cmp.left.accept(this));
         str.appendLine("BL      __save_reg__");
         //récup le registre depuis r0 dans le premier registre libre
