@@ -173,6 +173,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Écriture de la fonction _print
         fonctionPrint(str);
 
+        // Écriture des comparaisons
+        str.appendLine("__cmp__");
+        str.appendLine("MOV X0, #1");
+        str.appendLine("RET");
+
         // Ajout de la macro de sauvegarde des registres
         str.appendLine("__save_reg__:");
         str.appendLine("""
@@ -559,9 +564,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Egal egal) {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
-        str.appendLine("BNE _egal");
-        str.appendLine("MOV X0, #1");
-        str.appendLine("_egal:");
+        str.appendLine("BLEQ __cmp__");
         return str.getString();
     }
 
@@ -569,7 +572,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Different dif) {
         StringAggregator str = new StringAggregator();
         startCmp(dif, str);
-        str.appendLine("MOVNE X0, #1");
+        str.appendLine("BLNE __cmp__");
         return str.getString();
     }
 
@@ -577,9 +580,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Inferieur inf) {
         StringAggregator str = new StringAggregator();
         startCmp(inf, str);
-        str.appendLine("BLO _inf");
-        str.appendLine("MOV X0, #1");
-        str.appendLine("_inf:");
+        str.appendLine("BLLT __cmp__");
         return str.getString();
     }
 
@@ -587,7 +588,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(InferieurEgal infEgal) {
         StringAggregator str = new StringAggregator();
         startCmp(infEgal, str);
-        str.appendLine("MOVLE X0, #1");
+        str.appendLine("BLLE __cmp__");
         return str.getString();
     }
 
@@ -595,7 +596,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Superieur sup) {
         StringAggregator str = new StringAggregator();
         startCmp(sup, str);
-        str.appendLine("MOVGT X0, #1");
+        str.appendLine("BLGT __cmp__");
         return str.getString();
     }
 
@@ -603,7 +604,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(SuperieurEgal supEgal) {
         StringAggregator str = new StringAggregator();
         startCmp(supEgal, str);
-        str.appendLine("MOVGE X0, #1");
+        str.appendLine("BLGE __cmp__");
         return str.getString();
     }
 
