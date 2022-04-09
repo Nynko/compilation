@@ -325,11 +325,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int imbricationAppelee = idfParenthesis.getTds().findImbrication(((Idf) idfParenthesis.idf).name);
         if(imbricationPere == imbricationAppelee){
             // Si les imbrications sont identiques, on enregistre l'adresse pointée par le chainage statique de l'appelant dans X0
-            str.appendFormattedLine("LDR X10, [FP, #-%d]", 1*WORD_SIZE);
+            str.appendFormattedLine("LDR X0, [FP, #-%d]", 1*WORD_SIZE);
         }
         else{
             // Sinon, on enregistre l'adresse de base de l'appelant dans X0
-            str.appendFormattedLine("MOV X10, FP");
+            str.appendFormattedLine("MOV X0, FP");
         }
         // Appel de la fonction
         
@@ -355,11 +355,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int imbricationAppelee = idfParenthesisEmpty.getTds().findImbrication(((Idf) idfParenthesisEmpty.idf).name);
         if(imbricationPere == imbricationAppelee){
             // Si les imbrications sont identiques, on enregistre l'adresse pointée par le chainage statique de l'appelant dans X0
-            str.appendFormattedLine("LDR X10, [FP, #-%d]", 1*WORD_SIZE);
+            str.appendFormattedLine("LDR X0, [FP, #-%d]", 1*WORD_SIZE);
         }
         else{
             // Sinon, on enregistre l'adresse de base de l'appelant dans X0
-            str.appendFormattedLine("MOV X10, FP");
+            str.appendFormattedLine("MOV X0, FP");
         }
 
         // Appel de la fonction
@@ -697,6 +697,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
           
         // On met le nouveau pointeur de base dans FP
         str.appendLine("MOV FP, SP");
+
+        // Load dans X0 de l'argument
+        str.appendFormattedLine("LDR X0, [FP, #%d]", WORD_SIZE);
   
         if(type==systeme.MACOS){    
             str.appendLine("""
@@ -792,7 +795,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV FP, SP");
 
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
-        push(str, "X10");
+        push(str, "X0");
 
         // Espace libre pour les variables locales
         // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
