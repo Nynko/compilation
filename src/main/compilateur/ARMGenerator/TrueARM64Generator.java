@@ -531,8 +531,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(MoinsUnaire unaire) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine(unaire.noeud.accept(this));
+        str.appendLine("SUB R0, #0, R0");
+        return str.getString();
     }
 
     @Override
