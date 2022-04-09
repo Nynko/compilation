@@ -314,7 +314,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int nb_param = idfParenthesis.exprList.size();
         for (int i = 0; i < nb_param; i++) {
             Ast param = idfParenthesis.exprList.get(i);
-            str.appendLine(param.accept(this));
+            str.appendLine(param.accept(this)); // Met le paramètre dans X0
             // Putting X0 in the stack
             str.appendFormattedLine("STR X0, [SP, #-%d]", WORD_SIZE*(nb_param-i));
         }
