@@ -559,7 +559,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Egal egal) {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
-        str.appendLine("BEQ _egal");
+        str.appendLine("BNE _egal");
         str.appendLine("MOV X0, #1");
         str.appendLine("_egal:");
         return str.getString();
