@@ -121,6 +121,7 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
+        idfParenthesis.setTds(tds);
         int nbParam = idfParenthesis.exprList.size();
         String fctName = ((Idf) idfParenthesis.idf).name;
         Symbole sym = tds.findSymbole(fctName);
