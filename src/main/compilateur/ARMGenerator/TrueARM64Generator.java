@@ -133,7 +133,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement(WORD_SIZE*(-1));
         }
-        str.appendFormattedLine("LDR X0, [%s, #%d]", bp, decalage);
+        str.appendFormattedLine("LDR X0, [%s, #%d] // On récupère dans la pile la valeur de la variable", bp, decalage);
 
         return str.getString();
     }
@@ -325,11 +325,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int imbricationAppelee = idfParenthesis.getTds().findImbrication(((Idf) idfParenthesis.idf).name);
         if(imbricationPere == imbricationAppelee){
             // Si les imbrications sont identiques, on enregistre l'adresse pointée par le chainage statique de l'appelant dans X0
-            str.appendFormattedLine("LDR X0, [FP, #-%d]", 1*WORD_SIZE);
+            str.appendFormattedLine("LDR X0, [FP, #-%d]  // Chainage statique même imbrication", 1*WORD_SIZE);
         }
         else{
             // Sinon, on enregistre l'adresse de base de l'appelant dans X0
-            str.appendFormattedLine("MOV X0, FP");
+            str.appendFormattedLine("MOV X0, FP // Chainage statique adresse base appellante ");
         }
         // Appel de la fonction
         
@@ -436,7 +436,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int ifNum = getIfIncr();
         str.appendFormattedLine("//if%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThen.condition.accept(this));
-        str.appendLine("CMP X0, #0");
+        str.appendLine("CMP X0, #0 // X0 = bool condition --> Si X0 = 1 : vraie");
         str.appendFormattedLine("BEQ _finIf%d", ifNum);
         str.appendLine(ifThen.thenBlock.accept(this));
         str.appendFormattedLine("_finIf%d:", ifNum);
@@ -478,7 +478,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(Return return1) {
-        return return1.expr.accept(this);
+        StringAggregator str = new StringAggregator();
+        str.appendLine("// return");
+        str.appendLine(return1.expr.accept(this));
+
+
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV SP, FP");
+
+        // Récupération de l'addresse de retour et retour à l'appelant
+        popLRFP(str);
+
+        str.appendLine("RET");
+        return str.getString();
     }
 
     @Override
@@ -576,8 +588,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine(cmp.right.accept(this));
         // same
         str.appendLine("MOV X2, X0");
-        str.appendLine("CMP X1, X2");
-        str.appendLine("MOV X0, #0");
+        str.appendLine("CMP X1, X2"); // SUBS X0, X1, X2 || CMP X1, X2
+        str.appendLine("MOV X0, #0 // Remise a 0 cf plus bas dans comparaison");
         return str.getString();
     }
 
@@ -585,9 +597,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Egal egal) {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
-        str.appendLine("BNE _egal");
-        str.appendLine("MOV X0, #1");
-        str.appendLine("_egal:");
+        // TODO : add compteur !!!!! + formated line 
+        str.appendLine("BNE _Nonegal // Si Z==0 -->  X1 != X2"); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendLine("_Nonegal: // Sinon on ne met rien et X0 = 0");
         return str.getString();
     }
 
@@ -699,7 +712,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV FP, SP");
 
         // Load dans X0 de l'argument
-        str.appendFormattedLine("LDR X0, [FP, #%d]", WORD_SIZE);
+        str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour print", WORD_SIZE);
   
         if(type==systeme.MACOS){    
             str.appendLine("""
@@ -737,8 +750,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * @param str : le StringAggregator qui contient le code à écrire 
      * @param registre : le registre à mettre sur la stack
      */
-    private void push(StringAggregator str, String registre ){
-        str.appendFormattedLine("STR    %s, [SP,#-%d]! //PUSH %s sur SP avec pré-décrémentation", registre, WORD_SIZE,registre);
+    private void staticPush(StringAggregator str, String registre ){
+        str.appendFormattedLine("STR    %s, [SP,#-%d]! //Chainage statique: PUSH %s sur SP avec pré-décrémentation", registre, WORD_SIZE,registre);
     }
     
     /**
@@ -768,11 +781,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // }
     }
 
-    private void staticPush(StringAggregator str){
-         // chainage statique
-    }
-
-
     /**
      * @param str
      * @param name : nom de la fonction
@@ -795,7 +803,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV FP, SP");
 
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
-        push(str, "X0");
+        staticPush(str, "X0");
 
         // Espace libre pour les variables locales
         // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
@@ -803,7 +811,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // str.appendFormattedLine("SUB   SP, FP, %d", bloc.getTds().getDeplacement(WORD_SIZE));
         str.appendLine("MOV     X3, #0");
         for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
-            str.appendFormattedLine("STR    X3, [SP,#-%d]!", WORD_SIZE);
+            str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
         }
    
         //tmp juste X0 
@@ -819,7 +827,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         str.appendLine( bloc.accept(this));
 
-
+        
+        str.appendLine("// RETURN de sécurité si abscence de return");
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV SP, FP");
 
