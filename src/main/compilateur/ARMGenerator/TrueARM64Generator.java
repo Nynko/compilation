@@ -123,13 +123,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
         // chainage statique pour mettre a jour bp
         // chainage statique
-        if (idf.getTds().getImbrication() - imbrication != 0) {
-            // str.appendFormattedLine("LDR X0 , [FP, #-%d]",WORD_SIZE);
-            for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
-                // str.appendFormattedLine("LDR X0, [X0, #-%d]", WORD_SIZE);
-            }
-            bp = "X0";
-        }
+        // if (idf.getTds().getImbrication() - imbrication != 0) {
+        //     // str.appendFormattedLine("LDR X0 , [FP, #-%d]",WORD_SIZE);
+        //     for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
+        //         // str.appendFormattedLine("LDR X0, [X0, #-%d]", WORD_SIZE);
+        //     }
+        //     bp = "X0";
+        // }
         Symbole s = idf.getTds().findSymbole(idf.name);
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement(WORD_SIZE*(-1));
@@ -721,11 +721,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Plus plus) {
         StringAggregator str = new StringAggregator();
         str.appendLine(plus.left.accept(this));
-        str.appendLine("BL      __save_reg__");
+        // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV   X1, X0");
         str.appendLine(plus.right.accept(this));
         str.appendLine("ADD     X0, X0, X1");
-        str.appendLine("BL      __restore_reg__");
+        // str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -733,11 +733,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Minus minus) {
         StringAggregator str = new StringAggregator();
         str.appendLine(minus.left.accept(this));
-        str.appendLine("BL      __save_reg__");
+        // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(minus.right.accept(this));
         str.appendLine("SUB     X0, X0, X1");
-        str.appendLine("BL      __restore_reg__");
+        // str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -745,7 +745,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Division div) {
         StringAggregator str = new StringAggregator();
         str.appendLine(div.left.accept(this));
-        str.appendLine("BL      __save_reg__");
+        // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(div.right.accept(this));
         str.appendLine("MOV    X2, X0");
@@ -755,7 +755,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 """);
         str.appendLine("SDIV    X0, X1, X2");
         str.appendLine();
-        str.appendLine("BL      __restore_reg__");
+        // str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -763,12 +763,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Multiplication mult) {
         StringAggregator str = new StringAggregator();
         str.appendLine(mult.left.accept(this));
-        str.appendLine("BL      __save_reg__");
+        // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(mult.right.accept(this));
         str.appendLine("MOV    X2, X0");
         str.appendLine("MUL X0,X1,X2");
-        str.appendLine("BL      __restore_reg__");
+        // str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -880,7 +880,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
         // TODO adapter la TDS
         // str.appendFormattedLine("SUB   SP, FP, %d", bloc.getTds().getDeplacement(WORD_SIZE));
-        str.appendLine("MOV     X3, #0");
+        str.appendLine("MOV     X3, #0 // Inutile si pas de variables locales");
         for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
             str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
         }
