@@ -567,7 +567,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV R0, #0");
         str.appendFormattedLine("BNE _NonEgal%d // Si X1 > X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_NonEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_NonEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
         return str.getString();
     }
@@ -594,7 +594,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Comparaison
         str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
 
         str.appendLine("CMP R1, #1");
@@ -602,7 +602,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Comparaison
         str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
         
         str.appendLine("; Expr_ou");
@@ -626,7 +626,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("CMP R1, R2");
         str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
         
         str.appendLine("; Expr_et");
@@ -657,7 +657,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         startCmp(egal, str);
         str.appendFormattedLine("BEQ _Egal%d // Si Z==1 -->  X1 == X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
@@ -668,7 +668,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         startCmp(dif, str);
         str.appendFormattedLine("BNE _NotEgal%d // Si X1 != X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_NotEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_NotEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
@@ -679,7 +679,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         startCmp(inf, str);
         str.appendFormattedLine("BLT _Inf%d // Si X1 < X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_Inf%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_Inf%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
@@ -690,7 +690,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         startCmp(infEgal, str);
         str.appendFormattedLine("BLE _InfEgal%d // Si X1 <= X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_InfEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_InfEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
@@ -701,7 +701,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         startCmp(sup, str);
         str.appendFormattedLine("BGT _Sup%d // Si X1 > X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_Sup%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_Sup%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
@@ -712,7 +712,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         startCmp(supEgal, str);
         str.appendFormattedLine("BGE _SupEgal%d // Si X1 >= X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendFormattedLine("_SupEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("_SupEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
