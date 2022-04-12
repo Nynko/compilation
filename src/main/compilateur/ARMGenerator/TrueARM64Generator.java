@@ -77,6 +77,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     private int whileCompt = 0;
     private int ifCompt = 0;
+    private int nbCmp = 0;
 
     private StringAggregator data;
     private ArrayList<String> dataList;
@@ -552,32 +553,84 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(MoinsUnaire unaire) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine(unaire.noeud.accept(this));
+        str.appendLine("SUB R0, #0, R0");
+        return str.getString();
     }
 
     @Override
     public String visit(Negation unaire) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine(unaire.noeud.accept(this));
+        str.appendLine("CMP R0, #0");
+        str.appendLine("MOV R0, #0");
+        str.appendFormattedLine("BNE _NonEgal%d // Si X1 > X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_NonEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++;
+        return str.getString();
     }
 
     @Override
     public String visit(Semicolon semicolon) {
-        // TODO Auto-generated method stub
+        // TODO suppr jamais visité
         return "";
     }
 
     @Override
     public String visit(Expr_ou expr_ou) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine("; Expr_ou");
+        str.appendLine(expr_ou.left.accept(this));
+        str.appendLine("BL      __save_reg__");
+        str.appendLine("MOV R1,R0");
+
+        str.appendLine(expr_ou.right.accept(this));
+        str.appendLine("MOV R2,R0");
+        str.appendLine("MOV R0, #0");
+        str.appendLine("CMP R2, #1");
+
+        // Comparaison
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++;
+
+        str.appendLine("CMP R1, #1");
+
+        // Comparaison
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++;
+        
+        str.appendLine("; Expr_ou");
+        return str.getString();
     }
 
     @Override
     public String visit(Expr_et expr_et) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine("; Expr_et");
+        str.appendLine(expr_et.left.accept(this));
+        str.appendLine("BL      __save_reg__");
+        str.appendLine("MOV R1,R0");
+
+        str.appendLine(expr_et.right.accept(this));
+        str.appendLine("MOV R2,R0");
+        str.appendLine("MOV R0, #0");
+        str.appendLine("CMP R1, #1");
+
+        // Comparaison Expr_Et 
+        str.appendLine("CMP R1, R2");
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++;
+        
+        str.appendLine("; Expr_et");
+        return str.getString();
     }
 
     public String startCmp(Comparaison cmp, StringAggregator str) {
@@ -593,14 +646,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
         return str.getString();
     }
 
+    public String cmp(Comparaison cmp, StringAggregator str) {
+        str.appendLine("MOV X0, #1");
+        return str.getString();
+    }
+
     @Override
     public String visit(Egal egal) {
         StringAggregator str = new StringAggregator();
         startCmp(egal, str);
-        // TODO : add compteur !!!!! + formated line 
-        str.appendLine("BNE _Nonegal // Si Z==0 -->  X1 != X2"); 
+        str.appendFormattedLine("BEQ _Egal%d // Si Z==1 -->  X1 == X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
-        str.appendLine("_Nonegal: // Sinon on ne met rien et X0 = 0");
+        str.appendFormattedLine("_Egal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
 
@@ -608,7 +666,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Different dif) {
         StringAggregator str = new StringAggregator();
         startCmp(dif, str);
-        str.appendLine("MOVNE X0, #1");
+        str.appendFormattedLine("BNE _NotEgal%d // Si X1 != X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_NotEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
 
@@ -616,9 +677,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Inferieur inf) {
         StringAggregator str = new StringAggregator();
         startCmp(inf, str);
-        str.appendLine("BLO _inf");
-        str.appendLine("MOV X0, #1");
-        str.appendLine("_inf:");
+        str.appendFormattedLine("BLT _Inf%d // Si X1 < X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_Inf%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
 
@@ -626,7 +688,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(InferieurEgal infEgal) {
         StringAggregator str = new StringAggregator();
         startCmp(infEgal, str);
-        str.appendLine("MOVLE X0, #1");
+        str.appendFormattedLine("BLE _InfEgal%d // Si X1 <= X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_InfEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
 
@@ -634,7 +699,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Superieur sup) {
         StringAggregator str = new StringAggregator();
         startCmp(sup, str);
-        str.appendLine("MOVGT X0, #1");
+        str.appendFormattedLine("BGT _Sup%d // Si X1 > X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_Sup%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
 
@@ -642,7 +710,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(SuperieurEgal supEgal) {
         StringAggregator str = new StringAggregator();
         startCmp(supEgal, str);
-        str.appendLine("MOVGE X0, #1");
+        str.appendFormattedLine("BGE _SupEgal%d // Si X1 >= X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0");
+        str.appendFormattedLine("_SupEgal%: // Sinon on ne met rien et X0 = 0",nbCmp);
+        nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
     }
 
@@ -650,11 +721,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Plus plus) {
         StringAggregator str = new StringAggregator();
         str.appendLine(plus.left.accept(this));
-        // str.appendLine("BL      __save_reg__");
+        str.appendLine("BL      __save_reg__");
         str.appendLine("MOV   X1, X0");
         str.appendLine(plus.right.accept(this));
         str.appendLine("ADD     X0, X0, X1");
-        // str.appendLine("BL      __restore_reg__");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -662,11 +733,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Minus minus) {
         StringAggregator str = new StringAggregator();
         str.appendLine(minus.left.accept(this));
-        // str.appendLine("BL      __save_reg__");
+        str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(minus.right.accept(this));
         str.appendLine("SUB     X0, X0, X1");
-        // str.appendLine("BL      __restore_reg__");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -674,7 +745,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Division div) {
         StringAggregator str = new StringAggregator();
         str.appendLine(div.left.accept(this));
-        // str.appendLine("BL      __save_reg__");
+        str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(div.right.accept(this));
         str.appendLine("MOV    X2, X0");
@@ -684,7 +755,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 """);
         str.appendLine("SDIV    X0, X1, X2");
         str.appendLine();
-        // str.appendLine("BL      __restore_reg__");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
@@ -692,12 +763,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Multiplication mult) {
         StringAggregator str = new StringAggregator();
         str.appendLine(mult.left.accept(this));
-        // str.appendLine("BL      __save_reg__");
+        str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(mult.right.accept(this));
         str.appendLine("MOV    X2, X0");
         str.appendLine("MUL X0,X1,X2");
-        // str.appendLine("BL      __restore_reg__");
+        str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
 
