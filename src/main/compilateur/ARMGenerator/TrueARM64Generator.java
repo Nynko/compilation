@@ -555,7 +555,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(MoinsUnaire unaire) {
         StringAggregator str = new StringAggregator();
         str.appendLine(unaire.noeud.accept(this));
-        str.appendLine("SUB R0, #0, R0");
+        str.appendLine("SUB X0, #0, X0");
         return str.getString();
     }
 
@@ -563,8 +563,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Negation unaire) {
         StringAggregator str = new StringAggregator();
         str.appendLine(unaire.noeud.accept(this));
-        str.appendLine("CMP R0, #0");
-        str.appendLine("MOV R0, #0");
+        str.appendLine("CMP X0, #0");
+        str.appendLine("MOV X0, #0");
         str.appendFormattedLine("BNE _NonEgal%d // Si X1 > X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
         str.appendFormattedLine("_NonEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
@@ -584,23 +584,23 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("; Expr_ou");
         str.appendLine(expr_ou.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV R1,R0");
+        str.appendLine("MOV X1,X0");
 
         str.appendLine(expr_ou.right.accept(this));
-        str.appendLine("MOV R2,R0");
-        str.appendLine("MOV R0, #0");
-        str.appendLine("CMP R2, #1");
+        str.appendLine("MOV X2,X0");
+        str.appendLine("MOV X0, #0");
+        str.appendLine("CMP X2, #1");
 
         // Comparaison
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 == X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
         str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
 
-        str.appendLine("CMP R1, #1");
+        str.appendLine("CMP X1, #1");
 
         // Comparaison
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 == X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
         str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
@@ -615,16 +615,16 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("; Expr_et");
         str.appendLine(expr_et.left.accept(this));
         str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV R1,R0");
+        str.appendLine("MOV X1,X0");
 
         str.appendLine(expr_et.right.accept(this));
-        str.appendLine("MOV R2,R0");
-        str.appendLine("MOV R0, #0");
-        str.appendLine("CMP R1, #1");
+        str.appendLine("MOV X2,X0");
+        str.appendLine("MOV X0, #0");
+        str.appendLine("CMP X1, #1");
 
         // Comparaison Expr_Et 
-        str.appendLine("CMP R1, R2");
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 > X2",nbCmp); 
+        str.appendLine("CMP X1, X2");
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 == X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0");
         str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++;
@@ -636,7 +636,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String startCmp(Comparaison cmp, StringAggregator str) {
         str.appendLine("// début comparaison");
         str.appendLine(cmp.left.accept(this));
-        // récup le registre depuis r0 dans le premier registre libre
+        // récup le registre depuis X0 dans le premier registre libre
         str.appendLine("MOV X1,X0");
         str.appendLine(cmp.right.accept(this));
         // same
