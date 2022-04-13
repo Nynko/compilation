@@ -566,7 +566,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(MoinsUnaire unaire) {
         StringAggregator str = new StringAggregator();
         str.appendLine(unaire.noeud.accept(this));
-        str.appendLine("SUB X0, #0, X0");
+        str.appendLine("NEG X0, X0");
         return str.getString();
     }
 
