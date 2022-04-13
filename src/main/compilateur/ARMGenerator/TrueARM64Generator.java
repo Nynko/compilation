@@ -393,46 +393,42 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
         int imbrication;
+        Tds tds = affectation.getTds();
+        String name;
 
         if (affectation.left instanceof Idf idf) { // Si on a un idf à gauche
             // on recupere l'adresse de l'idf
             Idf identifiant = (Idf) affectation.left;
-            String name = identifiant.name;
-            Tds tds = identifiant.getTds();
-            imbrication = tds.getImbrication();
+            name = identifiant.name;
 
             // Détermination du nombre de remontée de chainage statique
+            imbrication = tds.getImbrication();
             int nb_remontage = imbrication - tds.findImbrication(name);
 
-            // On remonte les chainages statiques
+            // On récupère le décalage de la variable
+            decalage = ((SymboleVar) tds.findSymbole(name)).getDeplacement(WORD_SIZE); 
+            // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
+
+              // On remonte les chainages statiques
             str.appendFormattedLine("LDR X17, [FP,#-%d] // On récupère le chainage statique", WORD_SIZE);
             for (int i = 0; i < nb_remontage; i++) {
                 str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
             }
 
-            // On récupère le décalage de la variable
-            decalage = ((SymboleVar) tds.findSymbole(name)).getDeplacement(WORD_SIZE); 
-                // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
-
             // On store la nouvelle valeur à la place adéquate (passage au full descending avec le moins)
             str.appendFormattedLine("STR X0, [X17, #%d] // On store la nouvelle valeur à la place adéquate avec chainage statique", -decalage); 
 
-
-        } else if (affectation.left instanceof Fleche fleche) {
-            // a->b ou type(b) = int
-            // decalage = decalage de a + decalage de b
-            // @a->b = base de declaration de a + decalage
-            Idf idf = (Idf) fleche.right;
-            Symbole s = affectation.getTds().findSymbole(idf.name);
-
-            if (s instanceof SymboleVar sv) {
-                decalage = sv.getDeplacement(WORD_SIZE);
-            }
         }
-        // str.appendFormattedLine("STR X0, [%s, #-%d]", bp, decalage);
-        // if (bp.equals("X7")) {
-            // charge l'ancienne valeur de X7
-            // str.appendFormattedLine("LDR X7, [SP, #-%d]!", WORD_SIZE);
+        // else if (affectation.left instanceof Fleche fleche) {
+        //     // a->b où type(b) = int
+        //     // decalage = decalage de a + decalage de b
+        //     // @a->b = base de declaration de a + decalage
+        //     Idf idf = (Idf) fleche.right;
+        //     Symbole s = affectation.getTds().findSymbole(idf.name);
+
+        //     if (s instanceof SymboleVar sv) {
+        //         decalage = sv.getDeplacement(WORD_SIZE);
+        //     }
         // }
         str.appendLine();
         return str.getString();
