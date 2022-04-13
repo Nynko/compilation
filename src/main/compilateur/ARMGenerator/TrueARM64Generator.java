@@ -740,7 +740,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV    X1, X0");
         str.appendLine(minus.right.accept(this));
-        str.appendLine("SUB     X0, X0, X1");
+        str.appendLine("SUB     X0, X1, X0");
         // str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
