@@ -209,6 +209,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if(type == systeme.MACOS){
             // end 
             str.appendLine("RET");
+            str.appendLine("""
+            _div_by_zero:
+                        // Division par zéro
+                        MOV X0, #1
+                        RET
+            """);
             // data
             this.data.appendLine("""
                 .section	__TEXT,__cstring,cstring_literals
@@ -765,14 +771,22 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         StringAggregator str = new StringAggregator();
         str.appendLine(div.left.accept(this));
         // str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV    X1, X0");
+        str.appendLine("MOV    X3, X0");
         str.appendLine(div.right.accept(this));
-        str.appendLine("MOV    X2, X0");
+        str.appendLine("MOV    X4, X0");
+        if(type==systeme.MACOS){
+            str.appendLine("""
+                    CMP     X4, #0
+                    BEQ     _div_by_zero
+                    """);
+        }
+        else{
         str.appendLine("""
-                CMP     X2, #0
+                
                 BEQ      __end__ //division par 0, exit
                 """);
-        str.appendLine("SDIV    X0, X1, X2");
+        }
+        str.appendLine("SDIV    X0, X3, X4");
         str.appendLine();
         // str.appendLine("BL      __restore_reg__");
         return str.getString();
@@ -783,10 +797,10 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         StringAggregator str = new StringAggregator();
         str.appendLine(mult.left.accept(this));
         // str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV    X1, X0");
+        str.appendLine("MOV    X3, X0");
         str.appendLine(mult.right.accept(this));
-        str.appendLine("MOV    X2, X0");
-        str.appendLine("MUL X0,X1,X2");
+        str.appendLine("MOV    X4, X0");
+        str.appendLine("MUL X0,X3,X4");
         // str.appendLine("BL      __restore_reg__");
         return str.getString();
     }
