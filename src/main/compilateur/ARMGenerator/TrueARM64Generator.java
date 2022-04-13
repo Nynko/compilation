@@ -396,10 +396,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // On suppose que l'on a une variable locale:
             // On récupère le décalage de la variable dans la pile
-           //TODO: Temporaire !!!!
+
+    //// TMP à DELETE ENTRE LES DEUX TMP
+           //TODO: Temporaire !!!! juste pour essayer 
             decalage = -1*WORD_SIZE;
             // On recupere l'adresse de la variable locale
             str.appendFormattedLine("STR  X0, [%s,#%d]",bp, decalage);
+
+    ///// TMP
 
             // imbrication = affectation.getTds().findImbrication(idf.name);
             // // chainage statique
