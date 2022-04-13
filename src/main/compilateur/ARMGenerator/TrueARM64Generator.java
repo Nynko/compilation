@@ -134,6 +134,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement(WORD_SIZE*(-1));
         }
+        // TODO !! ATTENTION à ne pas mettre si on récupère l'idf pour ajouter la valeur à la place de la variable !!! 
         str.appendFormattedLine("LDR X0, [%s, #%d] // On récupère dans la pile la valeur de la variable", bp, decalage);
 
         return str.getString();
@@ -379,10 +380,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(Affectation affectation) {
-        StringAggregator sb = new StringAggregator();
+        StringAggregator str = new StringAggregator();
         // on recupere le code assembleur de la partie droite de l'affectation, le code
         // retourne le resultat de l'expression dans X0
-        sb.appendLine(affectation.right.accept(this));
+        str.appendLine(affectation.right.accept(this));
 
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
@@ -390,28 +391,38 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int imbrication;
 
         if (affectation.left instanceof Idf idf) {
-            imbrication = affectation.getTds().findImbrication(idf.name);
-            // chainage statique
-            if (affectation.getTds().getImbrication() - imbrication != 0) {
-                sb.appendLine();
-                // sauvegarde du registre X7 sur la pile
-                sb.appendFormattedLine("STR X7, [SP], #%d", WORD_SIZE);
 
-                sb.appendLine("//Chainage statique");
-                // recupère l'adresse du chainage statique du bloc dans X7
-                // sb.appendFormattedLine("LDR X7 , [FP, #-%d]", WORD_SIZE);
+            //TODO : chainage statique
 
-                // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
-                // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
-                for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
-                    // sb.appendFormattedLine("LDR X7, [X7, #-%d]", WORD_SIZE);
-                }
-                bp = "X7";
-            }
-            Symbole s = affectation.getTds().findSymbole(idf.name);
-            if (s instanceof SymboleVar sv) {
-                decalage = sv.getDeplacement(WORD_SIZE);
-            }
+            // On suppose que l'on a une variable locale:
+            // On récupère le décalage de la variable dans la pile
+           //TODO: Temporaire !!!!
+            decalage = -1*WORD_SIZE;
+            // On recupere l'adresse de la variable locale
+            str.appendFormattedLine("STR  X0, [%s,#%d]",bp, decalage);
+
+            // imbrication = affectation.getTds().findImbrication(idf.name);
+            // // chainage statique
+            // if (affectation.getTds().getImbrication() - imbrication != 0) {
+            //     str.appendLine();
+            //     // sauvegarde du registre X7 sur la pile
+            //     str.appendFormattedLine("STR X7, [SP], #%d", WORD_SIZE);
+
+            //     str.appendLine("//Chainage statique");
+            //     // recupère l'adresse du chainage statique du bloc dans X7
+            //     // str.appendFormattedLine("LDR X7 , [FP, #-%d]", WORD_SIZE);
+
+            //     // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
+            //     // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
+            //     for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
+            //         // str.appendFormattedLine("LDR X7, [X7, #-%d]", WORD_SIZE);
+            //     }
+            //     bp = "X7";
+            // }
+            // Symbole s = affectation.getTds().findSymbole(idf.name);
+            // if (s instanceof SymboleVar sv) {
+            //     decalage = sv.getDeplacement(WORD_SIZE);
+            // }
         } else if (affectation.left instanceof Fleche fleche) {
             // a->b ou type(b) = int
             // decalage = decalage de a + decalage de b
@@ -423,13 +434,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 decalage = sv.getDeplacement(WORD_SIZE);
             }
         }
-        // sb.appendFormattedLine("STR X0, [%s, #-%d]", bp, decalage);
+        // str.appendFormattedLine("STR X0, [%s, #-%d]", bp, decalage);
         if (bp.equals("X7")) {
             // charge l'ancienne valeur de X7
-            // sb.appendFormattedLine("LDR X7, [SP, #-%d]!", WORD_SIZE);
+            // str.appendFormattedLine("LDR X7, [SP, #-%d]!", WORD_SIZE);
         }
-        sb.appendLine();
-        return sb.getString();
+        str.appendLine();
+        return str.getString();
     }
 
     public String visit(IfThen ifThen) {
