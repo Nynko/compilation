@@ -117,24 +117,34 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(Idf idf) {
         StringAggregator str = new StringAggregator();
-        String bp = "FP";
         int decalage = 0;
-        int imbrication = idf.getTds().findImbrication(idf.name);
-        // TODO diplay[imbrication] ou remonter tds.getImbrication() - imbrication
-        // chainage statique pour mettre a jour bp
-        // chainage statique
-        // if (idf.getTds().getImbrication() - imbrication != 0) {
-        //     // str.appendFormattedLine("LDR X0 , [FP, #-%d]",WORD_SIZE);
-        //     for (int i = 0; i < idf.getTds().getImbrication() - imbrication - 1; i++) {
-        //         // str.appendFormattedLine("LDR X0, [X0, #-%d]", WORD_SIZE);
-        //     }
-        //     bp = "X0";
-        // }
-        Symbole s = idf.getTds().findSymbole(idf.name);
-        if (s instanceof SymboleVar sv) {
-            decalage = sv.getDeplacement(WORD_SIZE*(-1));
+        Tds tds = idf.getTds();
+        String name = idf.name;
+
+        // Avec chainage statique
+
+        // Détermination du nombre de remontée de chainage statique
+        int imbrication = tds.getImbrication();
+        int nb_remontage = imbrication - tds.findImbrication(name);
+
+        // On récupère le décalage de la variable
+        decalage = ((SymboleVar) tds.findSymbole(name)).getDeplacement(WORD_SIZE); 
+        // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
+
+        // On remonte les chainages statiques
+        str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
+        for (int i = 0; i < nb_remontage; i++) {
+            str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
         }
-        str.appendFormattedLine("LDR X0, [%s, #%d] // On récupère dans la pile la valeur de la variable", bp, decalage);
+
+        // On récupère la nouvelle valeur depuis l'emplacement'adéquate (passage au full descending avec le moins)
+        str.appendFormattedLine("LDR X0, [X17, #%d] // On load la nouvelle valeur depuis l'emplacement adéquate avec chainage statique", -decalage); 
+
+        // Symbole s = idf.getTds().findSymbole(idf.name);
+        // if (s instanceof SymboleVar sv) {
+        //     decalage = sv.getDeplacement(WORD_SIZE*(-1));
+        // }
+        // str.appendFormattedLine("LDR X0, [FP, #%d] // On récupère dans la pile la valeur de la variable", decalage);
 
         return str.getString();
     }
@@ -410,7 +420,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
 
               // On remonte les chainages statiques
-            str.appendFormattedLine("LDR X17, [FP,#-%d] // On récupère le chainage statique", WORD_SIZE);
+            str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
             for (int i = 0; i < nb_remontage; i++) {
                 str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
             }
@@ -485,6 +495,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("// return");
         str.appendLine(return1.expr.accept(this));
 
+        // TODO: chainage statique : si on est dans une imbrication > 1 on remonte le chainage statique
+        if(return1.getTds().getImbrication() > 1) {
+            int imbrication = return1.getTds().getImbrication();
+            str.appendFormattedLine("// On remonte de %d fois le chainage statique des blocs", imbrication - 1);
+            for (int i = 0; i < imbrication - 1; i++) {
+                remonteeChainageStatique(str);
+            }
+        }
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV SP, FP");
@@ -500,27 +518,37 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Bloc bloc) {
         StringAggregator str = new StringAggregator();
         Tds tds = bloc.getTds();
-        if (tds.getName().equals("anonblock")) {
-            str.appendLine("//debut bloc anonyme");
+        String name = tds.getName();
 
-            // Sauvegarde des registres
-            // str.appendLine("BL __save_reg__");
+        Boolean notFunctionBlock = name.equals("anonblock") || name.equals("thenblock") || name.equals("elseblock") || name.equals("whileblock");
+        // Si on est pas dans un bloc de fonction !!
+        if (notFunctionBlock) {
+            str.appendLine("//debut bloc anonyme, while, if, then, else... ");
 
-            // Ignore l'adresse de retour
-            // On sauvegarde temporairement l'ancien pointeur de base dans X1
-            str.appendLine("MOV X1, FP");
+        // On réalise un chainage statique:
+
+            // On a pas besoin de chainage dynamique et pour éviter des problèmes avec les variables locales et le déplacement !!!!
+            // on met une case vide à la place du chainage dynamique
+            str.appendFormattedLine("SUB SP, SP, #%d", WORD_SIZE);
+
+            // Chainage statique
+            // On sait qu'il y a une différence d'imbrication 
+            // Donc on enregistre l'adresse de base de l'appelant sur la pile (FP)
+            str.appendFormattedLine("STR FP, [SP, #-%d]", WORD_SIZE); // On décrémente pas encore 
+
             // On met le nouveau pointeur de base dans FP
             str.appendLine("MOV FP, SP");
-            // Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
-            str.appendFormattedLine("STR X1, [SP, #-%d]", WORD_SIZE);
-            // Chainage statique
-            str.appendFormattedLine("STR X1, [SP, #-%d]", WORD_SIZE);
-            
-            // On s'assure que SP pointe sur le maximum de son déplacement (ajoute la place
-            // pour var local)
-            str.appendLine("//ajout place pour var local");
-            str.appendFormattedLine("ADD X1, FP, #-%d", tds.getDeplacement(WORD_SIZE) - WORD_SIZE);
-            str.appendLine("MOV SP , X1");
+
+            // On décrémente SP qui avait bougé du coup 
+            str.appendFormattedLine("SUB SP, SP, #%d", WORD_SIZE);
+
+            // Espace libre pour les variables locales
+            str.appendLine("MOV     X3, #0 // Inutile si pas de variables locales");
+            int deplacement = bloc.getTds().getDeplacement();
+            for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
+                str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
+            }
+
         }
 
         str.appendLine("//debut instructions");
@@ -530,17 +558,22 @@ public class TrueARM64Generator implements AstVisitor<String> {
         }
         str.appendLine("//fin instructions");
 
-        if (tds.getName().equals("anonblock")) {
-            // Remise du pointeur de pile à sa position avant l'appel de fonction
+        if (notFunctionBlock) {
+            // Remise du pointeur de pile à sa position du chainage statique + WORD_SIZE (on rappel que le fp est au dessus du chainage statique)
             str.appendLine("MOV SP, FP");
-
-            // Restauration des registres
-            // str.appendLine("BL __restore_reg__");
-
+            remonteeChainageStatique(str);
             str.appendLine("//fin bloc anonyme");
         }
         return str.getString();
     }
+
+    private void remonteeChainageStatique(StringAggregator str) {
+        // On remonte le chainage statique
+        str.appendFormattedLine("LDR   X1, [FP,#-%d] //Remontée du chainage statique", WORD_SIZE); // (On rappel que le FP est au dessus du chainage statique)
+        str.appendLine("MOV SP, X1");
+        str.appendLine("MOV FP, SP // on met à jour le FP");
+    }
+
 
     @Override
     public String visit(CharNode charNode) {
