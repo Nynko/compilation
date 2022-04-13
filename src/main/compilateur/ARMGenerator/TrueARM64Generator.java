@@ -134,7 +134,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if (s instanceof SymboleVar sv) {
             decalage = sv.getDeplacement(WORD_SIZE*(-1));
         }
-        // TODO !! ATTENTION à ne pas mettre si on récupère l'idf pour ajouter la valeur à la place de la variable !!! 
         str.appendFormattedLine("LDR X0, [%s, #%d] // On récupère dans la pile la valeur de la variable", bp, decalage);
 
         return str.getString();
@@ -176,33 +175,33 @@ public class TrueARM64Generator implements AstVisitor<String> {
         fonctionPrint(str);
 
         // Ajout de la macro de sauvegarde des registres
-        str.appendLine("__save_reg__:");
-        str.appendLine("""
-            stp       X0, X1, [SP, #-16]!
-            stp       X2, X3, [SP, #-16]!
-            stp       X4, X5, [SP, #-16]!
-            stp       X6, X7, [SP, #-16]!
-            stp       X8, X9, [SP, #-16]!
-            stp       X10, X11, [SP, #-16]!
-            stp       X12, X13, [SP, #-16]!
-            stp       X14, X15, [SP, #-16]!
-            stp       X16, X17, [SP, #-16]!
-                """);
-        str.appendLine("RET");
-        str.appendLine();
+        // str.appendLine("__save_reg__:");
+        // str.appendLine("""
+        //     stp       X0, X1, [SP, #-16]!
+        //     stp       X2, X3, [SP, #-16]!
+        //     stp       X4, X5, [SP, #-16]!
+        //     stp       X6, X7, [SP, #-16]!
+        //     stp       X8, X9, [SP, #-16]!
+        //     stp       X10, X11, [SP, #-16]!
+        //     stp       X12, X13, [SP, #-16]!
+        //     stp       X14, X15, [SP, #-16]!
+        //     stp       X16, X17, [SP, #-16]!
+        //         """);
+        // str.appendLine("RET");
+        // str.appendLine();
 
         // Ajout de la macro de restauration des registres
-        str.appendLine("__restore_reg__:");
-        str.appendLine("""
-            ldp     X16, X17, [SP],#16
-            ldp     X14, X15, [SP],#16
-            ldp     X12, X13, [SP],#16
-            ldp     X10, X11, [SP],#16
-            ldp     X8, X9, [SP],#16
-            ldp     X6, X7, [SP],#16
-            ldp     X4, X5, [SP],#16
-            ldp     X2, X3, [SP],#16
-                """);
+        // str.appendLine("__restore_reg__:");
+        // str.appendLine("""
+        //     ldp     X16, X17, [SP],#16
+        //     ldp     X14, X15, [SP],#16
+        //     ldp     X12, X13, [SP],#16
+        //     ldp     X10, X11, [SP],#16
+        //     ldp     X8, X9, [SP],#16
+        //     ldp     X6, X7, [SP],#16
+        //     ldp     X4, X5, [SP],#16
+        //     ldp     X2, X3, [SP],#16
+        //         """);
        
 
 
@@ -393,46 +392,32 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // on recupere l'adresse de la base et le décalage de ce qu'il y à gauche
         int decalage = 0;
-        String bp = "FP";
         int imbrication;
 
-        if (affectation.left instanceof Idf idf) {
+        if (affectation.left instanceof Idf idf) { // Si on a un idf à gauche
+            // on recupere l'adresse de l'idf
+            Idf identifiant = (Idf) affectation.left;
+            String name = identifiant.name;
+            Tds tds = identifiant.getTds();
+            imbrication = tds.getImbrication();
 
-            //TODO : chainage statique
+            // Détermination du nombre de remontée de chainage statique
+            int nb_remontage = imbrication - tds.findImbrication(name);
 
-            // On suppose que l'on a une variable locale:
-            // On récupère le décalage de la variable dans la pile
+            // On remonte les chainages statiques
+            str.appendFormattedLine("LDR X17, [FP,#-%d] // On récupère le chainage statique", WORD_SIZE);
+            for (int i = 0; i < nb_remontage; i++) {
+                str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
+            }
 
-    //// TMP à DELETE ENTRE LES DEUX TMP
-           //TODO: Temporaire !!!! juste pour essayer 
-            decalage = -1*WORD_SIZE;
-            // On recupere l'adresse de la variable locale
-            str.appendFormattedLine("STR  X0, [%s,#%d]",bp, decalage);
+            // On récupère le décalage de la variable
+            decalage = ((SymboleVar) tds.findSymbole(name)).getDeplacement(WORD_SIZE); 
+                // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
 
-    ///// TMP
+            // On store la nouvelle valeur à la place adéquate (passage au full descending avec le moins)
+            str.appendFormattedLine("STR X0, [X17, #%d] // On store la nouvelle valeur à la place adéquate avec chainage statique", -decalage); 
 
-            // imbrication = affectation.getTds().findImbrication(idf.name);
-            // // chainage statique
-            // if (affectation.getTds().getImbrication() - imbrication != 0) {
-            //     str.appendLine();
-            //     // sauvegarde du registre X7 sur la pile
-            //     str.appendFormattedLine("STR X7, [SP], #%d", WORD_SIZE);
 
-            //     str.appendLine("//Chainage statique");
-            //     // recupère l'adresse du chainage statique du bloc dans X7
-            //     // str.appendFormattedLine("LDR X7 , [FP, #-%d]", WORD_SIZE);
-
-            //     // itère (num_imbri_courant - num_imbri_decla - 1 (car on a déjà la base de
-            //     // l'appelant)) jusqu'à obtenir la base ou se trouve la déclaration de l'idf
-            //     for (int i = 0; i < affectation.getTds().getImbrication() - imbrication - 1; i++) {
-            //         // str.appendFormattedLine("LDR X7, [X7, #-%d]", WORD_SIZE);
-            //     }
-            //     bp = "X7";
-            // }
-            // Symbole s = affectation.getTds().findSymbole(idf.name);
-            // if (s instanceof SymboleVar sv) {
-            //     decalage = sv.getDeplacement(WORD_SIZE);
-            // }
         } else if (affectation.left instanceof Fleche fleche) {
             // a->b ou type(b) = int
             // decalage = decalage de a + decalage de b
@@ -445,10 +430,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
             }
         }
         // str.appendFormattedLine("STR X0, [%s, #-%d]", bp, decalage);
-        if (bp.equals("X7")) {
+        // if (bp.equals("X7")) {
             // charge l'ancienne valeur de X7
             // str.appendFormattedLine("LDR X7, [SP, #-%d]!", WORD_SIZE);
-        }
+        // }
         str.appendLine();
         return str.getString();
     }
@@ -885,18 +870,19 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         // }
     }
 
-    /**
-     * @param str
+    /** Fonction pour la déclaration de fonction (afin d'éviter redondances entre struct et int)
+     * @param str : le StringAggregator qui contient le code à écrire
      * @param name : nom de la fonction
-     * @param deplacement    
-     * @param bloc
+     * @param deplacement : déplacement de la fonction dans la mémoire
+     * @param bloc : le bloc de l'AST declFunction {Struct || Int}
      */
     private void declFct(StringAggregator str, String name, Bloc bloc){
         
-        int numParams = bloc.getTds().getParams().size();
+        // int numParams = bloc.getTds().getParams().size();
         int deplacement = bloc.getTds().getDeplacement();
         System.out.println("deplacement : " + deplacement);
         System.out.println(bloc.getTds().getDeplacement(16));
+
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s:",name);
 
@@ -907,30 +893,19 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         str.appendLine("MOV FP, SP");
 
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
+        if(name.equals("main")){
+            str.appendLine("MOV X0, FP"); // Le chainage statique dans ce cas est le même que FP
+        }
         staticPush(str, "X0");
 
         // Espace libre pour les variables locales
-        // On enlève TEMPORAIREMENT un WORD_SIZE car le chaînage dynamique et l'adresse de retour sont dans le même espace
-        // TODO adapter la TDS
-        // str.appendFormattedLine("SUB   SP, FP, %d", bloc.getTds().getDeplacement(WORD_SIZE));
         str.appendLine("MOV     X3, #0 // Inutile si pas de variables locales");
         for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
             str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
         }
-   
-        //tmp juste X0 
-
-        // Chainage statique
-        // staticPush(str);
-
-        // On s'assure que SP pointe sur le maximum de son déplacement
-        //TODO : to check
-        // str.appendLine("//ajout place pour var local");
-        // str.appendFormattedLine("SUB  X1, SP, #%d", deplacement);
-        // str.appendLine("MOV SP, X1");
-
+        
+        // On s'assure que SP pointe sur le maximum de son déplacement ??? 
         str.appendLine( bloc.accept(this));
-
         
         str.appendLine("// RETURN de sécurité si abscence de return");
         // Remise du pointeur de pile à sa position avant l'appel de fonction
