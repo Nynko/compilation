@@ -600,9 +600,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine(unaire.noeud.accept(this));
         str.appendLine("CMP X0, #0");
         str.appendLine("MOV X0, #1 // On suppose que la condition est vraie");
-        str.appendFormattedLine("BNE _NonEgal%d // Si X1 > X2",nbCmp); 
-        str.appendLine("MOV X0, #0 // On met 0 dans X0");
-        str.appendFormattedLine("_NonEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("BEQ _Egal%d // Si X0 == 0, on fait rien",nbCmp); 
+        str.appendLine("MOV X0, #0 // Sinon on met 0 dans X0");
+        str.appendFormattedLine("_Egal%d: // on ne met rien et X0 = 1",nbCmp);
         nbCmp++;
         return str.getString();
     }
