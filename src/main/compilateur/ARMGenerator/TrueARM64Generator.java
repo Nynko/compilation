@@ -328,10 +328,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         str.appendLine("//debut appel fonction");
 
-        // On récupère le SP avant l'appel de la fonction
-        int deplacementVars = idfParenthesis.getTds().getDeplacement(WORD_SIZE) ; 
-        str.appendFormattedLine("SUB   SP, FP, #%d // On récupère le SP après variables locales",deplacementVars);
-        
         String name = ((Idf) idfParenthesis.idf).name;
 
         // Ajout des parametres à la pile
@@ -370,7 +366,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty) {
         StringAggregator str = new StringAggregator();
-
+        
         // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
         int imbricationPere = idfParenthesisEmpty.getTds().getImbrication();
         int imbricationAppelee = idfParenthesisEmpty.getTds().findImbrication(((Idf) idfParenthesisEmpty.idf).name);
