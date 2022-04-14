@@ -320,10 +320,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
-        // System.out.println(idfParenthesis.getTds().getName()); // le nom de la tds englobante !!
-        // Sauvegarde des registres
+
         str.appendLine("//debut appel fonction");
-        // str.appendLine("BL __save_reg__");
+
+        // On récupère le SP avant l'appel de la fonction
+        int deplacementVars = idfParenthesis.getTds().getDeplacement(WORD_SIZE) ; 
+        str.appendFormattedLine("SUB   SP, FP, #%d // On récupère le SP après variables locales",deplacementVars);
         
         String name = ((Idf) idfParenthesis.idf).name;
 
@@ -364,9 +366,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(IdfParenthesisEmpty idfParenthesisEmpty) {
         StringAggregator str = new StringAggregator();
 
-        // Sauvegarde des registres
-        // str.appendLine("BL		__save_reg__");
-
         // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
         int imbricationPere = idfParenthesisEmpty.getTds().getImbrication();
         int imbricationAppelee = idfParenthesisEmpty.getTds().findImbrication(((Idf) idfParenthesisEmpty.idf).name);
@@ -382,8 +381,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Appel de la fonction
         str.appendFormattedLine("BL 		_%s", ((Idf) idfParenthesisEmpty.idf).name);
 
-        // Restauration des registres
-        // str.appendLine("BL		__restore_reg__");
 
         return str.getString();
     }
@@ -523,7 +520,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         Boolean notFunctionBlock = name.equals("anonblock") || name.equals("thenblock") || name.equals("elseblock") || name.equals("whileblock");
         // Si on est pas dans un bloc de fonction !!
         if (notFunctionBlock) {
-            str.appendLine("//debut bloc anonyme, while, if, then, else... ");
+            str.appendFormattedLine("//debut bloc %s", name);
 
         // On réalise un chainage statique:
 
@@ -545,7 +542,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // Espace libre pour les variables locales
             str.appendLine("MOV     X3, #0 // Inutile si pas de variables locales");
             int deplacement = bloc.getTds().getDeplacement();
-            for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
+            for(int i=0; i < deplacement -2 ; i++ ){ // -2 car on a démarré le déplacement à 2 pour le chainage statique
                 str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
             }
 
@@ -562,16 +559,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // Remise du pointeur de pile à sa position du chainage statique + WORD_SIZE (on rappel que le fp est au dessus du chainage statique)
             str.appendLine("MOV SP, FP");
             remonteeChainageStatique(str);
-            str.appendLine("//fin bloc anonyme");
+            str.appendFormattedLine("//fin bloc %s", name);
         }
         return str.getString();
     }
 
     private void remonteeChainageStatique(StringAggregator str) {
         // On remonte le chainage statique
-        str.appendFormattedLine("LDR   X1, [FP,#-%d] //Remontée du chainage statique", WORD_SIZE); // (On rappel que le FP est au dessus du chainage statique)
-        str.appendLine("MOV SP, X1");
-        str.appendLine("MOV FP, SP // on met à jour le FP");
+        // str.appendFormattedLine("ADD   SP, FP, #%d // On récupère l'ancien SP situé juste sous le FP actuel", WORD_SIZE); // On en aura besoin pour les appels de fonctions ! Qui prennent SP en compte pour mettre les nouveaux paramètres !! 
+        str.appendFormattedLine("LDR   FP, [FP,#-%d] //Remontée du chainage statique", WORD_SIZE); // (On rappel que le FP est au dessus du chainage statique)
     }
 
 
@@ -618,7 +614,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine("; Expr_ou");
         str.appendLine(expr_ou.left.accept(this));
-        str.appendLine("BL      __save_reg__");
+        // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV X1,X0");
 
         str.appendLine(expr_ou.right.accept(this));
@@ -649,7 +645,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine("; Expr_et");
         str.appendLine(expr_et.left.accept(this));
-        str.appendLine("BL      __save_reg__");
+        // str.appendLine("BL      __save_reg__");
         str.appendLine("MOV X1,X0");
 
         str.appendLine(expr_et.right.accept(this));
@@ -929,7 +925,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         // Espace libre pour les variables locales
         str.appendLine("MOV     X3, #0 // Inutile si pas de variables locales");
-        for(int i=0; i < deplacement -1 ; i++ ){ // -1 car on a démarré le déplacement à 1 pour le chainage statique
+        for(int i=0; i < deplacement -2 ; i++ ){ // -2 car on a démarré le déplacement à 2 pour le chainage statique
             str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
         }
         
