@@ -82,6 +82,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private StringAggregator data;
     private ArrayList<String> dataList;
 
+    private Tds lastUsedTds = null; // nécessaire pour avoir la tds des identifiants quand on utilise les comparaisons dans les while et if dont les idfs sont pas forcéement associé à une tds !!
+
 
     public TrueARM64Generator(String type) {
         if(type.equals("macos")){
@@ -119,6 +121,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         int decalage = 0;
         Tds tds = idf.getTds();
+        if(tds==null){
+            tds = lastUsedTds;
+        }
         String name = idf.name;
 
         // Avec chainage statique
@@ -444,6 +449,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(IfThen ifThen) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
+        lastUsedTds = ifThen.getTds();
         str.appendFormattedLine("//if%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThen.condition.accept(this));
         str.appendLine("CMP X0, #0 // X0 = bool condition --> Si X0 = 1 : vraie");
@@ -458,6 +464,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(IfThenElse ifThenElse) {
         StringAggregator str = new StringAggregator();
         int ifNum = getIfIncr();
+        lastUsedTds = ifThenElse.getTds();
         str.appendFormattedLine("//ifThenElse%d", ifNum);// Commentaire pour debug
         str.appendLine(ifThenElse.condition.accept(this));
         str.appendLine("CMP X0, #0");
@@ -475,13 +482,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(While while1) {
         StringAggregator str = new StringAggregator();
         int whileNum = getWhileIncr();
-        str.appendFormattedLine("_while %d:", whileNum);
+        lastUsedTds = while1.getTds();
+        str.appendFormattedLine("_while%d:", whileNum);
         str.appendLine(while1.condition.accept(this));
         str.appendLine("CMP X0, #0");
-        str.appendFormattedLine("BEQ _finWhile %d", whileNum);
+        str.appendFormattedLine("BEQ _finWhile%d", whileNum);
         str.appendLine(while1.doBlock.accept(this));
-        str.appendFormattedLine("B _while %d", whileNum);
-        str.appendFormattedLine("_finWhile %d:", whileNum);
+        str.appendFormattedLine("B _while%d", whileNum);
+        str.appendFormattedLine("_finWhile%d:", whileNum);
         str.appendLine();
         return str.getString();
     }

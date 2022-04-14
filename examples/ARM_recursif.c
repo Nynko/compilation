@@ -10,7 +10,7 @@ int func(int a){
 
 int main(){
 	int a;
-	a = func(10);
+	a = func(1001);
 	print(a);
 	return 0;
 
