@@ -19,11 +19,31 @@ import compilateur.graphviz.GraphVizVisitor;
 import compilateur.tds.Tds;
 import compilateur.tds.TdsCreator;
 import compilateur.utils.ErrorAggregator;
+import compilateur.utils.Os;
 
 public class Main {
 
     private static void outputARM(String str){
         try (FileOutputStream output = new FileOutputStream("./out/ARM.s")) {
+            String buffer = str;
+            byte[] strToBytes = buffer.getBytes();
+            try {
+                output.write(strToBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void outputARMinBin(String str, String testFile){
+        try (FileOutputStream output = new FileOutputStream("./bin/ARM/ARMs/" + testFile.split("/")[2].split("\\.")[0].split("_")[1] + ".s")) {
             String buffer = str;
             byte[] strToBytes = buffer.getBytes();
             try {
@@ -106,10 +126,10 @@ public class Main {
                     graphVizTds.dumpGraph("./out/tds.dot");
 
                     // ARM
-                    TrueARM64Generator arm = new TrueARM64Generator("macos");
+                    TrueARM64Generator arm = new TrueARM64Generator(Os.getOS());
                     String str = ast.accept(arm);
                     outputARM(str);
-                    
+                    outputARMinBin(str, testFile);
                 }
 
             } else {

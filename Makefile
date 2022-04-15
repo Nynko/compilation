@@ -28,7 +28,7 @@ tds : FORCE
 		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
 
 macos: FORCE
-		./gradlew run --args "$(ARGS)"
+		./gradlew run --args "$(ARGS)" 
 		dot -Tsvg ./out/tree.dot -o ./out/tree.svg
 		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
 		as -o ./out/ARM.o ./out/ARM.s
@@ -40,6 +40,17 @@ linux: FORCE
 		dot -Tsvg ./out/tds.dot -o ./out/tds.svg
 		as -o ./out/ARM.o ./out/ARM.s
 		ld -o ./out/ARM ./out/ARM.o -lc -L'/usr/lib/aarch64-linux-gnu/' 
+
+
+macosNamed: FORCE
+		./gradlew run --args "$(ARGS)"
+		as -o ./bin/ARM/ARMo/$(NAME).o ./bin/ARM/ARMs/$(NAME).s
+		ld -o ./bin/ARM/$(NAME) ./bin/ARM/ARMo/$(NAME).o -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -arch arm64
+
+linuxNamed: FORCE
+		./gradlew run --args "$(ARGS)"
+		as -o ./bin/ARM/ARMo/$(NAME).o ./bin/ARM/ARMs/$(NAME).s
+		ld -o ./bin/ARM/$(NAME) ./bin/ARM/ARMo/$(NAME).o -lc -L'/usr/lib/aarch64-linux-gnu/'
 
 FORCE:
 
