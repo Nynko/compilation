@@ -58,6 +58,10 @@ public class ARMTests {
     }
 
     public boolean testFile(String testFile) throws IOException {
+        if(! System.getProperty("os.arch").contains("aarch64")){
+            // Si on n'est pas sur un ARM64, on ne test pas
+            return true;
+        }
         //chargement du fichier et construction du parser
         CharStream input = CharStreams.fromFileName(testFile);
         
