@@ -44,6 +44,7 @@ import compilateur.ast.While;
 import compilateur.tds.Symbole;
 import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
+import compilateur.utils.Os;
 
 public class TrueARM64Generator implements AstVisitor<String> {
 
@@ -66,13 +67,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
      *  
      */
 
-    private enum systeme{
-        MACOS,
-        LINUX
-    };
-
-    private systeme type;
-
+    private Os.systeme type;
     public static final int WORD_SIZE = 16; // Taille d'un mot en octet
 
     private int whileCompt = 0;
@@ -85,14 +80,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private Tds lastUsedTds = null; // nécessaire pour avoir la tds des identifiants quand on utilise les comparaisons dans les while et if dont les idfs sont pas forcéement associé à une tds !!
 
 
-    public TrueARM64Generator(String type) {
-        if(type.equals("macos")){
-        this.type = systeme.MACOS;
-        }
-
-        else{
-           this.type= systeme.LINUX;
-        }
+    public TrueARM64Generator(Os.systeme type) {
+        this.type = type;
         this.data = new StringAggregator();
         this.dataList = new ArrayList<String>();
     }
@@ -159,7 +148,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
 
        
-        if(type==systeme.MACOS){
+        if(type== Os.systeme.MACOS){
             // Initialisation
             str.appendLine("""
             .global _main             // Provide program starting address to linker
@@ -220,7 +209,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
        
 
 
-        if(type == systeme.MACOS){
+        if(type == Os.systeme.MACOS){
             // end 
             str.appendLine("RET");
             str.appendLine("""
@@ -788,7 +777,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         str.appendLine("MOV    X3, X0");
         str.appendLine(div.right.accept(this));
         str.appendLine("MOV    X4, X0");
-        if(type==systeme.MACOS){
+        if(type==Os.systeme.MACOS){
             str.appendLine("""
                     CMP     X4, #0
                     BEQ     _div_by_zero
@@ -832,7 +821,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         // Load dans X0 de l'argument
         str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour print", WORD_SIZE);
   
-        if(type==systeme.MACOS){    
+        if(type==Os.systeme.MACOS){    
             str.appendLine("""
                 mov	    X8, X0  // Argument dans X0, on passe à printf par X8
                 adrp	x0, l_.str@PAGE
