@@ -1,5 +1,4 @@
 package compilateur.ARMGenerator;
-import java.util.ArrayList;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
@@ -41,7 +40,6 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
-import compilateur.tds.Symbole;
 import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
 import compilateur.utils.Os;
@@ -75,7 +73,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private int nbCmp = 0;
 
     private StringAggregator data;
-    private ArrayList<String> dataList;
 
     private Tds lastUsedTds = null; // nécessaire pour avoir la tds des identifiants quand on utilise les comparaisons dans les while et if dont les idfs sont pas forcéement associé à une tds !!
 
@@ -83,7 +80,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public TrueARM64Generator(Os.systeme type) {
         this.type = type;
         this.data = new StringAggregator();
-        this.dataList = new ArrayList<String>();
     }
 
 
@@ -317,7 +313,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         str.appendLine("//debut appel fonction");
 
-        String name = ((Idf) idfParenthesis.idf).name;
 
         // Ajout des parametres à la pile
         int nb_param = idfParenthesis.exprList.size();
@@ -485,10 +480,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("// return");
         str.appendLine(return1.expr.accept(this));
 
-        // TODO: chainage statique : si on est dans une imbrication > 1 on remonte le chainage statique
+        // chainage statique : si on est dans une imbrication > 1 on remonte le chainage statique
         if(return1.getTds().getImbrication() > 1) {
             int imbrication = return1.getTds().getImbrication();
-            str.appendFormattedLine("// On remonte de %d fois le chainage statique des blocs", imbrication - 1);
+            str.appendFormattedLine("// On remonte au total de %d fois le chainage statique des blocs", imbrication - 1);
             for (int i = 0; i < imbrication - 1; i++) {
                 remonteeChainageStatique(str);
             }
@@ -881,12 +876,12 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
     }
 
 
-    private void stackParams(StringAggregator str, int numParams){
-        // if (numParams != 0) {
-        //     str.appendLine("// On empile les param");
-        //     str.appendFormattedLine("SUB SP, SP, #%d", numParams * WORD_SIZE);
-        // }
-    }
+    // private void stackParams(StringAggregator str, int numParams){
+    //     // if (numParams != 0) {
+    //     //     str.appendLine("// On empile les param");
+    //     //     str.appendFormattedLine("SUB SP, SP, #%d", numParams * WORD_SIZE);
+    //     // }
+    // }
 
     /** Fonction pour la déclaration de fonction (afin d'éviter redondances entre struct et int)
      * @param str : le StringAggregator qui contient le code à écrire
