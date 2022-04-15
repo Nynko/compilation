@@ -19,7 +19,7 @@ int func(int a,int b,int c){
 		}
 
 		if(c<=0){
-			print(d);
+			print(d); // 2
 			f = 0;
 			e = 1;
 			g = 2;
@@ -30,9 +30,9 @@ int func(int a,int b,int c){
 		return func(a+1,b+1,c+1);
 	}
 
-	print(f);
-	print(e);
-	print(g);
+	print(f); // 0
+	print(e); // 1
+	print(g); // 2
 	return 2001;
 }
 
@@ -40,7 +40,7 @@ int func(int a,int b,int c){
 int main(){
 	int a;
 	a = func(2,3,-3); // 2,3,-3 --> c <= 0 --> d = 2 et f=0 et e=1
-	print(a);
+	print(a); // 2001
 	return 0;
 
 }
