@@ -40,6 +40,7 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
+import compilateur.tds.SymboleStructContent;
 import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
 import compilateur.utils.Os;
@@ -306,8 +307,13 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(Sizeof sizeof) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        Idf argument = (Idf) sizeof.name; 
+        // On récupère le contenu de la structure
+        SymboleStructContent symbole = sizeof.getTds().findSymboleStruct("struct_"+ argument.name);
+        int size = symbole.getSizeOfStruct();
+        str.appendFormattedLine("MOV X0, #%d",size);
+        return str.getString();
     }
 
     @Override

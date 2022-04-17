@@ -71,6 +71,7 @@ public class ARMTests {
         String content = new String(java.nio.file.Files.readAllBytes(new File(testFile).toPath()));
         // add include <stdio.h> at the start of the file
         content = "#include <stdio.h>\n" + content;
+        content = "#include <stdlib.h>\n" + content;
         content = content.replace("print(", "printf(\"%d\\n\",");
 
         //Write the file
