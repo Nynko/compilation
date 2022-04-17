@@ -50,8 +50,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * Informations/Conventions:
      * Full Descending: SP pointe vers une case "pleine" et SP diminue quand on push sur la stack
      * adresses.
-     * X0 : Adresse de retour
-     * X1 : Utilisable pour les retours dans les "fonctions intermédiaire" quand on charge des valeurs...
+     * X0 : Adresse de retour / argument
+     * 
      * 
      * Différence avec 32 bits: 
      *  - Non accès PC: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Program-Counter-in-AArch64-state
@@ -173,6 +173,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Écriture de la fonction _print
         fonctionPrint(str);
+
+        // Écriture fonction _malloc2
+        fonctionMalloc2(str);
 
         // Ajout de la macro de sauvegarde des registres
         // str.appendLine("__save_reg__:");
@@ -310,9 +313,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
-
+        String name = ((Idf) idfParenthesis.idf).name;
+        if(name.equals("malloc")){ // TODO : à faire plus propre
+            name = "malloc2";
+        }
         str.appendLine("//debut appel fonction");
-
+        
 
         // Ajout des parametres à la pile
         int nb_param = idfParenthesis.exprList.size();
@@ -326,7 +332,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
         int imbricationPere = idfParenthesis.getTds().getImbrication();
-        int imbricationAppelee = idfParenthesis.getTds().findImbrication(((Idf) idfParenthesis.idf).name);
+        int imbricationAppelee = idfParenthesis.getTds().findImbrication(name);
         if(imbricationPere == imbricationAppelee){
             // Si les imbrications sont identiques, on enregistre l'adresse pointée par le chainage statique de l'appelant dans X0
             str.appendFormattedLine("LDR X0, [FP, #-%d]  // Chainage statique même imbrication", 1*WORD_SIZE);
@@ -336,10 +342,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendFormattedLine("MOV X0, FP // Chainage statique adresse base appellante ");
         }
         // Appel de la fonction
-        
-        str.appendFormattedLine("BL _%s", ((Idf) idfParenthesis.idf).name);
+        str.appendFormattedLine("BL _%s", name);
 
-        // str.appendFormattedLine("_breakpoint_%s:", ((Idf) idfParenthesis.idf).name);
+        // str.appendFormattedLine("_breakpoint_%s:", name);
         // Restauration des registres
         // str.appendLine("BL __restore_reg__");
         str.appendLine("//fin appel de fonction");
@@ -917,7 +922,6 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
             str.appendFormattedLine("STR    X3, [SP,#-%d]! // Espace libre pour variable locales", WORD_SIZE);
         }
         
-        // On s'assure que SP pointe sur le maximum de son déplacement ??? 
         str.appendLine( bloc.accept(this));
         
         str.appendLine("// RETURN de sécurité si abscence de return");
@@ -929,5 +933,38 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         str.appendLine("RET");
     }
+
+
+    private void fonctionMalloc2(StringAggregator str) {
+        
+        str.appendLine("_malloc2:");
+
+        // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
+        pushLRFP(str);
+
+        // On met le nouveau pointeur de base dans FP
+        str.appendLine("MOV FP, SP");
+        
+        // Sauvegarde du pointeur du bloc englobant (chaînage statique)
+        staticPush(str, "X0");
+
+        // On récupère le paramètre
+        str.appendFormattedLine("LDR X0, [FP, #%d] // Récupération du paramètre", WORD_SIZE);
+
+
+        str.appendLine("BL _malloc");
+
+
+        // Retour 
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV SP, FP");
+
+        // Récupération de l'addresse de retour et retour à l'appelant
+        popLRFP(str);
+
+        str.appendLine("RET");
+
+    }
+
 }
 
