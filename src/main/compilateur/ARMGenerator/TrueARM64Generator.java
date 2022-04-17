@@ -50,8 +50,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
      * Informations/Conventions:
      * Full Descending: SP pointe vers une case "pleine" et SP diminue quand on push sur la stack
      * adresses.
-     * X0 : Adresse de retour
-     * X1 : Utilisable pour les retours dans les "fonctions intermédiaire" quand on charge des valeurs...
+     * X0 : Adresse de retour / argument 
+     * On pose X14: contient l'adresse de la base de la heap 
+     * On pose X15: contient l'adresse du haut de la heap
      * 
      * Différence avec 32 bits: 
      *  - Non accès PC: https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Program-Counter-in-AArch64-state
@@ -63,10 +64,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
      *  - https://github.com/below/HelloSilicon
      *  - https://developer.apple.com/documentation/xcode/writing-arm64-code-for-apple-platforms
      *  
+     * Heap implementation:
+     *  - https://www.keil.com/support/man/docs/armclang_lib/armclang_lib_chr1358938928135.htm
+     *  - https://developer.arm.com/documentation/dui0809/a/CJAGAAHA
+     * 
      */
 
     private Os.systeme type;
     public static final int WORD_SIZE = 16; // Taille d'un mot en octet
+    public static final int HEAP_ADRESS = 0x10000000; // Adresse de base de la heap
 
     private int whileCompt = 0;
     private int ifCompt = 0;
@@ -163,7 +169,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
             """);
             //Si on est en linux: on doit ajouter .data à this.data
             this.data.appendLine(".data");
-
         }
 
         for (Ast ast : fichier.instructions) {
@@ -173,6 +178,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // Écriture de la fonction _print
         fonctionPrint(str);
+
+        // Écriture de la fonction _malloc
+        fonctionMalloc(str);
 
         // Ajout de la macro de sauvegarde des registres
         // str.appendLine("__save_reg__:");
@@ -712,7 +720,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         startCmp(infEgal, str);
         str.appendFormattedLine("BLE _InfEgal%d // Si X1 <= X2",nbCmp); 
-        str.appendLine("MOV X0, #0 // On met 1 dans X0");
+        str.appendLine("MOV X0, #0 // On met 0 dans X0");
         str.appendFormattedLine("_InfEgal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
         nbCmp++; //On incrémente un compteur pour nommer de manière unique
         return str.getString();
@@ -848,6 +856,62 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
     }
 
     /**
+     * Déclaration de la fonction malloc
+     * There is no limit to the size of the stack. 
+     * However, if the heap region grows into the stack, 
+     * malloc() attempts to detect the overlapping memory 
+     * and fails the new memory allocation request.
+     * @param str
+     */
+    private void fonctionMalloc(StringAggregator str){
+        str.appendLine("_malloc:");
+
+        // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
+        pushLRFP(str);
+          
+        // On met le nouveau pointeur de base dans FP
+        str.appendLine("MOV FP, SP");
+
+        // Load dans X0 de l'argument (la taille de l'espace à allouer)
+        str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour malloc --> taille espace à allouer", WORD_SIZE);
+  
+        str.appendFormattedLine("""
+            // Test si HEAP + X0 < STACK
+            ADD X1, X0, X15
+            MOV X2, SP
+            CMP X1, X2
+            BGE erreur_malloc // Si Heap + X0 >= stack, on renvoie NULL
+            //sinon on alloue X0 octets dans la zone mémoire
+            // On le fait comme un calloc ici afin d'allouer la mémoire
+            MOV X1, X0  // On copie pour allouer 
+            MOV X0, X15 // On renvoit l'adresse de la zone mémoire allouée
+            MOV X2, #0  // On mettra des 0 dans la zone à allouer
+            CMP X1, #0
+            BLE finWhileMalloc
+            STR X2, [X15], #16
+            SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
+            finWhileMalloc:
+            """);
+
+        // Remise du pointeur de pile à sa position avant l'appel de fonction
+        str.appendLine("MOV SP, FP");
+
+        // Récupération de l'addresse de retour et retour à l'appelant
+        popLRFP(str);
+
+        str.appendLine("RET");
+
+        // Écriture erreur_malloc
+        str.appendLine("""
+            erreur_malloc:
+            MOV X0, #0 // On retourne 0
+            MOV SP, FP
+            """);
+        popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
+        str.appendLine("RET");
+    }
+
+    /**
      * Push avec pré-decrémentation de SP sur la stack
      * @param str : le StringAggregator qui contient le code à écrire 
      * @param registre : le registre à mettre sur la stack
@@ -876,13 +940,6 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
     }
 
 
-    // private void stackParams(StringAggregator str, int numParams){
-    //     // if (numParams != 0) {
-    //     //     str.appendLine("// On empile les param");
-    //     //     str.appendFormattedLine("SUB SP, SP, #%d", numParams * WORD_SIZE);
-    //     // }
-    // }
-
     /** Fonction pour la déclaration de fonction (afin d'éviter redondances entre struct et int)
      * @param str : le StringAggregator qui contient le code à écrire
      * @param name : nom de la fonction
@@ -893,11 +950,15 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         
         // int numParams = bloc.getTds().getParams().size();
         int deplacement = bloc.getTds().getDeplacement();
-        System.out.println("deplacement : " + deplacement);
-        System.out.println(bloc.getTds().getDeplacement(16));
 
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s:",name);
+
+        if(name.equals("main")){
+            // Ajout de l'adresse de la HEAP dans X14 et X15
+            str.appendFormattedLine("MOV X14, %d", HEAP_ADRESS);
+            str.appendFormattedLine("MOV X15, %d", HEAP_ADRESS);
+        }
 
         // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         pushLRFP(str);
