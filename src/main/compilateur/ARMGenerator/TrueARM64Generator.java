@@ -175,8 +175,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Écriture de la fonction _print
         fonctionPrint(str);
 
-        // Écriture fonction _malloc2
-        fonctionMalloc2(str);
+        // Écriture fonction _malloc
+        fonctionMalloc(str);
 
         // Ajout de la macro de sauvegarde des registres
         // str.appendLine("__save_reg__:");
@@ -220,7 +220,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
             """);
             // data
             this.data.appendLine("""
-                .section	__TEXT,__cstring,cstring_literals
                 l_.str:                                 //@.str
                     .asciz	\"%d\\n\"                
                     """);
@@ -320,9 +319,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(IdfParenthesis idfParenthesis) {
         StringAggregator str = new StringAggregator();
         String name = ((Idf) idfParenthesis.idf).name;
-        if(name.equals("malloc")){ // TODO : à faire plus propre
-            name = "malloc2";
-        }
         str.appendLine("//debut appel fonction");
         
 
@@ -830,7 +826,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
   
         if(type==Os.systeme.MACOS){    
             str.appendLine("""
-                mov	    X8, X0  // Argument dans X0, on passe à printf par X8
+                mov	    X8, X0  // On copie l'argument dans X8
                 adrp	x0, l_.str@PAGE
                 add	x0, x0, l_.str@PAGEOFF
                 str	x8, [sp,#-16]!
@@ -920,6 +916,9 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
         if(name.equals("main")){
             str.appendLine("MOV X0, FP"); // Le chainage statique dans ce cas est le même que FP
+            // Ajout de l'adresse de la HEAP dans X14 et X15
+            str.appendLine("SUB X14, SP, #0x1000 // Adresse de la base HEAP");
+            str.appendLine("MOV X15, X14 // Adresse du haut de la HEAP");
         }
         staticPush(str, "X0");
 
@@ -942,27 +941,42 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
     }
 
 
-    private void fonctionMalloc2(StringAggregator str) {
         
-        str.appendLine("_malloc2:");
+    private void fonctionMalloc(StringAggregator str){
+        str.appendLine("_malloc:");
 
         // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         pushLRFP(str);
-
+            
         // On met le nouveau pointeur de base dans FP
         str.appendLine("MOV FP, SP");
-        
+
         // Sauvegarde du pointeur du bloc englobant (chaînage statique)
         staticPush(str, "X0");
 
-        // On récupère le paramètre
-        str.appendFormattedLine("LDR X0, [FP, #%d] // Récupération du paramètre", WORD_SIZE);
+        // Load dans X0 de l'argument (la taille de l'espace à allouer)
+        str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour malloc --> taille espace à allouer", WORD_SIZE);
+    
+        str.appendFormattedLine("""
+            // Test si HEAP + X0 < STACK
+            ADD X1, X0, X15
+            MOV X2, SP
+            CMP X1, X2
+            BGE erreur_malloc // Si Heap + X0 >= stack, on renvoie NULL
+            //sinon on alloue X0 octets dans la zone mémoire
+            // On le fait comme un calloc ici afin d'allouer la mémoire
+            MOV X1, X0  // On copie pour allouer 
+            MOV X0, X15 // On renvoit l'adresse de la zone mémoire allouée
+            MOV X2, #0  // On mettra des 0 dans la zone à allouer
+            whileMalloc:
+            CMP X1, #0
+            BLE finWhileMalloc
+            STR X2, [X15], #16
+            SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
+            B whileMalloc
+            finWhileMalloc:
+            """);
 
-
-        str.appendLine("BL _malloc");
-
-
-        // Retour 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV SP, FP");
 
@@ -971,6 +985,14 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         str.appendLine("RET");
 
+        // Écriture erreur_malloc
+        str.appendLine("""
+            erreur_malloc:
+            MOV X0, #0 // On retourne 0
+            MOV SP, FP
+            """);
+        popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
+        str.appendLine("RET");
     }
 
 }
