@@ -4,7 +4,7 @@ stages:
     - tests-unitaires
 
 antlr4:
-  image: "any0ne22/antlr4:4.9.3"
+    image: "any0ne22/antlr4:4.9.3"
     stage: tests-grammaire
     script:
         - java -Xmx500M -cp /usr/local/lib/antlr4-tool.jar org.antlr.v4.Tool -o src/main/compilateur/ -visitor -Dlanguage=Java grammar/*.g4
