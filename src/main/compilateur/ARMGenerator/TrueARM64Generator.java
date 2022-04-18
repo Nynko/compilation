@@ -422,6 +422,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendFormattedLine("STR X0, [X17, #%d] // On store la nouvelle valeur à la place adéquate avec chainage statique", -decalage); 
 
         }
+        // TODO: Fleche
         // else if (affectation.left instanceof Fleche fleche) {
         //     // a->b où type(b) = int
         //     // decalage = decalage de a + decalage de b
