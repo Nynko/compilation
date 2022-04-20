@@ -148,6 +148,20 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public String visit(Fichier fichier) {
         StringAggregator str = new StringAggregator();
 
+        // Ajout de la macro de sauvegarde des registres
+        str.appendLine(".macro saveReg Xn, Xnbis");
+        str.appendLine("""
+            stp       \\Xn, \\Xnbis, [SP, #-16]!
+                """);
+        str.appendLine(".endm");
+
+        // Ajout de la macro de restauration des registres
+        str.appendLine(".macro restoreReg Xn, Xnbis");
+        str.appendLine("""
+            ldp     \\Xn, \\Xnbis, [SP],#16
+                """);
+        str.appendLine(".endm");
+
        
         if(type== Os.systeme.MACOS){
             // Initialisation
@@ -182,37 +196,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Écriture fonction _malloc
         fonctionMalloc(str);
 
-        // Ajout de la macro de sauvegarde des registres
-        // str.appendLine("__save_reg__:");
-        // str.appendLine("""
-        //     stp       X0, X1, [SP, #-16]!
-        //     stp       X2, X3, [SP, #-16]!
-        //     stp       X4, X5, [SP, #-16]!
-        //     stp       X6, X7, [SP, #-16]!
-        //     stp       X8, X9, [SP, #-16]!
-        //     stp       X10, X11, [SP, #-16]!
-        //     stp       X12, X13, [SP, #-16]!
-        //     stp       X14, X15, [SP, #-16]!
-        //     stp       X16, X17, [SP, #-16]!
-        //         """);
-        // str.appendLine("RET");
-        // str.appendLine();
-
-        // Ajout de la macro de restauration des registres
-        // str.appendLine("__restore_reg__:");
-        // str.appendLine("""
-        //     ldp     X16, X17, [SP],#16
-        //     ldp     X14, X15, [SP],#16
-        //     ldp     X12, X13, [SP],#16
-        //     ldp     X10, X11, [SP],#16
-        //     ldp     X8, X9, [SP],#16
-        //     ldp     X6, X7, [SP],#16
-        //     ldp     X4, X5, [SP],#16
-        //     ldp     X2, X3, [SP],#16
-        //         """);
-       
-
-
         if(type == Os.systeme.MACOS){
             // end 
             str.appendLine("RET");
@@ -222,6 +205,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
                         MOV X0, #1
                         RET
             """);
+            // End en cas d'erreur
+            str.appendLine("__end__:");
+            str.appendLine("""
+                // Setup the parameters to exit the program
+                // and then call Linux to do it.
+                mov     X16, #1 // Service code 1 terminates
+                svc     #0x80 // Call iOS to terminate
+                    """);
+
             // data
             this.data.appendLine("""
                 l_.str:                                 //@.str
@@ -239,7 +231,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendLine("""
                 // Setup the parameters to exit the program
                 // and then call Linux to do it.
-                mov     X0, #0      // Use 0 return code
+                // mov     X0, #0      // Return code should be in X0
                 mov     X8, #93     // Service code 93 terminates
                 svc     0           // Call Linux to terminate
                     """);
@@ -856,13 +848,16 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         // Load dans X0 de l'argument
         str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour print", WORD_SIZE);
+
+        // Save reg 
+        str.appendLine("saveReg X14, X15");
   
         if(type==Os.systeme.MACOS){    
             str.appendLine("""
                 mov	    X8, X0  // On copie l'argument dans X8
                 adrp	x0, l_.str@PAGE
-                add	x0, x0, l_.str@PAGEOFF
-                str	x8, [sp,#-16]!
+                add	    x0, x0, l_.str@PAGEOFF
+                str	    x8, [sp,#-16]!  
                 bl	_printf
                 add SP, SP, #16 // Clean up stack
                     """);
@@ -876,6 +871,9 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
                 add SP, SP, #16 // Clean up stack
                     """);
         }
+
+        // Restore reg 
+        str.appendLine("restoreReg X14, X15");
   
   
         // Remise du pointeur de pile à sa position avant l'appel de fonction
@@ -1003,7 +1001,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
             MOV X2, #0  // On mettra des 0 dans la zone à allouer
             whileMalloc:
             CMP X1, #0
-            BLT finWhileMalloc
+            BLE finWhileMalloc
             STR X2, [X15], #16
             SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
             B whileMalloc
@@ -1024,17 +1022,20 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
                 erreur_malloc:
                 adrp	x0, erreur_malloc_str@PAGE
                 add	x0, x0, erreur_malloc_str@PAGEOFF 
+                bl    _printf
                         """);
         }
         else{
             str.appendLine("""
                 erreur_malloc:
                 ldr 	x0, =erreur_malloc_str  
+                bl    printf
                     """);
         }
         str.appendLine("""
             MOV X0, #0 // On retourne 0
             MOV SP, FP
+            // B   __end__ // On termine le programme
             """);
         popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
         str.appendLine("RET");

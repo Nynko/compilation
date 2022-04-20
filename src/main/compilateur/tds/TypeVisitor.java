@@ -116,6 +116,7 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Sizeof sizeof, Tds tds) {
+        sizeof.setTds(tds);
         return "int";
     }
 
