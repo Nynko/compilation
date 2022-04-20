@@ -40,6 +40,8 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
+import compilateur.tds.Symbole;
+import compilateur.tds.SymboleInt;
 import compilateur.tds.SymboleStructContent;
 import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
@@ -121,6 +123,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On récupère le décalage de la variable
         decalage = ((SymboleVar) tds.findSymbole(name)).getDeplacement(WORD_SIZE); 
         // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
+        // ++ TODO: Z'êtes sûr que findSymbole trouvera pas une struct à la place ? 
+
 
         // On remonte les chainages statiques
         str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
@@ -221,7 +225,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // data
             this.data.appendLine("""
                 l_.str:                                 //@.str
-                    .asciz	\"%d\\n\"                
+                    .asciz	\"%d\\n\"      
+                erreur_malloc_str:
+                    .asciz \"Erreur Malloc\\n\"          
                     """);
             str.appendLine(data.getString());
         }
@@ -385,6 +391,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(Affectation affectation) {
         StringAggregator str = new StringAggregator();
+        str.appendLine("// Début affection");
         // on recupere le code assembleur de la partie droite de l'affectation, le code
         // retourne le resultat de l'expression dans X0
         str.appendLine(affectation.right.accept(this));
@@ -395,9 +402,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         Tds tds = affectation.getTds();
         String name;
 
-        if (affectation.left instanceof Idf idf) { // Si on a un idf à gauche
+        if (affectation.left instanceof Idf identifiant) { // Si on a un idf à gauche
             // on recupere l'adresse de l'idf
-            Idf identifiant = (Idf) affectation.left;
             name = identifiant.name;
 
             // Détermination du nombre de remontée de chainage statique
@@ -419,18 +425,34 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         }
         // TODO: Fleche
-        // else if (affectation.left instanceof Fleche fleche) {
-        //     // a->b où type(b) = int
-        //     // decalage = decalage de a + decalage de b
-        //     // @a->b = base de declaration de a + decalage
-        //     Idf idf = (Idf) fleche.right;
-        //     Symbole s = affectation.getTds().findSymbole(idf.name);
+        else if (affectation.left instanceof Fleche fleche) {
+            // (a) -> b (avec a potentiellement aussi une fleche)
+            // Il faut donc accept a jusqu'à que a soit un idf. On a besoin d'accepter l'idf pour récupèrer l'adresse !
+            // a->b où type(b) = int
+            // @a->b = base de declaration de a + decalage de b
 
-        //     if (s instanceof SymboleVar sv) {
-        //         decalage = sv.getDeplacement(WORD_SIZE);
-        //     }
-        // }
+            // On recupere le decalage de l'int à droite:
+            Idf idf = (Idf) fleche.right;
+            Symbole s = idf.getTds().findSymbole(idf.name);
+            decalage = ((SymboleVar) s).getDeplacement() - 2; // - 2 car on s'en fout de la base et chainage statique ici
+            decalage = decalage * WORD_SIZE;
+            // Pas besoin d'accepter b (dans (a) -> b) c'est là où l'on veut affecter.
+
+            // On récupère l'addresse de a
+            str.appendLine("MOV X7, X0 // on SAVE X0 dans X7");
+            str.appendLine(fleche.left.accept(this)); 
+            // Soit fleche.left = idf --> dans ce cas on load la valeur de a dans X0
+            // Soit fleche.left est une fleche --> dans ce cas, on récupère l'adresse de c (a -> c -> b) en cherchant a.
+
+            // On a donc X7 = @ 
+            str.appendFormattedLine("ADD X0, X0, #%d // On ajoute le décalage de b dans (a) -> b", decalage);
+
+            // On store la valeur de X0 à l'adresse correspondante sachant que l'on est dans la heap
+            str.appendFormattedLine("STR X7, [X0] // On store la nouvelle valeur sachant que l'on est dans la heap (décalage positif)");
+
+        }
         str.appendLine();
+        str.appendLine("// Fin affection");
         return str.getString();
     }
 
@@ -574,8 +596,19 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(Fleche fleche) {
-        // TODO Auto-generated method stub
-        return "";
+        StringAggregator str = new StringAggregator();
+        str.appendLine("// fleche");
+        // On récupère l'adresse de a (a -> b) dans X0
+        str.appendLine(fleche.left.accept(this));
+
+        // On récupère l'adresse de b: pour cela
+        // On récupère le décalage de b par rapport à a
+        Idf idf = (Idf) fleche.right;
+        Tds tds = idf.getTds();
+        int deplacement = ((SymboleVar) tds.findSymbole(idf.name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
+        str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*WORD_SIZE);
+        str.appendLine("// Rappel on a malloc donc deplacement positif");
+        return str.getString();
     }
 
     @Override
@@ -970,7 +1003,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
             MOV X2, #0  // On mettra des 0 dans la zone à allouer
             whileMalloc:
             CMP X1, #0
-            BLE finWhileMalloc
+            BLT finWhileMalloc
             STR X2, [X15], #16
             SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
             B whileMalloc
@@ -986,8 +1019,20 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         str.appendLine("RET");
 
         // Écriture erreur_malloc
+        if(type==Os.systeme.MACOS){
+            str.appendLine("""
+                erreur_malloc:
+                adrp	x0, erreur_malloc_str@PAGE
+                add	x0, x0, erreur_malloc_str@PAGEOFF 
+                        """);
+        }
+        else{
+            str.appendLine("""
+                erreur_malloc:
+                ldr 	x0, =erreur_malloc_str  
+                    """);
+        }
         str.appendLine("""
-            erreur_malloc:
             MOV X0, #0 // On retourne 0
             MOV SP, FP
             """);
