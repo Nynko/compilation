@@ -1,5 +1,6 @@
 package compilateur.ast;
 
+
 import compilateur.tds.*;
 
 public interface Ast {

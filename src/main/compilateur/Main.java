@@ -1,17 +1,14 @@
 package compilateur;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
+import compilateur.ARMGenerator.ARMGenerator;
+import compilateur.ARMGenerator.TrueARM64Generator;
 import compilateur.ast.Ast;
 import compilateur.ast.AstCreator;
 import compilateur.grammar.circLexer;
@@ -22,8 +19,47 @@ import compilateur.graphviz.GraphVizVisitor;
 import compilateur.tds.Tds;
 import compilateur.tds.TdsCreator;
 import compilateur.utils.ErrorAggregator;
+import compilateur.utils.Os;
 
 public class Main {
+
+    private static void outputARM(String str){
+        try (FileOutputStream output = new FileOutputStream("./out/ARM.s")) {
+            String buffer = str;
+            byte[] strToBytes = buffer.getBytes();
+            try {
+                output.write(strToBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void outputARMinBin(String str, String testFile){
+        try (FileOutputStream output = new FileOutputStream("./bin/ARM/ARMs/" + testFile.split("/")[2].split("\\.")[0].split("_")[1] + ".s")) {
+            String buffer = str;
+            byte[] strToBytes = buffer.getBytes();
+            try {
+                output.write(strToBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -89,7 +125,13 @@ public class Main {
                     graphVizTds.createGraph(tds);
                     graphVizTds.dumpGraph("./out/tds.dot");
 
+                    // ARM
+                    TrueARM64Generator arm = new TrueARM64Generator(Os.getOS());
+                    String str = ast.accept(arm);
+                    outputARM(str);
+                    outputARMinBin(str, testFile);
                 }
+
             } else {
                 System.out.println("erreur syntaxique");
             }

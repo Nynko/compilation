@@ -1,8 +1,9 @@
 package compilateur.ast;
 
+
 import compilateur.tds.*;
 
-public class MoinsUnaire extends Line implements Ast {
+public class MoinsUnaire extends AstNode implements Ast {
     
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
@@ -11,6 +12,8 @@ public class MoinsUnaire extends Line implements Ast {
     public <T> T accept(TdsVisitor<T> visitor, Tds tds) {
         return visitor.visit(this, tds);
     }
+    
+
 
     public Ast noeud;
 

@@ -1,8 +1,12 @@
 package compilateur.ast;
 
+
 import compilateur.tds.*;
 
-public class DeclFctInt extends Line implements Ast {
+/**
+ * Déclaration d'une fonction qui retourne un int
+ */
+public class DeclFctInt extends AstNode implements Ast {
 
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -11,9 +15,14 @@ public class DeclFctInt extends Line implements Ast {
     public <T> T accept(TdsVisitor<T> visitor, Tds tds) {
         return visitor.visit(this, tds);
     }
+    
 
+
+    /** Le nom de la fonction */
     public Ast Idf;
+    /** La liste des parametres de la fonction */
     public Ast param;
+    /** Le bloc d'intructions de la fonction */
     public Ast bloc;
 
     public DeclFctInt(Ast idf, Ast param, Ast bloc, int line) {

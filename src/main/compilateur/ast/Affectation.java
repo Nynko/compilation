@@ -3,6 +3,7 @@ package compilateur.ast;
 import compilateur.tds.Tds;
 import compilateur.tds.TdsVisitor;
 
+
 public class Affectation extends Operateur {
 
     public <T> T accept(AstVisitor<T> visitor){
@@ -14,7 +15,11 @@ public class Affectation extends Operateur {
         return visitor.visit(this, tds);
     }
 
+
+
     public Affectation(Ast left, Ast right, int line) {
         super(left, right, line);
     }
+
+    
 }

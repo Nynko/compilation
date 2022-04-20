@@ -58,6 +58,7 @@ public class TypeVisitor implements TdsVisitor<String> {
     @Override
     public String visit(Idf idf, Tds tds) {
 
+        idf.setTds(tds);
         Symbole sym = tds.findSymbole(idf.name);
         if (sym instanceof SymboleFonction symfct) {
             return symfct.getReturnType();
@@ -115,11 +116,13 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Sizeof sizeof, Tds tds) {
+        sizeof.setTds(tds);
         return "int";
     }
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
+        idfParenthesis.setTds(tds);
         int nbParam = idfParenthesis.exprList.size();
         String fctName = ((Idf) idfParenthesis.idf).name;
         Symbole sym = tds.findSymbole(fctName);
@@ -225,7 +228,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             if (leftType.equals("int") && this.isPointer(rightType)
                     || this.isPointer(leftType) && rightType.equals("int")
                     || this.isPointer(leftType) && this.isPointer(rightType)
-                            && !this.isCompatible(leftType, rightType)) {
+                            && !rightType.equals("void_*") && !this.isCompatible(leftType, rightType)) {
                 errors.addError(new TypeWarningException(affectation.line, rightType, leftType));
             }
             if (affectation.left instanceof Idf idf) {
