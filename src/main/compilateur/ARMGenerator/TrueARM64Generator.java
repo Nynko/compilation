@@ -669,18 +669,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("MOV X2,X0");
         str.appendLine("MOV X0, #0");
         str.appendLine("CMP X1, #1");
-        str.appendFormattedLine("BNE _NonEgal%d // Si X1 == 0",nbCmp);
-        nbCmp++;
+        str.appendFormattedLine("BNE _NonEgal%d // Si X1 == 0",nbCmp); // Si x1 est faux alors toutes l'expression est fausse
 
         // Comparaison Expr_Et 
-        str.appendLine("CMP X1, X2");
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 == X2",nbCmp); 
-        str.appendLine("MOV X0, #0 // On met 0 dans X0");
-        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
-        nbCmp++;
+        str.appendLine("CMP X1, X2"); // Si x1 ne vaut pas x2 sachant que x1 est vrai alors l'expression est fausse
+        str.appendFormattedLine("BNE _NonEgal%d // Si X1 == X2",nbCmp); 
+        str.appendLine("MOV X0, #1 // On met 1 dans X0"); // Sinon tout vaut 1 donc l'expression est juste
 
         str.appendFormattedLine("_NonEgal%d:",nbCmp);
-        
+        nbCmp++;
         str.appendLine("; Expr_et");
         return str.getString();
     }
