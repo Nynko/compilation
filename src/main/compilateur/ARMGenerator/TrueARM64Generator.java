@@ -328,7 +328,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // Putting X0 in the stack
             str.appendFormattedLine("STR X0, [SP, #-%d]", WORD_SIZE*(nb_param-i));
         }
-        str.appendFormattedLine("SUB  SP, SP, #%d ", WORD_SIZE*nb_param);
+        str.appendFormattedLine("SUB  SP, SP, #%d // Place param", WORD_SIZE*nb_param);
 
         // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
         int imbricationPere = idfParenthesis.getTds().getImbrication();
@@ -567,7 +567,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         if (notFunctionBlock) {
             // Remise du pointeur de pile à sa position du chainage statique + WORD_SIZE (on rappel que le fp est au dessus du chainage statique)
-            str.appendLine("MOV SP, FP");
+            str.appendFormattedLine("ADD SP, FP, #%d // On remet SP à son emplacement initial (full descending)", WORD_SIZE);
             remonteeChainageStatique(str);
             str.appendFormattedLine("//fin bloc %s", name);
         }
