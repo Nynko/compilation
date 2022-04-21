@@ -52,5 +52,8 @@ linuxNamed: FORCE
 		as -o ./bin/ARM/ARMo/$(NAME).o ./bin/ARM/ARMs/$(NAME).s
 		ld -o ./bin/ARM/$(NAME) ./bin/ARM/ARMo/$(NAME).o -lc -L'/usr/lib/aarch64-linux-gnu/'
 
+macosDebug: FORCE
+		./gradlew run --args "$(ARGS)"
+
 FORCE:
 
