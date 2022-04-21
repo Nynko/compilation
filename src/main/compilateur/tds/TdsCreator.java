@@ -383,6 +383,9 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(IdfParenthesis idfParenthesis, Tds tds) {
         idfParenthesis.setTds(tds);
         idfParenthesis.accept(visitor, tds);
+        for(Ast ast : idfParenthesis.exprList){
+            ast.accept(this, tds);
+        }
         return null;
     }
 

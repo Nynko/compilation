@@ -1,5 +1,7 @@
 package compilateur.ARMGenerator;
 
+import org.antlr.v4.semantics.SymbolChecks;
+
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
 import compilateur.ast.AstVisitor;
@@ -42,6 +44,7 @@ import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
 import compilateur.tds.Symbole;
 import compilateur.tds.SymboleInt;
+import compilateur.tds.SymboleStruct;
 import compilateur.tds.SymboleStructContent;
 import compilateur.tds.SymboleVar;
 import compilateur.tds.Tds;
@@ -109,11 +112,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         int decalage = 0;
         Tds tds = idf.getTds();
-        if(tds==null){
-            tds = lastUsedTds;
-        }
         String name = idf.name;
-
+        // System.out.println("BUGGGGG : "+ idf.name + "    -" + tds + " " + idf);
         // Avec chainage statique
 
         // Détermination du nombre de remontée de chainage statique
@@ -431,8 +431,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // On recupere le decalage de l'int à droite:
             Idf idf = (Idf) fleche.right;
-            Symbole s = idf.getTds().findSymbole(idf.name);
-            decalage = ((SymboleVar) s).getDeplacement() - 2; // - 2 car on s'en fout de la base et chainage statique ici
+            decalage = recupDeplacementStruct(tds,fleche,idf.name);
             decalage = decalage * 8; // TODO: TMP 8
             // Pas besoin d'accepter b (dans (a) -> b) c'est là où l'on veut affecter.
 
@@ -590,13 +589,11 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(CharNode charNode) {
         String str = "' '";
-        if(sl){
-            if(charNode.string.equals('n')){
-                str = "'\\n'";
-            }
-            else if(charNode.string.equals('s')){
-                // do nothing
-            }
+        if(sl && charNode.string.equals('n')){
+            str = "'\\n'";
+        }
+        else if(sl && charNode.string.equals('s')){
+            // do nothing
         }
         else{
             str = charNode.string;
@@ -616,11 +613,37 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On récupère le décalage de b par rapport à a
         Idf idf = (Idf) fleche.right;
         Tds tds = idf.getTds();
-        int deplacement = ((SymboleVar) tds.findSymbole(idf.name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
+        System.out.println("tds: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ idf.name);
+        
+        int deplacement = recupDeplacementStruct(tds,fleche,idf.name);
         str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*8);
         str.appendLine("// Rappel on a malloc donc deplacement positif");
         return str.getString();
     }
+
+    private int recupDeplacementStruct(Tds tds, Fleche fleche, String name) {
+        // On récupère le type de struct en remontant les tds à partir de l'élément à gauche
+
+        // On récupère la nom de la variable de la structure utilisée
+        String nameStruct = "";
+        if(fleche.left instanceof Fleche fleche2){
+            nameStruct = ((Idf) fleche2.right).name;
+        }
+        else{ // Si c'est un idf
+            nameStruct = ((Idf)fleche.left).name;
+        }
+
+        // On récupère un symbole de struct
+        SymboleStruct symboleStruct = (SymboleStruct) tds.findSymbole(nameStruct);
+        
+        // On récupère la struct
+        SymboleStructContent struct = symboleStruct.getStruct();
+
+        // On récupère le déplacement
+        int deplacement = ((SymboleVar) struct.getTds().findSymbole(name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
+        return deplacement;
+    }
+
 
     @Override
     public String visit(MoinsUnaire unaire) {
