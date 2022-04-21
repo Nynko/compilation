@@ -142,7 +142,7 @@ public class TypeVisitor implements TdsVisitor<String> {
                 if (s instanceof SymboleInt) {
                     paramTypeRef = "int";
                 } else if (s instanceof SymboleStruct symstruct) {
-                    paramTypeRef = TYPESTRUCT + symstruct.getStruct().getName();
+                    paramTypeRef = symstruct.getType();
                 }
                 String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
                 if (!paramType.equals(paramTypeRef)) {
