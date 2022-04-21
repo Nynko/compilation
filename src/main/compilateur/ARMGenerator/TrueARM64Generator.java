@@ -74,7 +74,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private int whileCompt = 0;
     private int ifCompt = 0;
     private int nbCmp = 0;
-
+    private Boolean sl = true;
     private StringAggregator data;
 
     private Tds lastUsedTds = null; // nécessaire pour avoir la tds des identifiants quand on utilise les comparaisons dans les while et if dont les idfs sont pas forcéement associé à une tds !!
@@ -583,7 +583,20 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     @Override
     public String visit(CharNode charNode) {
-        return String.format("LDR X0, =%s\n", charNode.string);
+        String str = "' '";
+        if(sl){
+            if(charNode.string.equals('n')){
+                str = "'\\n'";
+            }
+            else if(charNode.string.equals('s')){
+                // do nothing
+            }
+        }
+        else{
+            str = charNode.string;
+        }
+
+        return String.format("LDR X0, =%s //Char \n ",str);
     }
 
     @Override
