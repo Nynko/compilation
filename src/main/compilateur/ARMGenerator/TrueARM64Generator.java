@@ -319,6 +319,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         String name = ((Idf) idfParenthesis.idf).name;
         str.appendLine("//debut appel fonction");
         
+        if(name.equals("malloc")){
+            name = "malloc2";
+        }
 
         // Ajout des parametres à la pile
         int nb_param = idfParenthesis.exprList.size();
@@ -347,6 +350,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // str.appendFormattedLine("_breakpoint_%s:", name);
         // Restauration des registres
         // str.appendLine("BL __restore_reg__");
+    
+        str.appendFormattedLine("ADD  SP, SP, #%d // Restore de la place pour les params", WORD_SIZE*nb_param);
+        
         str.appendLine("//fin appel de fonction");
 
         return str.getString();
@@ -427,7 +433,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             Idf idf = (Idf) fleche.right;
             Symbole s = idf.getTds().findSymbole(idf.name);
             decalage = ((SymboleVar) s).getDeplacement() - 2; // - 2 car on s'en fout de la base et chainage statique ici
-            decalage = decalage * WORD_SIZE;
+            decalage = decalage * 8; // TODO: TMP 8
             // Pas besoin d'accepter b (dans (a) -> b) c'est là où l'on veut affecter.
 
             // On récupère l'addresse de a
@@ -611,7 +617,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         Idf idf = (Idf) fleche.right;
         Tds tds = idf.getTds();
         int deplacement = ((SymboleVar) tds.findSymbole(idf.name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
-        str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*WORD_SIZE);
+        str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*8);
         str.appendLine("// Rappel on a malloc donc deplacement positif");
         return str.getString();
     }
@@ -980,7 +986,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         
     private void fonctionMalloc(StringAggregator str){
-        str.appendLine("_malloc:");
+        str.appendLine("_malloc2:");
 
         // Sauvegarde de l'adresse de retour et Sauvegarde de l'ancien pointeur de base (chaînage dynamique)
         pushLRFP(str);
@@ -993,26 +999,34 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         // Load dans X0 de l'argument (la taille de l'espace à allouer)
         str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour malloc --> taille espace à allouer", WORD_SIZE);
-    
-        str.appendFormattedLine("""
-            // Test si HEAP + X0 < STACK
-            ADD X1, X0, X15
-            MOV X2, SP
-            CMP X1, X2
-            BGE erreur_malloc // Si Heap + X0 >= stack, on renvoie NULL
-            //sinon on alloue X0 octets dans la zone mémoire
-            // On le fait comme un calloc ici afin d'allouer la mémoire
-            MOV X1, X0  // On copie pour allouer 
-            MOV X0, X15 // On renvoit l'adresse de la zone mémoire allouée
-            MOV X2, #0  // On mettra des 0 dans la zone à allouer
-            whileMalloc:
-            CMP X1, #0
-            BLE finWhileMalloc
-            STR X2, [X15], #16
-            SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
-            B whileMalloc
-            finWhileMalloc:
-            """);
+
+        
+        if(type==Os.systeme.MACOS){
+            str.appendLine("BL _malloc");
+        }
+        else{
+            str.appendLine("BL  malloc");
+        }
+
+        // str.appendFormattedLine("""
+        //     // Test si HEAP + X0 < STACK
+        //     ADD X1, X0, X15
+        //     MOV X2, SP
+        //     CMP X1, X2
+        //     BGE erreur_malloc // Si Heap + X0 >= stack, on renvoie NULL
+        //     //sinon on alloue X0 octets dans la zone mémoire
+        //     // On le fait comme un calloc ici afin d'allouer la mémoire
+        //     MOV X1, X0  // On copie pour allouer 
+        //     MOV X0, X15 // On renvoit l'adresse de la zone mémoire allouée
+        //     MOV X2, #0  // On mettra des 0 dans la zone à allouer
+        //     whileMalloc:
+        //     CMP X1, #0
+        //     BLE finWhileMalloc
+        //     STR X2, [X15], #16
+        //     SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
+        //     B whileMalloc
+        //     finWhileMalloc:
+        //     """);
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV SP, FP");
