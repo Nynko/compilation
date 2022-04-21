@@ -640,7 +640,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         str.appendLine(expr_ou.right.accept(this));
         str.appendLine("MOV X2,X0");
-        str.appendLine("MOV X0, #0");
+        str.appendLine("MOV X0, #1");
         str.appendLine("CMP X2, #1");
 
         // Comparaison
