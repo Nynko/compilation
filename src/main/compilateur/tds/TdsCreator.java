@@ -105,13 +105,17 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Idf idf, Tds tds) {
+        idf.setTds(tds);
+        // System.out.println("visite idf= "+ idf.name + "   -  " + idf.getTds().getName() + " " +  idf);
         return null;
-        // Ne sera jamais visité
     }
 
     @Override
     public Void visit(DeclVarInt declVarInt, Tds tds) {
         declVarInt.setTds(tds);
+        for(Ast ast: declVarInt.idf){
+            ast.accept(this, tds);
+        }
         for (Ast identifiants : declVarInt.idf) {
             String intName = ((Idf) identifiants).name;
             Symbole symbole = new SymboleInt(intName);
@@ -128,6 +132,10 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(DeclVarStruct declVarStruct, Tds tds) {
         declVarStruct.setTds(tds);
+
+        for(Ast ast: declVarStruct.idf){
+            ast.accept(this, tds);
+        }
 
         ArrayList<Ast> liste = declVarStruct.idf;
 
@@ -159,6 +167,8 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(Decl_typ decl_typ, Tds tds) {
         decl_typ.setTds(tds);
 
+        decl_typ.idf.accept(this, tds);
+
         // Création d'une struct
         String idf = ((Idf) decl_typ.idf).name;
 
@@ -185,6 +195,8 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(DeclFctInt declFctInt, Tds tds) {
         declFctInt.setTds(tds);
+
+        declFctInt.Idf.accept(this, tds);
 
         String name = ((Idf) declFctInt.Idf).name;
 
@@ -221,6 +233,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(DeclFctStruct declFctStruct, Tds tds) {
         declFctStruct.setTds(tds);
+        declFctStruct.Idf1.accept(this, tds);
 
         String structName = ((Idf) declFctStruct.Idf0).name;
         String functionName = ((Idf) declFctStruct.Idf1).name;
@@ -316,7 +329,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(ParamInt paramInt, Tds tds) {
         paramInt.setTds(tds);
-
+        paramInt.name.accept(this, tds);
         String name = ((Idf) paramInt.name).name;
         SymboleInt symboleInt = new SymboleInt(name);
         symboleInt.addDefinitionLine(paramInt.line);
@@ -332,6 +345,8 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(ParamStruct paramStruct, Tds tds) {
         paramStruct.setTds(tds);
+        paramStruct.idf1.accept(this,tds);
+
 
         String structName = ((Idf) paramStruct.idf0).name;
 
@@ -382,6 +397,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(IfThen ifThen, Tds tds) {
         ifThen.setTds(tds);
         ifThen.condition.accept(visitor, tds);
+        ifThen.condition.accept(this, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         ifThen.thenBlock.accept(this, newTds);
         return null;
@@ -391,6 +407,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     public Void visit(IfThenElse ifThenElse, Tds tds) {
         ifThenElse.setTds(tds);
         ifThenElse.condition.accept(visitor, tds);
+        ifThenElse.condition.accept(this, tds);
         Tds newTds = tds.nouvelleSousTDS("thenblock");
         Tds newTdsElse = tds.nouvelleSousTDS("elseblock");
         ifThenElse.thenBlock.accept(this, newTds);
@@ -402,6 +419,8 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(While while1, Tds tds) {
         while1.setTds(tds);
+        while1.condition.accept(this, tds);
+        while1.condition.accept(visitor,tds);
         Tds newTds = tds.nouvelleSousTDS("whileblock");
         while1.doBlock.accept(this, newTds);
         return null;
@@ -410,6 +429,7 @@ public class TdsCreator implements TdsVisitor<Void> {
     @Override
     public Void visit(Return return1, Tds tds) {
         return1.setTds(tds);
+        return1.expr.accept(this, tds);
         Tds temp = tds;
         while (temp.getImbrication() != 1) {
             temp = temp.getPere();
@@ -427,13 +447,11 @@ public class TdsCreator implements TdsVisitor<Void> {
                 return null;
             }
         }
-        return1.expr.accept(this, tds);
         return null;
     }
 
     @Override
     public Void visit(Bloc bloc, Tds tds) {
-        System.out.println("bloc " + tds);
         bloc.setTds(tds);
         if (bloc.instList == null)
             return null;
@@ -467,6 +485,7 @@ public class TdsCreator implements TdsVisitor<Void> {
         affectation.accept(visitor, tds);
         affectation.left.accept(this, tds);
         affectation.right.accept(this, tds);
+
         return null;
     }
 
@@ -503,7 +522,6 @@ public class TdsCreator implements TdsVisitor<Void> {
 
     @Override
     public Void visit(Operateur operateur, Tds tds) {
-        System.out.println("op " + tds);
         operateur.setTds(tds);
         operateur.accept(visitor, tds);
         operateur.left.accept(this, tds);
