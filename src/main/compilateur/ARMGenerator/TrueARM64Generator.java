@@ -644,19 +644,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("CMP X2, #1");
 
         // Comparaison
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 == X2",nbCmp); 
-        str.appendLine("MOV X0, #0 // On met 0 dans X0");
-        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
-        nbCmp++;
-
+        str.appendFormattedLine("BEQ _Egal%d // Si X1 == 1",nbCmp); // Si x1 vaut 1 alors l'expression ou est valide
         str.appendLine("CMP X1, #1");
 
         // Comparaison
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 == X2",nbCmp); 
-        str.appendLine("MOV X0, #0 // On met 0 dans X0");
-        str.appendFormattedLine("_Egal%d: // Sinon on ne met rien et X0 = 0",nbCmp);
+        str.appendFormattedLine("BEQ _Egal%d // Si X2 == 1",nbCmp); // Si x2 vaut 1 et x1 vaut 0 alors elle est valide aussi
+        str.appendLine("MOV X0, #0 // On met 0 dans X0"); // x1 et x2 vale tous les deux 0 à ce moment donc l'expr n'est pas valide
+
+        str.appendFormattedLine("_Egal%d: // Sinon on met 1 dans X0",nbCmp);
         nbCmp++;
-        
         str.appendLine("; Expr_ou");
         return str.getString();
     }
