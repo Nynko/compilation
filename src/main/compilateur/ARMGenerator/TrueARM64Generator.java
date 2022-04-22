@@ -113,7 +113,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int decalage = 0;
         Tds tds = idf.getTds();
         String name = idf.name;
-        // System.out.println("BUGGGGG : "+ idf.name + "    -" + tds + " " + idf);
+        // System.out.println("BUGGGGG : "+ idf.name + "    -" + tds.getName() + " " + idf);
         // Avec chainage statique
 
         // Détermination du nombre de remontée de chainage statique
@@ -217,9 +217,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // data
             this.data.appendLine("""
                 l_.str:                                 //@.str
-                    .asciz	\"%c\"      
-                erreur_malloc_str:
-                    .asciz \"Erreur Malloc\\n\"          
+                    .asciz	\"%d\\n\"      
+                // erreur_malloc_str:
+                //     .asciz \"Erreur Malloc\\n\"          
                     """);
             str.appendLine(data.getString());
         }
@@ -615,8 +615,21 @@ public class TrueARM64Generator implements AstVisitor<String> {
         else{
             Idf idfFleche = (Idf) fleche.left;
             Tds tds = idfFleche.getTds();
+            
+            // Détermination du nombre de remontée de chainage statique
+            int imbrication = tds.getImbrication();
+            int nb_remontage = imbrication - tds.findImbrication(idfFleche.name);
+
+
             // On récupère le décalage de la variable
             int deplacement = ((SymboleVar) tds.findSymbole(idfFleche.name)).getDeplacement(WORD_SIZE); 
+            // On remonte les chainages statiques
+            str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
+            for (int i = 0; i < nb_remontage; i++) {
+                str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
+            }
+
+            // On récupère la nouvelle valeur depuis l'emplacement'adéquate (passage au full descending avec le moins)
             str.appendFormattedLine("LDR X0, [X17, #%d] // On load l'adresse de a dans a -> b ", -deplacement); 
         }
 
@@ -627,9 +640,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // System.out.println("tds: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ idf.name);
         
         int deplacement = recupDeplacementStruct(tds,fleche,idf.name);
-        // str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*8);
-        // str.appendLine("// Rappel on a malloc donc deplacement positif");
         str.appendFormattedLine("ADD X0, X0, #%d // On ajoute le deplacement de b (dans a -> b) ", deplacement*8);
+        str.appendLine("LDR X0, [X0] // On récupère le contenu de a -> b");
+        str.appendLine("// Rappel on a malloc donc deplacement positif");
         return str.getString();
     }
 
@@ -690,7 +703,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("; Expr_ou");
         str.appendLine(expr_ou.left.accept(this));
         // str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV X1,X0");
+        str.appendLine("MOV X11,X0");
 
         str.appendLine(expr_ou.right.accept(this));
         str.appendLine("MOV X2,X0");
@@ -698,12 +711,12 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("CMP X2, #1");
 
         // Comparaison
-        str.appendFormattedLine("BEQ _Egal%d // Si X1 == 1",nbCmp); // Si x1 vaut 1 alors l'expression ou est valide
-        str.appendLine("CMP X1, #1");
+        str.appendFormattedLine("BEQ _Egal%d // Si X11 == 1",nbCmp); // Si X11 vaut 1 alors l'expression ou est valide
+        str.appendLine("CMP X11, #1");
 
         // Comparaison
-        str.appendFormattedLine("BEQ _Egal%d // Si X2 == 1",nbCmp); // Si x2 vaut 1 et x1 vaut 0 alors elle est valide aussi
-        str.appendLine("MOV X0, #0 // On met 0 dans X0"); // x1 et x2 vale tous les deux 0 à ce moment donc l'expr n'est pas valide
+        str.appendFormattedLine("BEQ _Egal%d // Si X2 == 1",nbCmp); // Si x2 vaut 1 et X11 vaut 0 alors elle est valide aussi
+        str.appendLine("MOV X0, #0 // On met 0 dans X0"); // X11 et x2 vale tous les deux 0 à ce moment donc l'expr n'est pas valide
 
         str.appendFormattedLine("_Egal%d: // Sinon on met 1 dans X0",nbCmp);
         nbCmp++;
@@ -717,17 +730,17 @@ public class TrueARM64Generator implements AstVisitor<String> {
         str.appendLine("; Expr_et");
         str.appendLine(expr_et.left.accept(this));
         // str.appendLine("BL      __save_reg__");
-        str.appendLine("MOV X1,X0");
+        str.appendLine("MOV X10,X0");
 
         str.appendLine(expr_et.right.accept(this));
         str.appendLine("MOV X2,X0");
         str.appendLine("MOV X0, #0");
-        str.appendLine("CMP X1, #1");
-        str.appendFormattedLine("BNE _NonEgal%d // Si X1 == 0",nbCmp); // Si x1 est faux alors toutes l'expression est fausse
+        str.appendLine("CMP X10, #1");
+        str.appendFormattedLine("BNE _NonEgal%d // Si X10 == 0",nbCmp); // Si x1 est faux alors toutes l'expression est fausse
 
         // Comparaison Expr_Et 
-        str.appendLine("CMP X1, X2"); // Si x1 ne vaut pas x2 sachant que x1 est vrai alors l'expression est fausse
-        str.appendFormattedLine("BNE _NonEgal%d // Si X1 == X2",nbCmp); 
+        str.appendLine("CMP X10, X2"); // Si X10 ne vaut pas x2 sachant que X10 est vrai alors l'expression est fausse
+        str.appendFormattedLine("BNE _NonEgal%d // Si X10 == X2",nbCmp); 
         str.appendLine("MOV X0, #1 // On met 1 dans X0"); // Sinon tout vaut 1 donc l'expression est juste
 
         str.appendFormattedLine("_NonEgal%d:",nbCmp);
@@ -1071,29 +1084,29 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         str.appendLine("RET");
 
-        // Écriture erreur_malloc
-        if(type==Os.systeme.MACOS){
-            str.appendLine("""
-                erreur_malloc:
-                adrp	x0, erreur_malloc_str@PAGE
-                add	x0, x0, erreur_malloc_str@PAGEOFF 
-                bl    _printf
-                        """);
-        }
-        else{
-            str.appendLine("""
-                erreur_malloc:
-                ldr 	x0, =erreur_malloc_str  
-                bl    printf
-                    """);
-        }
-        str.appendLine("""
-            MOV X0, #0 // On retourne 0
-            MOV SP, FP
-            // B   __end__ // On termine le programme
-            """);
-        popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
-        str.appendLine("RET");
+        // // Écriture erreur_malloc
+        // if(type==Os.systeme.MACOS){
+        //     str.appendLine("""
+        //         erreur_malloc:
+        //         adrp	x0, erreur_malloc_str@PAGE
+        //         add	x0, x0, erreur_malloc_str@PAGEOFF 
+        //         bl    _printf
+        //                 """);
+        // }
+        // else{
+        //     str.appendLine("""
+        //         erreur_malloc:
+        //         ldr 	x0, =erreur_malloc_str  
+        //         bl    printf
+        //             """);
+        // }
+        // str.appendLine("""
+        //     MOV X0, #0 // On retourne 0
+        //     MOV SP, FP
+        //     // B   __end__ // On termine le programme
+        //     """);
+        // popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
+        // str.appendLine("RET");
     }
 
 }
