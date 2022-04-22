@@ -4,6 +4,7 @@ import org.antlr.v4.semantics.SymbolChecks;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
+import compilateur.ast.AstNode;
 import compilateur.ast.AstVisitor;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
@@ -127,7 +128,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
 
         // On remonte les chainages statiques
-        str.appendLine("push x17");
         str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
         for (int i = 0; i < nb_remontage; i++) {
             str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
@@ -135,7 +135,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On récupère la nouvelle valeur depuis l'emplacement'adéquate (passage au full descending avec le moins)
         str.appendFormattedLine("LDR X0, [X17, #%d] // On load la nouvelle valeur depuis l'emplacement adéquate avec chainage statique", -decalage); 
-        str.appendLine("pop x17");
         // Symbole s = idf.getTds().findSymbole(idf.name);
         // if (s instanceof SymboleVar sv) {
         //     decalage = sv.getDeplacement(WORD_SIZE*(-1));
@@ -343,12 +342,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
             str.appendFormattedLine("push X%d // On save les registres utilisées", nb_param-i);
         }
 
-
+        Tds tds = idfParenthesis.getTds();
         for (int i = 0; i < nb_param; i++) {
             Ast param = idfParenthesis.exprList.get(i);
             str.appendLine(param.accept(this)); // Met le paramètre dans X0
             // Putting X0 in the stack
             if(nb_param < 17){
+                // // On récupère le deplacement
+                // if(param.)
+                // tds.findSymbole()
                 str.appendFormattedLine("MOV X%d, X0 // On sauvegarde le param %d pour la place ",(nb_param-i),i,(nb_param-i));
             }
             else{
@@ -445,7 +447,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
 
               // On remonte les chainages statiques
-            str.appendLine("push X17");
+
             str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
             for (int i = 0; i < nb_remontage; i++) {
                 str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
@@ -453,7 +455,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // On store la nouvelle valeur à la place adéquate (passage au full descending avec le moins)
             str.appendFormattedLine("STR X0, [X17, #%d] // On store la nouvelle valeur à la place adéquate avec chainage statique", -decalage); 
-            str.appendLine("pop X17");
+
         }
         // TODO: Fleche
         else if (affectation.left instanceof Fleche fleche) {
@@ -658,7 +660,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
             int deplacement = ((SymboleVar) tds.findSymbole(idfFleche.name)).getDeplacement(WORD_SIZE); 
 
             // On remonte les chainages statiques
-            str.appendLine("push x17");
             str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
             for (int i = 0; i < nb_remontage; i++) {
                 str.appendFormattedLine("LDR X17, [X17, #-%d] // On remonte de %d fois le chainage", WORD_SIZE, nb_remontage - i);
@@ -666,7 +667,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // On récupère la nouvelle valeur depuis l'emplacement'adéquate (passage au full descending avec le moins)
             str.appendFormattedLine("LDR X0, [X17, #%d] // On load l'adresse de a dans a -> b ", -deplacement); 
-            str.appendLine("pop x17");
         }
 
         // On récupère l'adresse de b: pour cela
@@ -686,19 +686,28 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On récupère le type de struct en remontant les tds à partir de l'élément à gauche
 
         // On récupère la nom de la variable de la structure utilisée
-        String nameStruct = "";
+        String nameStruct = new String();
+        SymboleStructContent struct;
         if(fleche.left instanceof Fleche fleche2){
-            nameStruct = ((Idf) fleche2.right).name;
+            while(fleche2.left instanceof Fleche){
+                System.out.println("fleche2.left: " + ((Idf) fleche2.right).name);
+                fleche2 = (Fleche) fleche2.left;
+            }
+            if(fleche2.left instanceof Idf){
+                nameStruct = ((Idf) fleche2.left).name;
+            }
         }
         else{ // Si c'est un idf
             nameStruct = ((Idf)fleche.left).name;
         }
 
+        System.out.println("nameStruct: " + nameStruct);
+        System.out.println("name: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ name);
         // On récupère un symbole de struct
         SymboleStruct symboleStruct = (SymboleStruct) tds.findSymbole(nameStruct);
-        
         // On récupère la struct
-        SymboleStructContent struct = symboleStruct.getStruct();
+        struct = symboleStruct.getStruct();
+    
 
         // On récupère le déplacement
         int deplacement = ((SymboleVar) struct.getTds().findSymbole(name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
