@@ -217,7 +217,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // data
             this.data.appendLine("""
                 l_.str:                                 //@.str
-                    .asciz	\"%d\\n\"      
+                    .asciz	\"%c\"      
                 erreur_malloc_str:
                     .asciz \"Erreur Malloc\\n\"          
                     """);
@@ -589,10 +589,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(CharNode charNode) {
         String str = "' '";
-        if(sl && charNode.string.equals('n')){
+        if(sl && charNode.string.equals("'n'")){
             str = "'\\n'";
         }
-        else if(sl && charNode.string.equals('s')){
+        else if(sl && charNode.string.equals("'s'")){
             // do nothing
         }
         else{
@@ -607,17 +607,27 @@ public class TrueARM64Generator implements AstVisitor<String> {
         StringAggregator str = new StringAggregator();
         str.appendLine("// fleche");
         // On récupère l'adresse de a (a -> b) dans X0
-        str.appendLine(fleche.left.accept(this));
+        if(fleche.left instanceof Fleche){
+            str.appendLine(fleche.left.accept(this)); 
+        }
+        else{
+            Idf idfFleche = (Idf) fleche.left;
+            Tds tds = idfFleche.getTds();
+            // On récupère le décalage de la variable
+            int deplacement = ((SymboleVar) tds.findSymbole(idfFleche.name)).getDeplacement(WORD_SIZE); 
+            str.appendFormattedLine("LDR X0, [X17, #%d] // On load l'adresse de a dans a -> b ", -deplacement); 
+        }
 
         // On récupère l'adresse de b: pour cela
         // On récupère le décalage de b par rapport à a
         Idf idf = (Idf) fleche.right;
         Tds tds = idf.getTds();
-        System.out.println("tds: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ idf.name);
+        // System.out.println("tds: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ idf.name);
         
         int deplacement = recupDeplacementStruct(tds,fleche,idf.name);
-        str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*8);
-        str.appendLine("// Rappel on a malloc donc deplacement positif");
+        // str.appendFormattedLine("LDR X0, [X0, #%d] // On récupère l'addresse de b (dans a -> b -> c)", deplacement*8);
+        // str.appendLine("// Rappel on a malloc donc deplacement positif");
+        str.appendFormattedLine("ADD X0, X0, #%d // On ajoute le deplacement de b (dans a -> b) ", deplacement*8);
         return str.getString();
     }
 

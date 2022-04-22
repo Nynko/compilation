@@ -154,27 +154,27 @@ int get_indice_bloc(int indice, int taille_bloc){
     return indice / taille_bloc; 
 }
 
-int print_bloc(struct bloc * blo) {
+int print_bloc(struct bloc * blo0) {
     int nb_element;
     int i;
-    nb_element = blo->nb_element;
+    nb_element = blo0->nb_element;
     i = 0;
     while (i != nb_element)
     {
-        print(get_element(blo, i));
+        print(get_element(blo0, i));
         i = i + 1;
     }
     return 0;
 }
 
-int print_bloc_decalage(struct bloc * blo, int debut, int fin) {
+int print_bloc_decalage(struct bloc * blo1, int debut, int fin) {
     int nb_element;
     int i;
-    nb_element = blo->nb_element;
+    nb_element = blo1->nb_element;
     i = debut;
     while (i != fin + 1)
     {
-        print(get_element(blo, i));
+        print(get_element(blo1, i));
         i = i + 1;
     }
     return 0;
@@ -260,21 +260,21 @@ int print_matrice_decalage(struct matrice * mat, int debut, int fin){
 }
 
 struct bloc * declaration_bloc(int nb_element){
-    struct bloc * blo;
-    blo = malloc(sizeof(struct bloc));
-    blo->nb_element = nb_element;
-    blo->e1 = 'a';
-    blo->e2 = 'b';
-    blo->e3 = 'c';
-    blo->e4 = 'd';
-    blo->e5 = 'e';
-    blo->e6 = 'f';
-    blo->e7 = 'g';
-    blo->e8 = 'h';
-    blo->e9 = 'i';
-    blo->e10 = 'j';
+    struct bloc * blo3;
+    blo3 = malloc(sizeof(struct bloc));
+    blo3->nb_element = nb_element;
+    blo3->e1 = 'a';
+    blo3->e2 = 'b';
+    blo3->e3 = 'c';
+    blo3->e4 = 'd';
+    blo3->e5 = 'e';
+    blo3->e6 = 'f';
+    blo3->e7 = 'g';
+    blo3->e8 = 'h';
+    blo3->e9 = 'i';
+    blo3->e10 = 'j';
 
-    return blo;
+    return blo3;
 }
 
 struct ligne * declaration_ligne(int nb_bloc){
@@ -338,7 +338,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, nb_bloc*10 - i, nb_bloc*10-1);
         j = 0;
-        while (j != 10000000)
+        while (j != 1000)
         {
             j = j + 1;
         }
@@ -350,7 +350,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, 0, nb_bloc*10-i-1);
         j = 0;
-        while (j != 10000000)
+        while (j != 1000)
         {
             j = j + 1;
         }
