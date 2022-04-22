@@ -67,6 +67,10 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return TYPESTRUCT + symstructcontent.getName();
         } else {
+            SymboleStructContent sb = tds.findSymboleStruct("struct_" + idf.name);
+            if (sb != null) {
+                return sb.getType();
+            }
             errors.addError(new UndefinedSymboleException(idf.name, idf.line));
         }
         return null;
@@ -229,7 +233,7 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
             if (affectation.left instanceof Idf idf) {
                 Symbole s = tds.findSymbole(idf.name);
-                System.out.println("y " + idf.name + " " + s + " " + affectation.line);
+                // System.out.println("y " + idf.name + " " + s + " " + affectation.line);
                 if (s instanceof SymboleVar sv) {
                     sv.setInitalized(true);
                 }
