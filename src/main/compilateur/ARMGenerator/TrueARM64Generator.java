@@ -238,7 +238,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         
             this.data.appendLine("""
                 l_.str:                                 
-                    .asciz	\"%d\\n\"                
+                    .asciz	\"%d\\n\"     
+                erreur_malloc_str:
+                    .asciz \"Erreur Malloc\\n\"                
                     """);
             str.appendLine(this.data.getString());
         }
