@@ -979,8 +979,8 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         
         // int numParams = bloc.getTds().getParams().size();
         int deplacement = bloc.getTds().getDeplacement();
-        System.out.println("deplacement : " + deplacement);
-        System.out.println(bloc.getTds().getDeplacement(16));
+        // System.out.println("deplacement : " + deplacement);
+        // System.out.println(bloc.getTds().getDeplacement(16));
 
         // On ajoute le nom de la fonction pour pouvoir faire le jump
         str.appendFormattedLine("_%s:",name);
