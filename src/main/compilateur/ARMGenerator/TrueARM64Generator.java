@@ -761,7 +761,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     @Override
     public String visit(Expr_ou expr_ou) {
         StringAggregator str = new StringAggregator();
-        str.appendLine("; Expr_ou");
+        str.appendLine("// Expr_ou");
         str.appendLine(expr_ou.left.accept(this));
         
         str.appendLine("push X11");
@@ -785,14 +785,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
         nbCmp++;
         str.appendLine("pop X2");
         str.appendLine("pop X11");
-        str.appendLine("; Expr_ou");
+        str.appendLine("// Expr_ou");
         return str.getString();
     }
 
     @Override
     public String visit(Expr_et expr_et) {
         StringAggregator str = new StringAggregator();
-        str.appendLine("; Expr_et");
+        str.appendLine("// Expr_et");
         str.appendLine(expr_et.left.accept(this));
 
         str.appendLine("push X10");
@@ -814,7 +814,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         nbCmp++;
         str.appendLine("pop X2");
         str.appendLine("pop X10");
-        str.appendLine("; Expr_et");
+        str.appendLine("// Expr_et");
         return str.getString();
     }
 
