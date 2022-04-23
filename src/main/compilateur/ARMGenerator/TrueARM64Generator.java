@@ -1,6 +1,5 @@
 package compilateur.ARMGenerator;
 
-import org.antlr.v4.semantics.SymbolChecks;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
@@ -74,6 +73,8 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
     private Os.systeme type;
     public static final int WORD_SIZE = 16; // Taille d'un mot en octet
+    private boolean useTrueMalloc = true;
+    private static int MALLOC_SIZE = 16; // Taille d'un malloc en octet
 
     private int whileCompt = 0;
     private int ifCompt = 0;
@@ -87,6 +88,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
     public TrueARM64Generator(Os.systeme type) {
         this.type = type;
         this.data = new StringAggregator();
+        if(useTrueMalloc){
+            MALLOC_SIZE = 8 ; // Taille d'un malloc en octet
+        }
     }
 
 
@@ -227,10 +231,14 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // data
             this.data.appendLine("""
                 l_.str:                                 //@.str
-                    .asciz	\"%d\\n\"      
-                // erreur_malloc_str:
-                //     .asciz \"Erreur Malloc\\n\"          
+                    .asciz	\"%d\\n\"              
                     """);
+            if(!useTrueMalloc){ // Si on utilise le malloc perso 
+                this.data.appendLine("""
+                    erreur_malloc_str:
+                    .asciz \"Erreur Malloc\\n\"  
+                        """);
+            }
             str.appendLine(data.getString());
         }
 
@@ -248,10 +256,16 @@ public class TrueARM64Generator implements AstVisitor<String> {
         
             this.data.appendLine("""
                 l_.str:                                 
-                    .asciz	\"%d\\n\"     
-                erreur_malloc_str:
-                    .asciz \"Erreur Malloc\\n\"                
+                    .asciz	\"%d\\n\"                 
                     """);
+
+            if(!useTrueMalloc){ // Si on utilise le malloc perso 
+                this.data.appendLine("""
+                    erreur_malloc_str:
+                    .asciz \"Erreur Malloc\\n\"  
+                        """);
+            }
+
             str.appendLine(this.data.getString());
         }
 
@@ -467,7 +481,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             // On recupere le decalage de l'int à droite:
             Idf idf = (Idf) fleche.right;
             decalage = recupDeplacementStruct(tds,fleche,idf.name);
-            decalage = decalage * 8; // TODO: TMP 8
+            decalage = decalage * MALLOC_SIZE; // TODO: TMP 8
             // Pas besoin d'accepter b (dans (a) -> b) c'est là où l'on veut affecter.
 
             // On récupère l'addresse de a
@@ -647,7 +661,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         if(fleche.left instanceof Fleche){
             str.appendLine(fleche.left.accept(this)); 
         }
-        else{
+        else{ // Si instanceof Idf 
             Idf idfFleche = (Idf) fleche.left;
             Tds tds = idfFleche.getTds();
             
@@ -676,7 +690,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // System.out.println("tds: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ idf.name);
         
         int deplacement = recupDeplacementStruct(tds,fleche,idf.name);
-        str.appendFormattedLine("ADD X0, X0, #%d // On ajoute le deplacement de b (dans a -> b) ", deplacement*8);
+        str.appendFormattedLine("ADD X0, X0, #%d // On ajoute le deplacement de b (dans a -> b) ", deplacement*MALLOC_SIZE);
         str.appendLine("LDR X0, [X0] // On récupère le contenu de a -> b");
         str.appendLine("// Rappel on a malloc donc deplacement positif");
         return str.getString();
@@ -688,9 +702,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // On récupère la nom de la variable de la structure utilisée
         String nameStruct = new String();
         SymboleStructContent struct;
-        if(fleche.left instanceof Fleche fleche2){
+        if(fleche.left instanceof Fleche fleche2){ // on récupère récursivement le nom de la variable associée à la structure ! (pour récupérer dans les params...)
+            System.out.println("fleche2.right: " + ((Idf) fleche2.right).name);
             while(fleche2.left instanceof Fleche){
-                System.out.println("fleche2.left: " + ((Idf) fleche2.right).name);
                 fleche2 = (Fleche) fleche2.left;
             }
             if(fleche2.left instanceof Idf){
@@ -701,13 +715,15 @@ public class TrueARM64Generator implements AstVisitor<String> {
             nameStruct = ((Idf)fleche.left).name;
         }
 
-        System.out.println("nameStruct: " + nameStruct);
-        System.out.println("name: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ name);
+
+        // System.out.println("name: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ name);
         // On récupère un symbole de struct
         SymboleStruct symboleStruct = (SymboleStruct) tds.findSymbole(nameStruct);
         // On récupère la struct
         struct = symboleStruct.getStruct();
     
+        // System.out.println("nameStruct: " + nameStruct);
+        // System.out.println("struct: " + struct.getName());
 
         // On récupère le déplacement
         int deplacement = ((SymboleVar) struct.getTds().findSymbole(name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
@@ -1069,7 +1085,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         if(name.equals("main")){
             str.appendLine("MOV X0, FP"); // Le chainage statique dans ce cas est le même que FP
             // Ajout de l'adresse de la HEAP dans X14 et X15
-            str.appendLine("SUB X14, SP, #0x1000 // Adresse de la base HEAP");
+            str.appendLine("SUB X14, SP, #0x10000 // Adresse de la base HEAP");
             str.appendLine("MOV X15, X14 // Adresse du haut de la HEAP");
         }
         staticPush(str, "X0");
@@ -1109,33 +1125,37 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         // Load dans X0 de l'argument (la taille de l'espace à allouer)
         str.appendFormattedLine("LDR X0, [FP, #%d]  // On récupère l'argument pour malloc --> taille espace à allouer", WORD_SIZE);
 
-        
-        if(type==Os.systeme.MACOS){
-            str.appendLine("BL _malloc");
-        }
-        else{
-            str.appendLine("BL  malloc");
+        if(useTrueMalloc){
+            if(type==Os.systeme.MACOS){
+                str.appendLine("BL _malloc");
+            }
+            else{
+                str.appendLine("BL  malloc");
+            }
         }
 
-        // str.appendFormattedLine("""
-        //     // Test si HEAP + X0 < STACK
-        //     ADD X1, X0, X15
-        //     MOV X2, SP
-        //     CMP X1, X2
-        //     BGE erreur_malloc // Si Heap + X0 >= stack, on renvoie NULL
-        //     //sinon on alloue X0 octets dans la zone mémoire
-        //     // On le fait comme un calloc ici afin d'allouer la mémoire
-        //     MOV X1, X0  // On copie pour allouer 
-        //     MOV X0, X15 // On renvoit l'adresse de la zone mémoire allouée
-        //     MOV X2, #0  // On mettra des 0 dans la zone à allouer
-        //     whileMalloc:
-        //     CMP X1, #0
-        //     BLE finWhileMalloc
-        //     STR X2, [X15], #16
-        //     SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
-        //     B whileMalloc
-        //     finWhileMalloc:
-        //     """);
+        else{
+            str.appendFormattedLine("""
+            // Test si HEAP + X0 < STACK
+            ADD X1, X0, X15
+            MOV X2, SP
+            CMP X1, X2
+            BGE erreur_malloc // Si Heap + X0 >= stack, on renvoie NULL
+            //sinon on alloue X0 octets dans la zone mémoire
+            // On le fait comme un calloc ici afin d'allouer la mémoire
+            MOV X1, X0  // On copie pour allouer 
+            MOV X0, X15 // On renvoit l'adresse de la zone mémoire allouée
+            MOV X2, #0  // On mettra des 0 dans la zone à allouer
+            whileMalloc:
+            CMP X1, #0
+            BLE finWhileMalloc
+            STR X2, [X15], #16
+            SUB X1, X1, #8  // Oui car on utilise pas les 16 octets mais seulement 8
+            B whileMalloc
+            finWhileMalloc:
+            """);
+
+        }
 
         // Remise du pointeur de pile à sa position avant l'appel de fonction
         str.appendLine("MOV SP, FP");
@@ -1145,29 +1165,37 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
 
         str.appendLine("RET");
 
-        // // Écriture erreur_malloc
-        // if(type==Os.systeme.MACOS){
-        //     str.appendLine("""
-        //         erreur_malloc:
-        //         adrp	x0, erreur_malloc_str@PAGE
-        //         add	x0, x0, erreur_malloc_str@PAGEOFF 
-        //         bl    _printf
-        //                 """);
-        // }
-        // else{
-        //     str.appendLine("""
-        //         erreur_malloc:
-        //         ldr 	x0, =erreur_malloc_str  
-        //         bl    printf
-        //             """);
-        // }
-        // str.appendLine("""
-        //     MOV X0, #0 // On retourne 0
-        //     MOV SP, FP
-        //     // B   __end__ // On termine le programme
-        //     """);
-        // popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
-        // str.appendLine("RET");
+        if(!useTrueMalloc){
+            // Écriture erreur_malloc
+            if(type==Os.systeme.MACOS){
+                str.appendLine("""
+                    erreur_malloc:
+                    saveReg X14, X15
+                    adrp	x0, erreur_malloc_str@PAGE
+                    add	x0, x0, erreur_malloc_str@PAGEOFF 
+                    bl    _printf
+                    restoreReg X14, X15
+                            """);
+            }
+            else{
+                str.appendLine("""
+                    erreur_malloc:
+                    saveReg X14, X15
+                    ldr 	x0, =erreur_malloc_str  
+                    bl    printf
+                    restoreReg X14, X15
+                        """);
+            }
+            str.appendLine("""
+                MOV X0, #0 // On retourne 0
+                MOV SP, FP
+                // B   __end__ // On termine le programme
+                """);
+            popLRFP(str); // Récupération de l'addresse de retour et retour à l'appelant
+            str.appendLine("RET");
+
+        }
+        
     }
 
 }
