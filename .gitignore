@@ -31,3 +31,6 @@ out/
 #ARM
 *.s
 examples/C/*.c
+
+#compile file
+*.out
