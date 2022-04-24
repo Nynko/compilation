@@ -339,7 +339,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, nb_bloc*10 - i, nb_bloc*10-1);
         j = 0;
-        while (j != 1000)
+        while (j != 10000000)
         {
             j = j + 1;
         }
@@ -351,7 +351,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, 0, nb_bloc*10-i-1);
         j = 0;
-        while (j != 1000)
+        while (j != 10000000)
         {
             j = j + 1;
         }

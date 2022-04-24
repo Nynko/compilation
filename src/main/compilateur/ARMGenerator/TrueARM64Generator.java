@@ -229,13 +229,21 @@ public class TrueARM64Generator implements AstVisitor<String> {
                     """);
 
             // data
-            this.data.appendLine("""
-                l_.str:                                 //@.str
-                    .asciz	\"%d\\n\"              
-                    """);
+            if(sl){
+                this.data.appendLine("""
+                    l_.str:                                 //@.str
+                        .asciz	\"%c\"              
+                        """);
+            }
+            else{
+                this.data.appendLine("""
+                    l_.str:                                 //@.str
+                        .asciz	\"%d\\n\"              
+                        """);
+            }
             if(!useTrueMalloc){ // Si on utilise le malloc perso 
                 this.data.appendLine("""
-                    erreur_malloc_str:
+                erreur_malloc_str:
                     .asciz \"Erreur Malloc\\n\"  
                         """);
             }
@@ -254,14 +262,21 @@ public class TrueARM64Generator implements AstVisitor<String> {
                 svc     0           // Call Linux to terminate
                     """);
         
-            this.data.appendLine("""
-                l_.str:                                 
-                    .asciz	\"%d\\n\"                 
-                    """);
-
+            if(sl){
+                this.data.appendLine("""
+                    l_.str:                                 //@.str
+                        .asciz	\"%c\"              
+                        """);
+            }
+            else{
+                this.data.appendLine("""
+                    l_.str:                                 //@.str
+                        .asciz	\"%d\\n\"              
+                        """);
+            }
             if(!useTrueMalloc){ // Si on utilise le malloc perso 
                 this.data.appendLine("""
-                    erreur_malloc_str:
+                erreur_malloc_str:
                     .asciz \"Erreur Malloc\\n\"  
                         """);
             }
@@ -1092,7 +1107,7 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         if(name.equals("main")){
             str.appendLine("MOV X0, FP"); // Le chainage statique dans ce cas est le même que FP
             // Ajout de l'adresse de la HEAP dans X14 et X15
-            str.appendLine("SUB X14, SP, #0x10000 // Adresse de la base HEAP");
+            str.appendLine("SUB X14, SP, #0x20000 // Adresse de la base HEAP");
             str.appendLine("MOV X15, X14 // Adresse du haut de la HEAP");
         }
         staticPush(str, "X0");
