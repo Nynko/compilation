@@ -203,7 +203,7 @@ int print_bloc(struct bloc * blo0) {
     return 0;
 }
 
-int print_bloc_decalage(struct bloc * blo1, int debut, int fin) {
+int print_bloc_decalage(struct bloc * blo1, int debut, int fin) { // debut = 0 - 9 fin = 0 - 9
     int nb_element;
     int i;
     nb_element = blo1->nb_element;
@@ -229,42 +229,46 @@ int print_ligne(struct ligne * lig){
     return 0;
 }
 
-int print_ligne_decalage(struct ligne * lig, int debut, int fin){
+int print_ligne_decalage(struct ligne * lig, int debut, int fin){ // debut = 0 - 99 fin 0 - 99
     int nb_bloc, indice_bloc_debut, indice_bloc_fin;
     int i;
     nb_bloc = lig->nb_bloc;
-    indice_bloc_debut = get_indice_bloc(debut, 10);
-    indice_bloc_fin = get_indice_bloc(fin, 10);
+    indice_bloc_debut = get_indice_bloc(debut, 10); // 0 - 9
+    indice_bloc_fin = get_indice_bloc(fin, 10); // 0 - 9
     i = indice_bloc_debut;
-    while ( i != indice_bloc_fin + 1 ) {
-        if (i == indice_bloc_debut)
-        {
-            int temp;
-            temp = nb_bloc * 10 - 1;
-            while (temp != fin)
-            {
-                print('s');
-                temp = temp - 1;
-            }
 
-            if (fin >= 10)
-            {
-                print_bloc_decalage(get_bloc(lig, i), debut - indice_bloc_debut * 10, 9);
-            }
-            else {
-                print_bloc_decalage(get_bloc(lig, i), debut - indice_bloc_debut * 10, fin);
-            }
-            
-        }
-        else {
-            if (i == indice_bloc_fin){
-                print_bloc_decalage(get_bloc(lig, i), 0, fin - indice_bloc_fin * 10);
-            }
-            else
-            {
-                print_bloc(get_bloc(lig, i));
-            }
-        }
+if (fin != nb_bloc * 10 - 1){
+	int temp;
+	temp = nb_bloc * 10 - 1;
+	while( temp != 0){
+	print('s');
+	temp = temp - 1;
+	}
+}
+
+
+while ( i != indice_bloc_fin + 1) {
+	if (fin >= 10) {
+        	if (i == indice_bloc_debut)
+        	{
+                	print_bloc_decalage(get_bloc(lig, i), debut - indice_bloc_debut * 10, 9);
+            	}
+            	else 
+		{
+          		if (i == indice_bloc_fin)
+			{
+            			print_bloc_decalage(get_bloc(lig, i), 0, fin - indice_bloc_fin * 10);
+            		} 
+			else
+			{
+				print_bloc(get_bloc(lig, i));
+        		}
+		}
+	}
+	else 
+	{
+		print_bloc_decalage(get_bloc(lig, i), debut, fin);
+	}
         i = i + 1;
     }
     print('n');
@@ -765,24 +769,24 @@ int main(){
     mat = declaration_matrice(nb_ligne, nb_bloc);
     remplissage_mat(mat);
     i = 0;
-    while (i != nb_bloc*10 +1)
+    while (i != nb_bloc*10) // 0 - 100
     {
         int j;
-        print_matrice_decalage(mat, 0, nb_bloc*10-i-1);
+        print_matrice_decalage(mat, 0, i); // debut = 0 fin = 0 - 99
         j = 0;
-        while (j != 10000000)
+        while (j != 10000)
         {
             j = j + 1;
         }
         i = i + 1;
     }
-    i = 0;
-    while (i != nb_bloc*10)
+    i = 1;
+    while (i != nb_bloc*10) // 1 - 100
     {
         int j;
-        print_matrice_decalage(mat, nb_bloc*10 - i, nb_bloc*10-1);
+        print_matrice_decalage(mat, i, nb_bloc*10-1); // debut = 1 - 99 fin = 99
         j = 0;
-        while (j != 10000000)
+        while (j != 10000)
         {
             j = j + 1;
         }
