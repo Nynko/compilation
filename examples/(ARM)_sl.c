@@ -57,49 +57,48 @@ struct matrice
 int get_element(struct bloc * lig, int indice){
     if (indice == 0){
         return lig->e1;
-    } else if (indice == 1){
+    } if (indice == 1){
         return lig->e2;
-    } else if (indice == 2){
+    } if (indice == 2){
         return lig->e3;
-    } else if (indice == 3){
+    } if (indice == 3){
         return lig->e4;
-    } else if (indice == 4){
+    } if (indice == 4){
         return lig->e5;
-    } else if (indice == 5){
+    } if (indice == 5){
         return lig->e6;
-    } else if (indice == 6){
+    } if (indice == 6){
         return lig->e7;
-    } else if (indice == 7){
+    } if (indice == 7){
         return lig->e8;
-    } else if (indice == 8){
+    } if (indice == 8){
         return lig->e9;
-    } else if (indice == 9){
+    } if (indice == 9){
         return lig->e10;
-    } else {
-        return -1;
-    }
+    } 
+    return -1;
 }
 
 struct bloc * get_bloc(struct ligne * lig, int indice){
     if (indice == 0){
         return lig->b1;
-    } else if (indice == 1){
+    } if (indice == 1){
         return lig->b2;
-    } else if (indice == 2){
+    } if (indice == 2){
         return lig->b3;
-    } else if (indice == 3){
+    } if (indice == 3){
         return lig->b4;
-    } else if (indice == 4){
+    } if (indice == 4){
         return lig->b5;
-    } else if (indice == 5){
+    } if (indice == 5){
         return lig->b6;
-    } else if (indice == 6){
+    } if (indice == 6){
         return lig->b7;
-    } else if (indice == 7){
+    } if (indice == 7){
         return lig->b8;
-    } else if (indice == 8){
+    } if (indice == 8){
         return lig->b9;
-    } else if (indice == 9){
+    } if (indice == 9){
         return lig->b10;
     }
     return 0;
@@ -108,43 +107,43 @@ struct bloc * get_bloc(struct ligne * lig, int indice){
 struct ligne * get_ligne(struct matrice * mat, int indice){
     if (indice == 0){
         return mat->l1;
-    } else if (indice == 1){
+    } if (indice == 1){
         return mat->l2;
-    } else if (indice == 2){
+    } if (indice == 2){
         return mat->l3;
-    } else if (indice == 3){
+    } if (indice == 3){
         return mat->l4;
-    } else if (indice == 4){
+    } if (indice == 4){
         return mat->l5;
-    } else if (indice == 5){
+    } if (indice == 5){
         return mat->l6;
-    } else if (indice == 6){
+    } if (indice == 6){
         return mat->l7;
-    } else if (indice == 7){
+    } if (indice == 7){
         return mat->l8;
-    } else if (indice == 8){
+    } if (indice == 8){
         return mat->l9;
-    } else if (indice == 9){
+    } if (indice == 9){
         return mat->l10;
-    } else if (indice == 10){
+    } if (indice == 10){
         return mat->l11;
-    } else if (indice == 11){
+    } if (indice == 11){
         return mat->l12;
-    } else if (indice == 12){
+    } if (indice == 12){
         return mat->l13;
-    } else if (indice == 13){
+    } if (indice == 13){
         return mat->l14;
-    } else if (indice == 14){
+    } if (indice == 14){
         return mat->l15;
-    } else if (indice == 15){
+    } if (indice == 15){
         return mat->l16;
-    } else if (indice == 16){
+    } if (indice == 16){
         return mat->l17;
-    } else if (indice == 17){
+    } if (indice == 17){
         return mat->l18;
-    } else if (indice == 18){
+    } if (indice == 18){
         return mat->l19;
-    } else if (indice == 19){
+    } if (indice == 19){
         return mat->l20;
     }
     return 0;
@@ -220,12 +219,14 @@ int print_ligne_decalage(struct ligne * lig, int debut, int fin){
             }
             
         }
-        else if (i == indice_bloc_fin){
-            print_bloc_decalage(get_bloc(lig, i), 0, fin - indice_bloc_fin * 10);
-        }
-        else
-        {
-            print_bloc(get_bloc(lig, i));
+        else {
+            if (i == indice_bloc_fin){
+                print_bloc_decalage(get_bloc(lig, i), 0, fin - indice_bloc_fin * 10);
+            }
+            else
+            {
+                print_bloc(get_bloc(lig, i));
+            }
         }
         i = i + 1;
     }
