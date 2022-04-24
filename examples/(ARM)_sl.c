@@ -1,3 +1,435 @@
+//0                              (@@) (  ) (@) ( ) @@     ()      @       0       @       0          @
+//1                          (   )
+//2                      (@@@)
+//3                  (    )
+//4 
+//5              (@@@)
+//6          ====        _______               ___________
+//7      _D _|  |_______/       \__I_I____===__|_________|
+//8       |(_)---  |   H\_______/ |   |       =|___ ___|       _________________
+//9       /     |  |   H  |  |    |   |        ||_| |_||      _|                \_____A
+//10     |      |  |   H  |__------------------| [___] |    =|                        |
+//11     | ________|___H__/__|____/[][]~\______|       |    -|                        |
+//12     |/ |   |-----------I____I [][] []  D  |=======|_____|________________________|_
+//13   __/ =| 0 |=-~~\  /~~\  /~~\  /~~\____Y__________|___|__________________________|_
+//14    |/-=|___|=   0=====0=====0=====0|____/~\___/          |_D__D__D_|  |_D__D__D_| 
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+int remplissage_mat(struct matrice * mat){
+    struct ligne * lig;
+    struct bloc * blo;
+
+    // ligne 1
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 2
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 3
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 4
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 5
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 6
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 7
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 8
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 9
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 10
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 11
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 12
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 13
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 14
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 2);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 3);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+
+    // ligne 15
+//14    |/-=|___|=   0=====0=====0=====0|____/~\___/          |_D__D__D_|  |_D__D__D_| 
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+    lig = get_ligne(mat, 14);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = '|'; blo->e3 = '/'; blo->e4 = '-'; blo->e5 = '='; blo->e6 = '|'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '|';
+    blo = get_bloc(lig, 1);
+    blo->e1 = '='; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = '0'; blo->e6 = '='; blo->e7 = '='; blo->e8 = '='; blo->e9 = '='; blo->e10 = '=';
+    blo = get_bloc(lig, 2);
+    blo->e1 = '0'; blo->e2 = '='; blo->e3 = '='; blo->e4 = '='; blo->e5 = '='; blo->e6 = '='; blo->e7 = '0'; blo->e8 = '='; blo->e9 = '='; blo->e10 = '=';
+    blo = get_bloc(lig, 3);
+    blo->e1 = '='; blo->e2 = '='; blo->e3 = '0'; blo->e4 = '|'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 4);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 7);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+    // ligne 16
+//16     \_/      \__/  \__/  \__/  \__/     \_/               \_/   \_/    \_/   \_/
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+    lig = get_ligne(mat, 15);
+    blo = get_bloc(lig, 0);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '\\'; blo->e4 = '_'; blo->e5 = '/'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 1);
+    blo->e1 = 's'; blo->e2 = '\\'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '/'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = '\\'; blo->e9 = '_'; blo->e10 = '_';
+    blo = get_bloc(lig, 2);
+    blo->e1 = '/'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '\\'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '/'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '\\';
+    blo = get_bloc(lig, 3);
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '/'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '\\'; blo->e10 = '_';
+    blo = get_bloc(lig, 4);
+    blo->e1 = '/'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 5);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = '\\'; blo->e8 = '_'; blo->e9 = '/'; blo->e10 = 's';
+    blo = get_bloc(lig, 6);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '\\'; blo->e4 = '_'; blo->e5 = '/'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '\\';
+    blo = get_bloc(lig, 7);
+    blo->e1 = '_'; blo->e2 = '/'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = '\\'; blo->e7 = '_'; blo->e8 = '/'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 8);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo = get_bloc(lig, 9);
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+
+    return 0;
+}
+
+//0                              (@@) (  ) (@) ( ) @@     ()      @       0       @       0          @
+//1                          (   )
+//2                      (@@@)
+//3                  (    )
+//4 
+//5              (@@@)
+//6          ====        _______               ___________
+//7      _D _|  |_______/       \__I_I____===__|_________|
+//8       |(_)---  |   H\_______/ |   |       =|___ ___|       _________________
+//9       /     |  |   H  |  |    |   |        ||_| |_||      _|                \_____A
+//10     |      |  |   H  |__------------------| [___] |    =|                        |
+//11     | ________|___H__/__|____/[][]~\______|       |    -|                        |
+//12     |/ |   |-----------I____I [][] []  D  |=======|_____|________________________|_
+//13   __/ =| 0 |=-~~\  /~~\  /~~\  /~~\____Y__________|___|__________________________|_
+//14    |/-=|___|=   0=====0=====0=====0|____/~\___/          |_D__D__D_|  |_D__D__D_| 
+//15     \_/      \__/  \__/  \__/  \__/     \_/               \_/   \_/    \_/   \_/
+//     0123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//               012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
 struct bloc
 {
     int nb_element;
@@ -264,16 +696,16 @@ struct bloc * declaration_bloc(int nb_element){
     struct bloc * blo3;
     blo3 = malloc(sizeof(struct bloc));
     blo3->nb_element = nb_element;
-    blo3->e1 = 'a';
-    blo3->e2 = 'b';
-    blo3->e3 = 'c';
-    blo3->e4 = 'd';
-    blo3->e5 = 'e';
-    blo3->e6 = 'f';
-    blo3->e7 = 'g';
-    blo3->e8 = 'h';
-    blo3->e9 = 'i';
-    blo3->e10 = 'j';
+    blo3->e1 = 's';
+    blo3->e2 = 's';
+    blo3->e3 = 's';
+    blo3->e4 = 's';
+    blo3->e5 = 's';
+    blo3->e6 = 's';
+    blo3->e7 = 's';
+    blo3->e8 = 's';
+    blo3->e9 = 's';
+    blo3->e10 = 's';
 
     return blo3;
 }
@@ -327,19 +759,18 @@ struct matrice * declaration_matrice(int nb_ligne, int nb_bloc){
 int main(){
     int nb_ligne, nb_bloc;
     struct matrice * mat;
-    struct matrice * mat_vide;
     int i;
     nb_ligne = 20;
     nb_bloc = 10;
     mat = declaration_matrice(nb_ligne, nb_bloc);
-    mat_vide = declaration_matrice(nb_ligne, nb_bloc);
+    remplissage_mat(mat);
     i = 0;
     while (i != nb_bloc*10)
     {
         int j;
         print_matrice_decalage(mat, nb_bloc*10 - i, nb_bloc*10-1);
         j = 0;
-        while (j != 1000)
+        while (j != 1000000)
         {
             j = j + 1;
         }
@@ -351,7 +782,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, 0, nb_bloc*10-i-1);
         j = 0;
-        while (j != 1000)
+        while (j != 1000000)
         {
             j = j + 1;
         }
