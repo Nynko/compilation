@@ -352,30 +352,37 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Ajout des parametres à la pile
         int nb_param = idfParenthesis.exprList.size();
 
-        for(int i=0 ; i < nb_param ; i++){ // On store les registres que l'on va utilisé
-            str.appendFormattedLine("push X%d // On save les registres utilisées", nb_param-i);
-        }
+        // for(int i=0 ; i < nb_param ; i++){ // On store les registres que l'on va utilisé
+        //     str.appendFormattedLine("push X%d // On save les registres utilisées", nb_param-i);
+        // }
+
+        // on le change le SP au début car on va placer les paramètres dans un ordre particulier
+        // et que l'on risque de perdre des données car on push et pop des registres sur la pile 
+        // lorsque l'on fait des expressions !!
+        str.appendFormattedLine("SUB  SP, SP, #%d // Place param", WORD_SIZE*nb_param);
+
 
         Tds tds = idfParenthesis.getTds();
         for (int i = 0; i < nb_param; i++) {
             Ast param = idfParenthesis.exprList.get(i);
             str.appendLine(param.accept(this)); // Met le paramètre dans X0
+
+            // On store le paramètre dans la pile
+            str.appendFormattedLine("STR X0, [SP, #%d] // On store les params", WORD_SIZE*i);
+
             // Putting X0 in the stack
-            if(nb_param < 17){
-                // // On récupère le deplacement
-                // if(param.)
-                // tds.findSymbole()
-                str.appendFormattedLine("MOV X%d, X0 // On sauvegarde le param %d pour la place ",(nb_param-i),i,(nb_param-i));
-            }
-            else{
-                System.err.println("Trop de param, on gère pas... dsl");
-            }
+            // if(nb_param < 17){
+            //     // // On récupère le deplacement
+            //     // if(param.)
+            //     // tds.findSymbole()
+            //     str.appendFormattedLine("MOV X%d, X0 // On sauvegarde le param %d pour la place ",(nb_param-i),i,(nb_param-i));
+            // }
+            // else{
+            //     System.err.println("Trop de param, on gère pas... dsl");
+            // }
+
         }
-        // on store les params dans la pile
-        for(int i=0 ; i < nb_param ; i++){
-            str.appendFormattedLine("STR X%d, [SP, #-%d] // On store les params", nb_param-i, WORD_SIZE*(nb_param-i));
-        }
-        str.appendFormattedLine("SUB  SP, SP, #%d // Place param", WORD_SIZE*nb_param);
+       
 
         // On détermine si la fonction appelée a le même chainage dynamique que la fonction appelante
         int imbricationPere = idfParenthesis.getTds().getImbrication();
@@ -397,9 +404,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
     
         str.appendFormattedLine("ADD  SP, SP, #%d // Restore de la place pour les params", WORD_SIZE*nb_param);
 
-        for(int i=0 ; i < nb_param ; i++){ // On restore les anciens registre
-            str.appendFormattedLine("pop X%d // On restore les registres", nb_param-i);
-        }
+        // for(int i=0 ; i < nb_param ; i++){ // On restore les anciens registre
+        //     str.appendFormattedLine("pop X%d // On restore les registres", nb_param-i);
+        // }
         
         str.appendLine("//fin appel de fonction");
 
