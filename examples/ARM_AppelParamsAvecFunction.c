@@ -8,9 +8,7 @@ struct test
 
 
 int recupValue(struct test * b, int a){
-    int a;
-    int b;
-    int c;
+    int d;
     return b->c;
 }
 
