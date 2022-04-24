@@ -79,7 +79,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     private int whileCompt = 0;
     private int ifCompt = 0;
     private int nbCmp = 0;
-    public Boolean sl = true;
+    public Boolean sl = false;
     private StringAggregator data;
 
     private Tds lastUsedTds = null; // nécessaire pour avoir la tds des identifiants quand on utilise les comparaisons dans les while et if dont les idfs sont pas forcéement associé à une tds !!

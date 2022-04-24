@@ -127,10 +127,14 @@ public class Main {
 
                     // ARM
                     TrueARM64Generator arm = new TrueARM64Generator(Os.getOS());
+                    if(testFile.contains("_sl.c")){
+                        arm.sl = true;
+                    }
                     String str = ast.accept(arm);
                     outputARM(str);
                     outputARMinBin(str, testFile);
                 }
+                
 
             } else {
                 System.out.println("erreur syntaxique");
