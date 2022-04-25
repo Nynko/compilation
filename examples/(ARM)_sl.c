@@ -1,39 +1,19 @@
-//0                              (@@) (  ) (@) ( ) @@     ()      @       0       @       0          @
-//1                          (   )
-//2                      (@@@)
-//3                  (    )
-//4 
-//5              (@@@)
-//6          ====        _______               ___________
-//7      _D _|  |_______/       \__I_I____===__|_________|
-//8       |(_)---  |   H\_______/ |   |       =|___ ___|       _________________
-//9       /     |  |   H  |  |    |   |        ||_| |_||      _|                \_____A
-//10     |      |  |   H  |__------------------| [___] |    =|                        |
-//11     | ________|___H__/__|____/[][]~\______|       |    -|                        |
-//12     |/ |   |-----------I____I [][] []  D  |=======|_____|________________________|_
-//13   __/ =| 0 |=-~~\  /~~\  /~~\  /~~\____Y__________|___|__________________________|_
-//14    |/-=|___|=   0=====0=====0=====0|____/~\___/          |_D__D__D_|  |_D__D__D_| 
-//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
-//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-
-//0                              (@@) (  ) (@) ( ) @@     ()      @       0       @       0          @
-//1                          (   )
-//2                      (@@@)
-//3                  (    )
-//4 
-//5              (@@@)
-//6          ====        _______               ___________
-//7      _D _|  |_______/       \__I_I____===__|_________|
-//8       |(_)---  |   H\_______/ |   |       =|___ ___|       _________________
-//9       /     |  |   H  |  |    |   |        ||_| |_||      _|                \_____A
-//10     |      |  |   H  |__------------------| [___] |    =|                        |
-//11     | ________|___H__/__|____/[][]~\______|       |    -|                        |
-//12     |/ |   |-----------I____I [][] []  D  |=======|_____|________________________|_
-//13   __/ =| 0 |=-~~\  /~~\  /~~\  /~~\____Y__________|___|__________________________|_
-//14    |/-=|___|=   0=====0=====0=====0|____/~\___/          |_D__D__D_|  |_D__D__D_| 
-//15     \_/      \__/  \__/  \__/  \__/     \_/               \_/   \_/    \_/   \_/
-//     0123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
-//               012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+//                             (@@) (  ) (@) ( ) @@     ()      @       0       @       0          @
+//                         (   )
+//                     (@@@)
+//                 (    )
+//
+//             (@@@)
+//         ====        _______               ___________
+//     _D _|  |_______/       \__I_I____===__|_________|
+//      |(_)---  |   H\_______/ |   |       =|___ ___|       _________________
+//      /     |  |   H  |  |    |   |        ||_| |_||      _|                \_____A
+//     |      |  |   H  |__------------------| [___] |    =|                        |
+//     | ________|___H__/__|____/[][]~\______|       |    -|                        |
+//     |/ |   |-----------I____I [][] []  D  |=======|_____|________________________|_
+//   __/ =| 0 |=-~~\  /~~\  /~~\  /~~\____Y__________|___|__________________________|_
+//    |/-=|___|=   0=====0=====0=====0|____/~\___/          |_D__D__D_|  |_D__D__D_| 
+//     \_/      \__/  \__/  \__/  \__/     \_/               \_/   \_/    \_/   \_/
 
 struct bloc
 {
@@ -239,7 +219,7 @@ int print_ligne_decalage(struct ligne * lig, int debut, int fin){ // debut = 0 -
 
 if (fin != nb_bloc * 10 - 1){
 	int temp;
-	temp = nb_bloc * 10 - 1;
+	temp = nb_bloc * 10 - 1 - fin;
 	while( temp != 0){
 	print('s');
 	temp = temp - 1;
@@ -370,37 +350,45 @@ int remplissage_mat(struct matrice * mat){
     struct bloc * blo;
 
     // ligne 1
-    lig = get_ligne(mat, 14);
+//0                              (@@) (  ) (@) ( ) @@     ()     @      0         @          0           @
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 0);
     blo = get_bloc(lig, 0);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 1);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = '('; blo->e8 = '@'; blo->e9 = '@'; blo->e10 = ')';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = '('; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = ')'; blo->e6 = 's'; blo->e7 = '('; blo->e8 = '@'; blo->e9 = ')'; blo->e10 = 's';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '('; blo->e2 = 's'; blo->e3 = ')'; blo->e4 = 's'; blo->e5 = '@'; blo->e6 = '@'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = '('; blo->e3 = ')'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '@'; blo->e10 = 's';
     blo = get_bloc(lig, 6);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = '0'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = '@'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 8);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = '0'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '@'; blo->e10 = 's';
 
 
     // ligne 2
-    lig = get_ligne(mat, 14);
+//1                          (   )
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 1);
     blo = get_bloc(lig, 0);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 1);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '('; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = ')'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 4);
@@ -418,13 +406,17 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 3
-    lig = get_ligne(mat, 14);
+//2                      (@@@)
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 2);
     blo = get_bloc(lig, 0);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '('; blo->e10 = '@';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '@'; blo->e2 = '@'; blo->e3 = ')'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 4);
@@ -442,11 +434,15 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 4
-    lig = get_ligne(mat, 14);
+//3                  (    )
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 3);
     blo = get_bloc(lig, 0);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = '('; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = ')';
     blo = get_bloc(lig, 2);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
@@ -466,7 +462,11 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 5
-    lig = get_ligne(mat, 14);
+//4 
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 4);
     blo = get_bloc(lig, 0);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 1);
@@ -490,11 +490,15 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 6
-    lig = get_ligne(mat, 14);
+//5              (@@@)
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 5);
     blo = get_bloc(lig, 0);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '('; blo->e2 = '@'; blo->e3 = '@'; blo->e4 = '@'; blo->e5 = ')'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 2);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
@@ -514,19 +518,23 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 7
-    lig = get_ligne(mat, 14);
+//6          ====        _______               ___________
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 6);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = '='; blo->e8 = '='; blo->e9 = '='; blo->e10 = '=';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 6);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 7);
@@ -538,19 +546,23 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 8
-    lig = get_ligne(mat, 14);
+//7      _D _|  |_______/       \__I_I____===__|_________|
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 7);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '_'; blo->e4 = 'D'; blo->e5 = 's'; blo->e6 = '_'; blo->e7 = '|'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '/'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = '\\'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = 'I'; blo->e10 = '_';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 'I'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '='; blo->e7 = '='; blo->e8 = '='; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 6);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 7);
@@ -562,23 +574,27 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 9
-    lig = get_ligne(mat, 14);
+//8       |(_)---  |   H\_______/ |   |       =|___ ___|       _________________
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 8);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '|'; blo->e5 = '('; blo->e6 = '_'; blo->e7 = ')'; blo->e8 = '-'; blo->e9 = '-'; blo->e10 = '-';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 'H'; blo->e8 = '\\'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '/'; blo->e7 = 's'; blo->e8 = '|'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = '|'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '=';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = 's'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '|'; blo->e10 = 's';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 6);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 8);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
@@ -586,23 +602,27 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 10
-    lig = get_ligne(mat, 14);
+//9       /     |  |   H  |  |    |   |        ||_| |_||      _|                \_____A
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 9);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '/'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 'H'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = '|'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = '|'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = '|'; blo->e3 = '_'; blo->e4 = '|'; blo->e5 = 's'; blo->e6 = '|'; blo->e7 = '_'; blo->e8 = '|'; blo->e9 = '|'; blo->e10 = 's';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = '_'; blo->e7 = '|'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 6);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '\\'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = 'A';
     blo = get_bloc(lig, 8);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
@@ -610,23 +630,27 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 11
-    lig = get_ligne(mat, 14);
+//10     |      |  |   H  |__------------------| [___] |    =|                        |
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 10);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 'H'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '-'; blo->e4 = '-'; blo->e5 = '-'; blo->e6 = '-'; blo->e7 = '-'; blo->e8 = '-'; blo->e9 = '-'; blo->e10 = '-';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '-'; blo->e2 = '-'; blo->e3 = '-'; blo->e4 = '-'; blo->e5 = '-'; blo->e6 = '-'; blo->e7 = '-'; blo->e8 = '-'; blo->e9 = '-'; blo->e10 = '-';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = 's'; blo->e3 = '['; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = ']'; blo->e8 = 's'; blo->e9 = '|'; blo->e10 = 's';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '='; blo->e5 = '|'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 6);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 8);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
@@ -634,23 +658,27 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 12
-    lig = get_ligne(mat, 14);
+//11     | ________|___H__/__|____/[][]~\______|       |    -|                        |
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 11);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = 's'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '|'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = 'H'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '/';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '|'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '/'; blo->e9 = '['; blo->e10 = ']';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '['; blo->e2 = ']'; blo->e3 = '~'; blo->e4 = '\\'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '|'; blo->e10 = 's';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '-'; blo->e5 = '|'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 6);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 8);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
@@ -658,49 +686,57 @@ int remplissage_mat(struct matrice * mat){
 
 
     // ligne 13
-    lig = get_ligne(mat, 14);
+//12     |/ |   |-----------I____I [][] []  D  |=======|_____|________________________|_
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 12);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = '|'; blo->e4 = '/'; blo->e5 = 's'; blo->e6 = '|'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '-'; blo->e2 = '-'; blo->e3 = '-'; blo->e4 = '-'; blo->e5 = '-'; blo->e6 = '-'; blo->e7 = '-'; blo->e8 = '-'; blo->e9 = '-'; blo->e10 = '-';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '-'; blo->e2 = 'I'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = 'I'; blo->e8 = 's'; blo->e9 = '['; blo->e10 = ']';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '['; blo->e2 = ']'; blo->e3 = 's'; blo->e4 = '['; blo->e5 = ']'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 'D'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '|'; blo->e2 = '='; blo->e3 = '='; blo->e4 = '='; blo->e5 = '='; blo->e6 = '='; blo->e7 = '='; blo->e8 = '='; blo->e9 = '|'; blo->e10 = '_';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '|'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 6);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '|';
     blo = get_bloc(lig, 8);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
 
 
     // ligne 14
-    lig = get_ligne(mat, 14);
+//13   __/ =| 0 |=-~~\  /~~\  /~~\  /~~\____Y__________|___|__________________________|_
+//     123456789111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+//              012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    lig = get_ligne(mat, 13);
     blo = get_bloc(lig, 0);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '/'; blo->e4 = 's'; blo->e5 = '='; blo->e6 = '|'; blo->e7 = 's'; blo->e8 = '0'; blo->e9 = 's'; blo->e10 = '|';
     blo = get_bloc(lig, 1);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '='; blo->e2 = '-'; blo->e3 = '~'; blo->e4 = '~'; blo->e5 = '\\'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = '/'; blo->e9 = '~'; blo->e10 = '~';
     blo = get_bloc(lig, 2);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '\\'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = '/'; blo->e5 = '~'; blo->e6 = '~'; blo->e7 = '\\'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = '/';
     blo = get_bloc(lig, 3);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '~'; blo->e2 = '~'; blo->e3 = '\\'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = 'Y'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '|'; blo->e10 = '_';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '|'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 6);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '_'; blo->e10 = '|';
     blo = get_bloc(lig, 8);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '_'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
 
@@ -717,15 +753,15 @@ int remplissage_mat(struct matrice * mat){
     blo = get_bloc(lig, 2);
     blo->e1 = '0'; blo->e2 = '='; blo->e3 = '='; blo->e4 = '='; blo->e5 = '='; blo->e6 = '='; blo->e7 = '0'; blo->e8 = '='; blo->e9 = '='; blo->e10 = '=';
     blo = get_bloc(lig, 3);
-    blo->e1 = '='; blo->e2 = '='; blo->e3 = '0'; blo->e4 = '|'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '='; blo->e2 = '='; blo->e3 = '0'; blo->e4 = '|'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = '_'; blo->e8 = '_'; blo->e9 = '/'; blo->e10 = '~';
     blo = get_bloc(lig, 4);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = '\\'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = '_'; blo->e5 = '/'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 5);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = '|'; blo->e7 = '_'; blo->e8 = 'D'; blo->e9 = '_'; blo->e10 = '_';
     blo = get_bloc(lig, 6);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 'D'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = 'D'; blo->e5 = '_'; blo->e6 = '|'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = '|'; blo->e10 = '_';
     blo = get_bloc(lig, 7);
-    blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
+    blo->e1 = 'D'; blo->e2 = '_'; blo->e3 = '_'; blo->e4 = 'D'; blo->e5 = '_'; blo->e6 = '_'; blo->e7 = 'D'; blo->e8 = '_'; blo->e9 = '|'; blo->e10 = 's';
     blo = get_bloc(lig, 8);
     blo->e1 = 's'; blo->e2 = 's'; blo->e3 = 's'; blo->e4 = 's'; blo->e5 = 's'; blo->e6 = 's'; blo->e7 = 's'; blo->e8 = 's'; blo->e9 = 's'; blo->e10 = 's';
     blo = get_bloc(lig, 9);
@@ -774,7 +810,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, 0, i); // debut = 0 fin = 0 - 99
         j = 0;
-        while (j != 10000)
+        while (j != 10000000)
         {
             j = j + 1;
         }
@@ -786,7 +822,7 @@ int main(){
         int j;
         print_matrice_decalage(mat, i, nb_bloc*10-1); // debut = 1 - 99 fin = 99
         j = 0;
-        while (j != 10000)
+        while (j != 10000000)
         {
             j = j + 1;
         }
