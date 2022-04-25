@@ -3,7 +3,6 @@ package compilateur.ARMGenerator;
 
 import compilateur.ast.Affectation;
 import compilateur.ast.Ast;
-import compilateur.ast.AstNode;
 import compilateur.ast.AstVisitor;
 import compilateur.ast.Bloc;
 import compilateur.ast.CharNode;
@@ -42,8 +41,6 @@ import compilateur.ast.Sizeof;
 import compilateur.ast.Superieur;
 import compilateur.ast.SuperieurEgal;
 import compilateur.ast.While;
-import compilateur.tds.Symbole;
-import compilateur.tds.SymboleInt;
 import compilateur.tds.SymboleStruct;
 import compilateur.tds.SymboleStructContent;
 import compilateur.tds.SymboleVar;
@@ -109,8 +106,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
     // |<- SP
     // |var loc|
     // |@stat @bp |
-    // |dyn @bp |
-    // |@r | <- FP (bp)
+    // |@r |dyn @bp | <- FP (bp)
     // |param |
     @Override
     public String visit(Idf idf) {
@@ -118,8 +114,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
         int decalage = 0;
         Tds tds = idf.getTds();
         String name = idf.name;
-        // System.out.println("BUGGGGG : "+ idf.name + "    -" + tds.getName() + " " + idf);
-        // Avec chainage statique
+   
 
         // Détermination du nombre de remontée de chainage statique
         int imbrication = tds.getImbrication();
@@ -127,9 +122,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On récupère le décalage de la variable
         decalage = ((SymboleVar) tds.findSymbole(name)).getDeplacement(WORD_SIZE); 
-        // TODO: pas le truc le plus propre car incertain potentiellement (on a une valeur d'imbrication qu'on utilise pas pour retrouver le symbole et le déplacement)
-        // ++ TODO: Z'êtes sûr que findSymbole trouvera pas une struct à la place ? 
-
 
         // On remonte les chainages statiques
         str.appendFormattedLine("MOV X17, FP // On récupère le chainage statique", WORD_SIZE);
@@ -139,11 +131,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
         // On récupère la nouvelle valeur depuis l'emplacement'adéquate (passage au full descending avec le moins)
         str.appendFormattedLine("LDR X0, [X17, #%d] // On load la nouvelle valeur depuis l'emplacement adéquate avec chainage statique", -decalage); 
-        // Symbole s = idf.getTds().findSymbole(idf.name);
-        // if (s instanceof SymboleVar sv) {
-        //     decalage = sv.getDeplacement(WORD_SIZE*(-1));
-        // }
-        // str.appendFormattedLine("LDR X0, [FP, #%d] // On récupère dans la pile la valeur de la variable", decalage);
 
         return str.getString();
     }
@@ -367,10 +354,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Ajout des parametres à la pile
         int nb_param = idfParenthesis.exprList.size();
 
-        // for(int i=0 ; i < nb_param ; i++){ // On store les registres que l'on va utilisé
-        //     str.appendFormattedLine("push X%d // On save les registres utilisées", nb_param-i);
-        // }
-
         // on le change le SP au début car on va placer les paramètres dans un ordre particulier
         // et que l'on risque de perdre des données car on push et pop des registres sur la pile 
         // lorsque l'on fait des expressions !!
@@ -384,17 +367,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
 
             // On store le paramètre dans la pile
             str.appendFormattedLine("STR X0, [SP, #%d] // On store les params", WORD_SIZE*i);
-
-            // Putting X0 in the stack
-            // if(nb_param < 17){
-            //     // // On récupère le deplacement
-            //     // if(param.)
-            //     // tds.findSymbole()
-            //     str.appendFormattedLine("MOV X%d, X0 // On sauvegarde le param %d pour la place ",(nb_param-i),i,(nb_param-i));
-            // }
-            // else{
-            //     System.err.println("Trop de param, on gère pas... dsl");
-            // }
 
         }
        
@@ -413,15 +385,9 @@ public class TrueARM64Generator implements AstVisitor<String> {
         // Appel de la fonction
         str.appendFormattedLine("BL _%s", name);
 
-        // str.appendFormattedLine("_breakpoint_%s:", name);
-        // Restauration des registres
-        // str.appendLine("BL __restore_reg__");
     
         str.appendFormattedLine("ADD  SP, SP, #%d // Restore de la place pour les params", WORD_SIZE*nb_param);
 
-        // for(int i=0 ; i < nb_param ; i++){ // On restore les anciens registre
-        //     str.appendFormattedLine("pop X%d // On restore les registres", nb_param-i);
-        // }
         
         str.appendLine("//fin appel de fonction");
 
@@ -737,15 +703,10 @@ public class TrueARM64Generator implements AstVisitor<String> {
             nameStruct = ((Idf)fleche.left).name;
         }
 
-
-        // System.out.println("name: " + tds.getName() + " num region= " + tds.getNumRegion() + " - Symbole: "+ name);
         // On récupère un symbole de struct
         SymboleStruct symboleStruct = (SymboleStruct) tds.findSymbole(nameStruct);
         // On récupère la struct
         struct = symboleStruct.getStruct();
-    
-        // System.out.println("nameStruct: " + nameStruct);
-        // System.out.println("struct: " + struct.getName());
 
         // On récupère le déplacement
         int deplacement = ((SymboleVar) struct.getTds().findSymbole(name)).getDeplacement() - 2; // -2 car on s'en fout de BP et chainage statique
@@ -1072,14 +1033,6 @@ str.appendLine("MOV X0, #0 // On met 0 dans X0");
         str.appendFormattedLine("LDP   LR, FP, [SP], #%d // Restore LR, FP avec post incrémentation",WORD_SIZE);
         
     }
-
-
-    // private void stackParams(StringAggregator str, int numParams){
-    //     // if (numParams != 0) {
-    //     //     str.appendLine("// On empile les param");
-    //     //     str.appendFormattedLine("SUB SP, SP, #%d", numParams * WORD_SIZE);
-    //     // }
-    // }
 
     /** Fonction pour la déclaration de fonction (afin d'éviter redondances entre struct et int)
      * @param str : le StringAggregator qui contient le code à écrire
