@@ -183,6 +183,7 @@ public class TrueARM64Generator implements AstVisitor<String> {
             .global _main             // Provide program starting address to linker
             .align 4        // Nécessaire d'être aligné par 4 pour Darwin
             """);
+            this.data.appendLine(".data");
         }
         else{
             // Initialisation
@@ -194,7 +195,6 @@ public class TrueARM64Generator implements AstVisitor<String> {
             BL _main
             BL __end__
             """);
-            //Si on est en linux: on doit ajouter .data à this.data
             this.data.appendLine(".data");
 
         }
