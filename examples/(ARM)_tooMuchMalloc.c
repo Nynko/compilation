@@ -6,11 +6,10 @@ struct Int{
 int main(){
     int a;
     struct Int * b;
-    a = 247;
+    a = 8185;
     while(a){
         b = malloc(8);
         a = a - 1;
-        print(247-a);
     }
     return 0;
 }

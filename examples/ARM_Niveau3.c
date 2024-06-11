@@ -1,5 +1,5 @@
 int facto(int result) { //Test de factoriel
-    if (result = 0) {
+    if (result == 0) {
         return 1;
     }
     else
