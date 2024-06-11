@@ -15,8 +15,7 @@ java: build
 run: FORCE
 	./gradlew run --args "$(ARGS)"
 
-test: FORCE
-	grammar
+test: grammar
 	./gradlew test
 
 ast: FORCE
