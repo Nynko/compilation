@@ -38,8 +38,14 @@ Lancer le projet :
 ./gradlew run
 ```
 
-Run sl:
+Compiler un fichier sous mac ou linux avec l'executable:
+(Remplacer macos par linux pour les machines linux arm)
 
+```bash
+make macos ARGS="pathToTheCFile"
+```
+
+Run sl:
 (replace macos by linux for arm linux machine)
 
 ```bash
