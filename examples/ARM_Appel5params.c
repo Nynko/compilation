@@ -1,15 +1,15 @@
 
-int func(int c, int d, int e, int f, int g){
+int func(int zzzz, int a, int g, int aaa, int bbb){
 
-    print(c);
-    print(d);
-    print(e); 
-    print(f);
-    print(g);
+    print(zzzz); // 67
+    print(a);
+    print(g); 
+    print(aaa);
+    print(bbb);
     return 0;
 }
 int main(){
-    func(45,43 ,56, 67, 78);
+    func(67,43 ,78, 67, 2);
     return 0;
 }
 

@@ -57,8 +57,6 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Idf idf, Tds tds) {
-
-        idf.setTds(tds);
         Symbole sym = tds.findSymbole(idf.name);
         if (sym instanceof SymboleFonction symfct) {
             return symfct.getReturnType();
@@ -69,6 +67,10 @@ public class TypeVisitor implements TdsVisitor<String> {
         } else if (sym instanceof SymboleStructContent symstructcontent) {
             return TYPESTRUCT + symstructcontent.getName();
         } else {
+            SymboleStructContent sb = tds.findSymboleStruct("struct_" + idf.name);
+            if (sb != null) {
+                return sb.getType();
+            }
             errors.addError(new UndefinedSymboleException(idf.name, idf.line));
         }
         return null;
@@ -116,13 +118,11 @@ public class TypeVisitor implements TdsVisitor<String> {
 
     @Override
     public String visit(Sizeof sizeof, Tds tds) {
-        sizeof.setTds(tds);
         return "int";
     }
 
     @Override
     public String visit(IdfParenthesis idfParenthesis, Tds tds) {
-        idfParenthesis.setTds(tds);
         int nbParam = idfParenthesis.exprList.size();
         String fctName = ((Idf) idfParenthesis.idf).name;
         Symbole sym = tds.findSymbole(fctName);
@@ -142,7 +142,7 @@ public class TypeVisitor implements TdsVisitor<String> {
                 if (s instanceof SymboleInt) {
                     paramTypeRef = "int";
                 } else if (s instanceof SymboleStruct symstruct) {
-                    paramTypeRef = TYPESTRUCT + symstruct.getStruct().getName();
+                    paramTypeRef = symstruct.getType();
                 }
                 String paramType = idfParenthesis.exprList.get(i).accept(this, tds);
                 if (!paramType.equals(paramTypeRef)) {
@@ -233,16 +233,19 @@ public class TypeVisitor implements TdsVisitor<String> {
             }
             if (affectation.left instanceof Idf idf) {
                 Symbole s = tds.findSymbole(idf.name);
+                // System.out.println("y " + idf.name + " " + s + " " + affectation.line);
                 if (s instanceof SymboleVar sv) {
                     sv.setInitalized(true);
                 }
-            } else if (affectation.left instanceof Fleche fleche) {
-                Idf idf = (Idf) fleche.right;
-                Symbole s = tds.findSymbole(idf.name);
-                if (s instanceof SymboleVar sv) {
-                    sv.setInitalized(true);
-                }
-            }
+            } 
+            // else if (affectation.left instanceof Fleche fleche) {
+            //     Idf idf = (Idf) fleche.left;
+            //     Symbole s = tds.findSymbole(idf.name);
+            //     System.out.println("x " + idf.name + " " + s + " " + affectation.line);
+            //     if (s instanceof SymboleVar sv) {
+            //         sv.setInitalized(true);
+            //     }
+            // }
             return leftType;
         }
 
@@ -261,9 +264,9 @@ public class TypeVisitor implements TdsVisitor<String> {
         String rightType = fleche.right.accept(this, tdsStruct);
 
         // si a droite c'est un idf
-        if (rightType == null || !this.testIfIsIdfAndInitialized(fleche.right, tds, fleche.line)) {
-            return null;
-        }
+        // if (rightType == null || !this.testIfIsIdfAndInitialized(fleche.right, tds, fleche.line)) {
+        //     return null;
+        // }
         // si a gauche c'est un idf
         if (!this.testIfIsIdfAndInitialized(fleche.left, tds, fleche.line)) {
             return null;
