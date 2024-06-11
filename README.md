@@ -37,3 +37,12 @@ Lancer le projet :
 ```bash
 ./gradlew run
 ```
+
+Run sl:
+
+(replace macos by linux for arm linux machine)
+
+```bash
+make macos ARGS=./examples/\(ARM\)_sl.c
+./out/ARM
+```
